@@ -1,0 +1,43 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments :: head"></head>
+
+<body>
+
+<nav th:replace="fragments :: navigation"></nav>
+
+<div class="container">
+    <div class="starter-template">
+        <div class="page-header"><h1 th:text="${questions.category}">1) Overarching Capabilities</h1></div>
+        <h2 th:text="${questions.subCategory}">Multi-Agency Command, Control and Coordination</h2>
+        <form action="#" th:action="@{/question}" th:object="${answers}" method="post" class="form-horizontal">
+            <div th:each="question,questionStat : ${questions.questionList}">
+                <div class="row">
+                    <div class="col-xs-3"><strong>No.:</strong> <span th:text="${question.number}"/></div>
+                    <div class="col-xs-9"><strong>Response action:</strong> <span th:text="${question.text}"/></div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-3">
+                        <div>
+                            <select th:field="*{answerList[__${questionStat.index}__].piGrade}" class="form-control input-lg" style="color: #999;">
+                                <option value="0" hidden="hidden" style="color: #999">select PI Grade..</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-xs-9">
+                        <textarea th:field="*{answerList[__${questionStat.index}__].comments}" class="form-control input-lg" placeholder="enter comments"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div th:replace="fragments :: buttons"/>
+        </form>
+    </div>
+</div>
+
+<span th:replace="fragments :: bootrapScript"></span>
+
+</body>
+</html>

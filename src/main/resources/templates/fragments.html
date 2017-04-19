@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head">
+    <title>IAEA - SACS</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" type="text/css" href="webjars/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel="stylesheet" th:href="@{/css/main.css}" href="../../css/main.css" />
+</head>
+<body>
+<nav class="navbar navbar-inverse" th:fragment="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">IAEA - SACS</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="#">Home</a></li>
+                <li><a href="#about">About</a></li>
+            </ul>
+            <span th:text="${common.companyName}">company</span>
+        </div>
+    </div>
+</nav>
+
+<script type="text/javascript" src="webjars/bootstrap/3.3.7/js/bootstrap.min.js" th:fragment="bootrapScript"></script>
+
+<div class="row" th:fragment="buttons">
+    <div class="col-xs-6">
+        <button type="submit" class="btn btn-primary btn-lg btn-block" name="action" value="previous"><span class="glyphicon glyphicon-arrow-left"/> Previous</button>
+    </div>
+    <div class="col-xs-6">
+        <button type="submit" class="btn btn-primary btn-lg btn-block" name="action" value="next">Next <span class="glyphicon glyphicon-arrow-right"/></button>
+    </div>
+</div>
+
+</body>
+</html>

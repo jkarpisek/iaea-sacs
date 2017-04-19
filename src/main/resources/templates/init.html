@@ -1,0 +1,27 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments :: head"></head>
+
+<body>
+
+<nav th:replace="fragments :: navigation"></nav>
+
+<div class="container">
+    <div class="starter-template">
+        <h1>SACS questionnaire</h1>
+        <form action="#" th:action="@{/init}" th:object="${init}" method="post">
+            <div class="row">
+                <div class="col-xs-6">
+                    <input type="text" class="form-control input-lg" placeholder="Name of company" th:field="*{companyName}" />
+                </div>
+                <div class="col-xs-6">
+                    <button type="submit" class="btn btn-primary btn-lg btn-block" name="action" value="next">Next <span class="glyphicon glyphicon-arrow-right"/></button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<span th:replace="fragments :: bootrapScript"></span>
+
+</body>
+</html>
