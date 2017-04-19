@@ -7,7 +7,6 @@ import java.util.List;
  */
 public class CommonVo {
     private String companyName;
-    private String action;
     private List<String> actions;
 
     public String getCompanyName() {
@@ -16,14 +15,6 @@ public class CommonVo {
 
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
-    }
-
-    public String getAction() {
-        return action;
-    }
-
-    public void setAction(String action) {
-        this.action = action;
     }
 
     public List<String> getActions() {

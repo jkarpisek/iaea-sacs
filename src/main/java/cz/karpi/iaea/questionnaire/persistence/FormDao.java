@@ -21,9 +21,6 @@ import cz.karpi.iaea.questionnaire.model.Category;
 import cz.karpi.iaea.questionnaire.model.SACSForm;
 import cz.karpi.iaea.questionnaire.model.SubCategory;
 
-/**
- * Created by karpi on 12.4.17.
- */
 @Repository
 public class FormDao {
 
@@ -31,13 +28,20 @@ public class FormDao {
     private static final String EXCEL_NAME = "SACS Grid CDP-{0}.xlsx";
     private static final String EXCEL_SHEET_NAME = "1-SACS";
 
+    private static final Integer FIRST_CELL_INDEX = 0;
+    private static final Integer SUBCATEGORY_CELL_INDEX = 1;
+    private static final Integer QUESTION_CELL_INDEX = 2;
+    private static final Integer ADDITIONAL_COMMENTS_CELL_INDEX = 2;
+    private static final Integer PI_GRADE_CELL_INDEX = 3;
+    private static final Integer COMMENTS_CELL_INDEX = 4;
+
     private XSSFWorkbook loadWorkbook(String fileName) {
         try {
             final File myFile = new File(fileName);
-            final FileInputStream fis = new FileInputStream(myFile); // Finds the workbook instance for XLSX file
-            return new XSSFWorkbook(fis); // Return first sheet from the XLSX workbook
+            final FileInputStream fis = new FileInputStream(myFile);
+            return new XSSFWorkbook(fis);
         } catch (Exception e) {
-            throw new DaoExpcetion("", e);
+            throw new DaoExpcetion("Load file failed", e);
         }
     }
 
@@ -46,7 +50,7 @@ public class FormDao {
             FileOutputStream os = new FileOutputStream(new File(fileName));
             workbook.write(os);
         } catch (Exception e) {
-            throw new DaoExpcetion("", e);
+            throw new DaoExpcetion("Save file failed", e);
         }
     }
 
@@ -56,7 +60,7 @@ public class FormDao {
         try {
             FileCopyUtils.copy(source, dest);
         } catch (IOException e) {
-            throw new DaoExpcetion("", e);
+            throw new DaoExpcetion("Copy template file failed", e);
         }
     }
 
@@ -67,23 +71,27 @@ public class FormDao {
 
         answerRows.forEach(answerRow -> {
             final Row row = mySheet.getRow(answerRow.getRowNum());
-            row.getCell(4).setCellValue(answerRow.getComments());
+            if (answerRow.getClass().isAssignableFrom(AdditionalCommentsRow.class)) {
+                row.getCell(ADDITIONAL_COMMENTS_CELL_INDEX).setCellValue(answerRow.getComments());
+            } else if (answerRow.getClass().isAssignableFrom(AnswerWithPiGradeRow.class)) {
+                row.getCell(PI_GRADE_CELL_INDEX).setCellValue(((AnswerWithPiGradeRow) answerRow).getPiGrade());
+                row.getCell(COMMENTS_CELL_INDEX).setCellValue(answerRow.getComments());
+            }
         });
         saveWorkbook(workbook, excelName);
     }
 
     public SACSForm getSACSForm(String companyName) {
         final String excelName = MessageFormat.format(EXCEL_NAME, companyName);
-        final Sheet mySheet = loadWorkbook(excelName).getSheet(EXCEL_SHEET_NAME); // Get iterator to all the rows in current sheet
+        final Sheet mySheet = loadWorkbook(excelName).getSheet(EXCEL_SHEET_NAME);
         final SACSForm sacsForm = new SACSForm();
         Category category = null;
         SubCategory subCategory = null;
         for (Row row : mySheet) {
             if (row.getRowNum() > 0) {
-                final String firstCellContent = row.getCell(0).getStringCellValue();
+                final String firstCellContent = row.getCell(FIRST_CELL_INDEX).getStringCellValue();
                 if (firstCellContent.matches("[A-Z]+-[0-9]+")) {
-                    //otazka
-                    final String subCategoryName = row.getCell(1).getStringCellValue();
+                    final String subCategoryName = row.getCell(SUBCATEGORY_CELL_INDEX).getStringCellValue();
                     if (!subCategoryName.isEmpty()) {
                         subCategory = new SubCategory();
                         subCategory.setName(subCategoryName);
@@ -93,22 +101,21 @@ public class FormDao {
                     final AnswerWithPiGradeRow answerWithPiGradeRow = new AnswerWithPiGradeRow();
                     answerWithPiGradeRow.setRowNum(row.getRowNum());
                     answerWithPiGradeRow.setNumber(firstCellContent);
-                    answerWithPiGradeRow.setQuestion(row.getCell(2).getStringCellValue());
-                    answerWithPiGradeRow.setPiGrade(Double.valueOf(row.getCell(3).getNumericCellValue()).intValue());
-                    answerWithPiGradeRow.setComments(row.getCell(4).getStringCellValue());
+                    answerWithPiGradeRow.setQuestion(row.getCell(QUESTION_CELL_INDEX).getStringCellValue());
+                    answerWithPiGradeRow.setPiGrade(Double.valueOf(row.getCell(PI_GRADE_CELL_INDEX).getNumericCellValue()).intValue());
+                    answerWithPiGradeRow.setComments(row.getCell(COMMENTS_CELL_INDEX).getStringCellValue());
                     answerWithPiGradeRow.setSubCategory(subCategory);
                     subCategory.getAnswerRows().add(answerWithPiGradeRow);
-                } else if (firstCellContent.matches("[A-Z]+-X") || row.getCell(1).getStringCellValue().equalsIgnoreCase("Additional written comments:")) {
-                    //additional comments
+                } else if (firstCellContent.matches("[A-Z]+-X")
+                           || row.getCell(SUBCATEGORY_CELL_INDEX).getStringCellValue().equalsIgnoreCase("Additional written comments:")) {
                     final AdditionalCommentsRow additionalCommentsRow = new AdditionalCommentsRow();
                     additionalCommentsRow.setRowNum(row.getRowNum());
                     additionalCommentsRow.setNumber(firstCellContent);
-                    additionalCommentsRow.setQuestion(row.getCell(1).getStringCellValue());
-                    additionalCommentsRow.setComments(row.getCell(2).getStringCellValue());
+                    additionalCommentsRow.setQuestion(row.getCell(QUESTION_CELL_INDEX).getStringCellValue());
+                    additionalCommentsRow.setComments(row.getCell(ADDITIONAL_COMMENTS_CELL_INDEX).getStringCellValue());
                     additionalCommentsRow.setSubCategory(subCategory);
                     subCategory.getAnswerRows().add(additionalCommentsRow);
                 } else if (firstCellContent.matches("[0-9]+\\).+")) {
-                    //kategorie
                     category = new Category();
                     category.setName(firstCellContent);
                     sacsForm.getCategories().add(category);

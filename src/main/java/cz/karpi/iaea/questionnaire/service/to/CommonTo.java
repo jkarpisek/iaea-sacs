@@ -3,13 +3,15 @@ package cz.karpi.iaea.questionnaire.service.to;
 import java.util.ArrayList;
 import java.util.List;
 
+import cz.karpi.iaea.questionnaire.service.FlowService;
+
 /**
  * Created by karpi on 18.4.17.
  */
 public class CommonTo {
     private String companyName;
     private String state;
-    private List<String> actions;
+    private List<FlowService.EAction> actions;
 
     public String getCompanyName() {
         return companyName;
@@ -27,14 +29,14 @@ public class CommonTo {
         this.state = state;
     }
 
-    public List<String> getActions() {
+    public List<FlowService.EAction> getActions() {
         if (actions == null) {
             actions = new ArrayList<>();
         }
         return actions;
     }
 
-    public void setActions(List<String> actions) {
+    public void setActions(List<FlowService.EAction> actions) {
         this.actions = actions;
     }
 }

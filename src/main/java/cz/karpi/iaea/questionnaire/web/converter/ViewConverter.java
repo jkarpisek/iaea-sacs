@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
 
+import cz.karpi.iaea.questionnaire.service.FlowService;
 import cz.karpi.iaea.questionnaire.service.to.AnswerTo;
 import cz.karpi.iaea.questionnaire.service.to.AnswersTo;
 import cz.karpi.iaea.questionnaire.service.to.CommonTo;
@@ -58,6 +59,7 @@ public class ViewConverter {
     public CommonVo toCommonVo(CommonTo commonTo) {
         final CommonVo commonVo = new CommonVo();
         commonVo.setCompanyName(commonTo.getCompanyName());
+        commonVo.setActions(commonTo.getActions().stream().map(FlowService.EAction::name).collect(Collectors.toList()));
         return commonVo;
     }
 
@@ -74,5 +76,9 @@ public class ViewConverter {
         questionVo.setNumber(questionTo.getNumber());
         questionVo.setText(questionTo.getText());
         return questionVo;
+    }
+
+    public FlowService.EAction convertToEAction(String action) {
+        return FlowService.EAction.valueOf(action.toUpperCase());
     }
 }

@@ -14,7 +14,7 @@
                     <input type="text" class="form-control input-lg" placeholder="Name of company" th:field="*{companyName}" />
                 </div>
                 <div class="col-xs-6">
-                    <button type="submit" class="btn btn-primary btn-lg btn-block" name="action" value="next">Next <span class="glyphicon glyphicon-arrow-right"/></button>
+                    <span th:replace="fragments :: buttonNext"/>
                 </div>
             </div>
         </form>

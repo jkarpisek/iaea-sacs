@@ -26,12 +26,17 @@
 
 <div class="row" th:fragment="buttons">
     <div class="col-xs-6">
-        <button type="submit" class="btn btn-primary btn-lg btn-block" name="action" value="previous"><span class="glyphicon glyphicon-arrow-left"/> Previous</button>
+        <span th:replace="fragments :: buttonPrevious"/>
     </div>
     <div class="col-xs-6">
-        <button type="submit" class="btn btn-primary btn-lg btn-block" name="action" value="next">Next <span class="glyphicon glyphicon-arrow-right"/></button>
+        <span th:replace="fragments :: buttonNext"/>
+        <span th:replace="fragments :: buttonFinish"/>
     </div>
 </div>
+
+<button th:fragment="buttonPrevious" th:if="${#lists.contains(common.actions, 'PREVIOUS')}" type="submit" class="btn btn-primary btn-lg btn-block" name="action" value="previous"><span class="glyphicon glyphicon-arrow-left"/> Previous</button>
+<button th:fragment="buttonNext" th:if="${#lists.contains(common.actions, 'NEXT')}" type="submit" class="btn btn-primary btn-lg btn-block" name="action" value="next">Next <span class="glyphicon glyphicon-arrow-right"/></button>
+<button th:fragment="buttonFinish" th:if="${#lists.contains(common.actions, 'FINISH')}" type="submit" class="btn btn-primary btn-lg btn-block" name="action" value="next">Finish <span class="glyphicon glyphicon-flag"/></button>
 
 </body>
 </html>

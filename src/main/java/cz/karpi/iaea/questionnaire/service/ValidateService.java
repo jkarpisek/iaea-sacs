@@ -13,12 +13,14 @@ import cz.karpi.iaea.questionnaire.service.to.InitTo;
 @Service
 public class ValidateService {
 
+    private static final Integer MIN_PI_GRADE = 1;
+    private static final Integer MAX_PI_GRADE = 4;
+
     public void validate(InitTo initTo) {
         if (initTo.getCompanyName() == null || initTo.getCompanyName().isEmpty()) {
             throw new ValidationException();
         }
     }
-
 
     public void validate(AnswersTo answersTo) {
         if (answersTo.getAnswerList().stream().anyMatch(this::validate)) {
@@ -27,7 +29,8 @@ public class ValidateService {
     }
 
     private boolean validate(AnswerTo answerTo) {
-        return answerTo.getComments().isEmpty() || answerTo.getPiGrade() < 1 || answerTo.getPiGrade() > 4;
+        //todo not validate additional comments
+        return answerTo.getComments().isEmpty() || answerTo.getPiGrade() < MIN_PI_GRADE || answerTo.getPiGrade() > MAX_PI_GRADE;
     }
 
     

@@ -14,9 +14,6 @@ import cz.karpi.iaea.questionnaire.service.to.InitTo;
 import cz.karpi.iaea.questionnaire.service.to.QuestionTo;
 import cz.karpi.iaea.questionnaire.service.to.QuestionsTo;
 
-/**
- * Created by karpi on 15.4.17.
- */
 @Service
 public class QuestionnaireFacadeService {
 
@@ -42,12 +39,12 @@ public class QuestionnaireFacadeService {
 
     public AnswersTo getAnswersTo() {
         final AnswersTo answersTo = new AnswersTo();
-        answersTo.setAnswerList(formService.getCurrentAnswerRows().stream().map(this::ddd).collect(Collectors.toList()));
+        answersTo.setAnswerList(formService.getCurrentAnswerRows().stream().map(this::mapToAnswer).collect(Collectors.toList()));
         return answersTo;
     }
 
-    public void question(AnswersTo answersTo, String action) {
-        if (action.equals("next")) {
+    public void question(AnswersTo answersTo, FlowService.EAction action) {
+        if (action.equals(FlowService.EAction.NEXT)) {
             validateService.validate(answersTo);
             formService.saveAnswer(answersTo);
         }
@@ -67,25 +64,25 @@ public class QuestionnaireFacadeService {
         final SubCategory subCategory = formService.getCurrentAnswerRows().get(0).getSubCategory();
         questionsTo.setSubCategory(subCategory.getName());
         questionsTo.setCategory(subCategory.getCategory().getName());
-        questionsTo.setQuestionList(formService.getCurrentAnswerRows().stream().map(this::dd).collect(Collectors.toList()));
+        questionsTo.setQuestionList(formService.getCurrentAnswerRows().stream().map(this::mapToQuestion).collect(Collectors.toList()));
         return questionsTo;
     }
 
-    private AnswerTo ddd(AbstractAnswerRow answerRow) {
+    private AnswerTo mapToAnswer(AbstractAnswerRow answerRow) {
         final AnswerTo answerTo = new AnswerTo();
         answerRow.setNumber(answerRow.getNumber());
         answerRow.setComments(answerRow.getComments());
         return answerTo;
     }
 
-    private QuestionTo dd(AbstractAnswerRow answerRow) {
+    private QuestionTo mapToQuestion(AbstractAnswerRow answerRow) {
         final QuestionTo questionTo = new QuestionTo();
         questionTo.setNumber(answerRow.getNumber());
         questionTo.setText(answerRow.getQuestion());
         return questionTo;
     }
 
-    public void instruction(String action) {
+    public void instruction(FlowService.EAction action) {
         flowService.moveCounterTo(action);
     }
 }

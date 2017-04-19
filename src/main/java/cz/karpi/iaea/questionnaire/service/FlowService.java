@@ -15,6 +15,9 @@ import cz.karpi.iaea.questionnaire.model.Flow;
  */
 @Service
 public class FlowService {
+
+    public enum EAction { PREVIOUS, NEXT, FINISH }
+
     private Flow flow = new Flow();
 
     @Autowired
@@ -24,8 +27,8 @@ public class FlowService {
         return flow;
     }
 
-    public void moveCounterTo(String action) {
-        if (action.equalsIgnoreCase("previous")) {
+    public void moveCounterTo(EAction action) {
+        if (action.equals(EAction.PREVIOUS)) {
             moveCounterToPrevious();
         } else {
             moveCounterToNext();
@@ -86,23 +89,23 @@ public class FlowService {
         }
     }
 
-    public List<String> getPossibilityActions() {
-        final List<String> actions;
+    public List<EAction> getPossibilityActions() {
+        final List<EAction> actions;
         switch (flow.getFlowType()) {
             case INIT:
-                actions = Collections.singletonList("next");
+                actions = Collections.singletonList(EAction.NEXT);
                 break;
             case INSTRUCTION:
-                actions = Arrays.asList("previous", "next");
+                actions = Arrays.asList(EAction.PREVIOUS, EAction.NEXT);
                 break;
             case QUESTION:
                 actions = new ArrayList<>();
-                actions.add("previous");
+                actions.add(EAction.PREVIOUS);
                 if (formService.getSacsForm().getCategories().get(flow.getCurrentIndex()).getSubCategories().size() > flow.getCurrentSubIndex() + 1
                     || formService.getSacsForm().getCategories().size() > flow.getCurrentIndex() + 1){
-                    actions.add("next");
+                    actions.add(EAction.NEXT);
                 } else {
-                    actions.add("finish");
+                    actions.add(EAction.FINISH);
                 }
                 break;
             default:
