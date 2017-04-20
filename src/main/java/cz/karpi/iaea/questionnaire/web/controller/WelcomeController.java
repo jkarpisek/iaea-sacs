@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -48,17 +49,15 @@ public class WelcomeController {
     }
 
     @RequestMapping(value = "/init", method = RequestMethod.POST)
-    public String initQuestionnaire(@ModelAttribute InitVo initVo, BindingResult errors, Model model) throws Exception {
+    public String initQuestionnaire(@ModelAttribute(MODEL_ATTRIBUTE_INIT) InitVo initVo, BindingResult errors, Model model) throws Exception {
         try {
             questionnaireFacadeService.init(viewConverter.toInitTo(initVo));
         } catch (ValidationException e) {
-            /*todo zobrazeni*/
-            errors.addError(new FieldError(MODEL_ATTRIBUTE_INIT, "companyName", "Cannot be empty"));
+            errors.addError(new ObjectError(MODEL_ATTRIBUTE_INIT, ""));
         }
         final CommonTo commonTo = questionnaireFacadeService.getCommonTo();
         model.addAttribute(MODEL_ATTRIBUTE_COMMON, viewConverter.toCommonVo(commonTo));
         if (errors.hasErrors()) {
-            model.addAttribute(MODEL_ATTRIBUTE_INIT, initVo);
             return commonTo.getState().toLowerCase();
         }
         return "redirect:/" + commonTo.getState().toLowerCase();
@@ -89,7 +88,7 @@ public class WelcomeController {
     }
 
     @RequestMapping(value = "/question", method = RequestMethod.POST)
-    public String questionPost(@ModelAttribute AnswersVo answerVo, @RequestParam String action, BindingResult errors, Model model) throws Exception {
+    public String questionPost(@ModelAttribute(MODEL_ATTRIBUTE_ANSWERS) AnswersVo answerVo, @RequestParam String action, BindingResult errors, Model model) throws Exception {
         try {
             questionnaireFacadeService.question(viewConverter.toAnswersTo(answerVo), viewConverter.convertToEAction(action));
         } catch (ValidationException e) {
@@ -100,7 +99,6 @@ public class WelcomeController {
         model.addAttribute(MODEL_ATTRIBUTE_COMMON, viewConverter.toCommonVo(commonTo));
         model.addAttribute(MODEL_ATTRIBUTE_QUESTION, viewConverter.toQuestionsVo(questionnaireFacadeService.getQuestionsTo()));
         if (errors.hasErrors()) {
-            model.addAttribute(MODEL_ATTRIBUTE_ANSWERS, answerVo);
             return null;
         }
         model.addAttribute(MODEL_ATTRIBUTE_ANSWERS, viewConverter.toAnswersVo(questionnaireFacadeService.getAnswersTo()));

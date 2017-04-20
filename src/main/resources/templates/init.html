@@ -9,12 +9,15 @@
     <div class="starter-template">
         <h1>SACS questionnaire</h1>
         <form action="#" th:action="@{/init}" th:object="${init}" method="post">
+            <div class="row" th:if="${#fields.hasAnyErrors()}">
+                <div class="col-xs-12">Form contains errors, please correct it.</div>
+            </div>
             <div class="row">
-                <div class="col-xs-6">
+                <div th:class="${#fields.hasAnyErrors()} ? 'col-xs-6 has-error' : 'col-xs-6'">
                     <input type="text" class="form-control" placeholder="Name of company" th:field="*{companyName}" />
                 </div>
                 <div class="col-xs-6">
-                    <span th:replace="fragments :: buttonNext"/>
+                    <span th:replace="fragments :: buttonNext"></span>
                 </div>
             </div>
         </form>
