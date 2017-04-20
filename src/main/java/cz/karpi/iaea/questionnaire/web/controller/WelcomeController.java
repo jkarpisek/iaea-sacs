@@ -5,11 +5,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 import cz.karpi.iaea.questionnaire.service.QuestionnaireFacadeService;
 import cz.karpi.iaea.questionnaire.service.exception.ValidationException;
@@ -53,7 +54,7 @@ public class WelcomeController {
         try {
             questionnaireFacadeService.init(viewConverter.toInitTo(initVo));
         } catch (ValidationException e) {
-            errors.addError(new ObjectError(MODEL_ATTRIBUTE_INIT, ""));
+            errors.addError(new FieldError(MODEL_ATTRIBUTE_INIT, "companyName", ""));
         }
         final CommonTo commonTo = questionnaireFacadeService.getCommonTo();
         model.addAttribute(MODEL_ATTRIBUTE_COMMON, viewConverter.toCommonVo(commonTo));
@@ -92,8 +93,9 @@ public class WelcomeController {
         try {
             questionnaireFacadeService.question(viewConverter.toAnswersTo(answerVo), viewConverter.convertToEAction(action));
         } catch (ValidationException e) {
-            /*todo zobrazeni*/
-            errors.addError(new FieldError(MODEL_ATTRIBUTE_ANSWERS, "comments", "Cannot be empty"));
+            ((List<Object[]>) e.getErrors()).forEach(objs -> {
+                errors.addError(new FieldError(MODEL_ATTRIBUTE_ANSWERS, "answerList[" + objs[0] + "]." + objs[1], "Cannot be empty"));
+            });
         }
         final CommonTo commonTo = questionnaireFacadeService.getCommonTo();
         model.addAttribute(MODEL_ATTRIBUTE_COMMON, viewConverter.toCommonVo(commonTo));

@@ -9,11 +9,11 @@
     <div class="starter-template">
         <h1>SACS questionnaire</h1>
         <form action="#" th:action="@{/init}" th:object="${init}" method="post">
-            <div class="row" th:if="${#fields.hasAnyErrors()}">
+            <div class="row common-errors" th:if="${#fields.hasAnyErrors()}">
                 <div class="col-xs-12">Form contains errors, please correct it.</div>
             </div>
             <div class="row">
-                <div th:class="${#fields.hasAnyErrors()} ? 'col-xs-6 has-error' : 'col-xs-6'">
+                <div th:class="${#fields.hasErrors('companyName')} ? 'col-xs-6 has-error' : 'col-xs-6'">
                     <input type="text" class="form-control" placeholder="Name of company" th:field="*{companyName}" />
                 </div>
                 <div class="col-xs-6">

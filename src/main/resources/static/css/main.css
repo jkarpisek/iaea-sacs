@@ -27,3 +27,10 @@ body {
 .pi-grade:required:invalid > option {
     color: #555;
 }
+.common-errors {
+    color: red;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    padding: 20px 0;
+}

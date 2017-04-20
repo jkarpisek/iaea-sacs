@@ -7,17 +7,19 @@
 
 <div class="container">
     <div class="starter-template">
-        <!--TODO errors-->
         <h1 th:text="${questions.category}">1) Overarching Capabilities</h1>
         <h2 th:text="${questions.subCategory}">Multi-Agency Command, Control and Coordination</h2>
         <form action="#" th:action="@{/question}" th:object="${answers}" method="post" class="form-horizontal">
+            <div class="row common-errors" th:if="${#fields.hasAnyErrors()}">
+                <div class="col-xs-12">Form contains errors, please correct it.</div>
+            </div>
             <div th:each="question,questionStat : ${questions.questionList}" class="question-box">
                 <div class="row">
                     <div class="col-xs-3"><strong>No.:</strong> <span th:text="${question.number}"></span></div>
                     <div th:if="${question.type == 'AnswerWithPiGradeRow'}" class="col-xs-9"><strong>Response action:</strong> <span th:text="${question.text}"></span></div>
                 </div>
                 <div class="row">
-                    <div th:if="${question.type == 'AnswerWithPiGradeRow'}" class="col-xs-3">
+                    <div th:if="${question.type == 'AnswerWithPiGradeRow'}" th:class="${#fields.hasErrors('answerList[__${questionStat.index}__].piGrade')} ? 'col-xs-3 has-error' : 'col-xs-3'">
                         <select title="PI Grade" th:field="*{answerList[__${questionStat.index}__].piGrade}" class="form-control pi-grade" required="required">
                             <option value="">select PI Grade..</option>
                             <option value="3">3 - MS has full confidence in its capability</option>
@@ -26,10 +28,10 @@
                             <option value="0">0 - no capability in place</option>
                         </select>
                     </div>
-                    <div th:if="${question.type == 'AnswerWithPiGradeRow'}" class="col-xs-9">
+                    <div th:if="${question.type == 'AnswerWithPiGradeRow'}" th:class="${#fields.hasErrors('answerList[__${questionStat.index}__].comments')} ? 'col-xs-9 has-error' : 'col-xs-9'">
                         <textarea th:field="*{answerList[__${questionStat.index}__].comments}" class="form-control" placeholder="enter comments" required="required"></textarea>
                     </div>
-                    <div th:if="${question.type == 'AdditionalCommentsRow'}" class="col-xs-12">
+                    <div th:if="${question.type == 'AdditionalCommentsRow'}" th:class="${#fields.hasErrors('answerList[__${questionStat.index}__].comments')} ? 'col-xs-12 has-error' : 'col-xs-12'">
                         <textarea th:field="*{answerList[__${questionStat.index}__].comments}" class="form-control" placeholder="enter additional comments"></textarea>
                     </div>
                 </div>
