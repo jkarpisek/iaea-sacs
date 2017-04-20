@@ -7,30 +7,29 @@
 
 <div class="container">
     <div class="starter-template">
-        <div class="page-header"><h1 th:text="${questions.category}">1) Overarching Capabilities</h1></div>
+        <h1 th:text="${questions.category}">1) Overarching Capabilities</h1>
         <h2 th:text="${questions.subCategory}">Multi-Agency Command, Control and Coordination</h2>
         <form action="#" th:action="@{/question}" th:object="${answers}" method="post" class="form-horizontal">
-            <div th:each="question,questionStat : ${questions.questionList}">
+            <div th:each="question,questionStat : ${questions.questionList}" class="question-box">
                 <div class="row">
                     <div class="col-xs-3"><strong>No.:</strong> <span th:text="${question.number}"/></div>
-                    <div class="col-xs-9"><strong>Response action:</strong> <span th:text="${question.text}"/></div>
+                    <div th:if="${question.type == 'AnswerWithPiGradeRow'}" class="col-xs-9"><strong>Response action:</strong> <span th:text="${question.text}"/></div>
                 </div>
-                <!--todo additional comments-->
-                <!--todo css-->
                 <div class="row">
-                    <div class="col-xs-3">
-                        <div>
-                            <select th:field="*{answerList[__${questionStat.index}__].piGrade}" class="form-control input-lg" style="color: #999;">
-                                <option value="0" hidden="hidden" style="color: #999">select PI Grade..</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                            </select>
-                        </div>
+                    <div th:if="${question.type == 'AnswerWithPiGradeRow'}" class="col-xs-3">
+                        <select th:field="*{answerList[__${questionStat.index}__].piGrade}" class="form-control pi-grade" required="required">
+                            <option value="">select PI Grade..</option>
+                            <option value="3">3 - MS has full confidence in its capability</option>
+                            <option value="2">2 - good confidence in the MS capability</option>
+                            <option value="1">1 - low confidence in the MS capability</option>
+                            <option value="0">0 - no capability in place</option>
+                        </select>
                     </div>
-                    <div class="col-xs-9">
-                        <textarea th:field="*{answerList[__${questionStat.index}__].comments}" class="form-control input-lg" placeholder="enter comments"></textarea>
+                    <div th:if="${question.type == 'AnswerWithPiGradeRow'}" class="col-xs-9">
+                        <textarea th:field="*{answerList[__${questionStat.index}__].comments}" class="form-control" placeholder="enter comments" required="required"></textarea>
+                    </div>
+                    <div th:if="${question.type == 'AdditionalCommentsRow'}" class="col-xs-12">
+                        <textarea th:field="*{answerList[__${questionStat.index}__].comments}" class="form-control" placeholder="enter additional comments"></textarea>
                     </div>
                 </div>
             </div>

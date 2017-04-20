@@ -39,13 +39,15 @@ public class QuestionnaireFacadeService {
 
     public AnswersTo getAnswersTo() {
         final AnswersTo answersTo = new AnswersTo();
+        /*todo nacitani odpovedi*/
         answersTo.setAnswerList(formService.getCurrentAnswerRows().stream().map(this::mapToAnswer).collect(Collectors.toList()));
         return answersTo;
     }
 
     public void question(AnswersTo answersTo, FlowService.EAction action) {
         if (action.equals(FlowService.EAction.NEXT)) {
-            validateService.validate(answersTo);
+            validateService.validate(answersTo, formService.getCurrentAnswerRows());
+            /*todo ukladani PI*/
             formService.saveAnswer(answersTo);
         }
         flowService.moveCounterTo(action);
@@ -79,6 +81,7 @@ public class QuestionnaireFacadeService {
         final QuestionTo questionTo = new QuestionTo();
         questionTo.setNumber(answerRow.getNumber());
         questionTo.setText(answerRow.getQuestion());
+        questionTo.setType(answerRow.getClass().getSimpleName());
         return questionTo;
     }
 

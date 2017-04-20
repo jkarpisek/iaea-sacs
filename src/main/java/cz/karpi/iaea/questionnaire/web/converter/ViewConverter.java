@@ -75,6 +75,7 @@ public class ViewConverter {
         final QuestionVo questionVo = new QuestionVo();
         questionVo.setNumber(questionTo.getNumber());
         questionVo.setText(questionTo.getText());
+        questionVo.setType(questionTo.getType());
         return questionVo;
     }
 

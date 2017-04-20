@@ -1,0 +1,29 @@
+body {
+    background-color: #F1F1F2;
+    font-family: 'Open Sans', Arial, sans-serif;
+}
+
+.question-box {
+    padding: 20px 0;
+    border-top: 1px solid #ccc;
+}
+
+.question-box > div:first-child {
+    padding-bottom: 10px;
+}
+
+.question-box:first-child {
+    border-top: 0;
+}
+
+.pi-grade:required:invalid {
+    color: #999;
+}
+
+.pi-grade > option[value=''] {
+    display: none;
+}
+
+.pi-grade:required:invalid > option {
+    color: #555;
+}

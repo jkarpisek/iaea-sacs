@@ -6,6 +6,7 @@ package cz.karpi.iaea.questionnaire.service.to;
 public class QuestionTo {
     private String number;
     private String text;
+    private String type;
 
     public String getNumber() {
         return number;
@@ -21,5 +22,13 @@ public class QuestionTo {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

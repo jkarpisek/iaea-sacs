@@ -8,6 +8,9 @@ public class AnswerVo {
     private String comments;
 
     public Integer getPiGrade() {
+        if (piGrade == null) {
+            piGrade = -1;
+        }
         return piGrade;
     }
 
