@@ -23,6 +23,12 @@ import cz.karpi.iaea.questionnaire.web.model.QuestionsVo;
  */
 @Component
 public class ViewConverter {
+    private static final String PATTERN_PAGE = "%s";
+    private static final String PATTERN_PAGE_REDIRECT = "redirect:/%s";
+
+    public String toPage(String state, Boolean redirect) {
+        return String.format(redirect ? PATTERN_PAGE_REDIRECT : PATTERN_PAGE, state.toLowerCase());
+    }
 
     public AnswersVo toAnswersVo(AnswersTo answersTo) {
         final AnswersVo answersVo = new AnswersVo();

@@ -4,13 +4,13 @@ package cz.karpi.iaea.questionnaire.model;
  * Created by karpi on 17.4.17.
  */
 public class Flow {
-    public enum EFlowType { INIT, INSTRUCTION, QUESTION, FINISH }
+    public enum EFlowType { START, INSTRUCTION, QUESTION, FINISH }
     private EFlowType flowType;
     private Integer currentIndex;
     private Integer currentSubIndex;
 
     public Flow() {
-        this.flowType = EFlowType.INIT;
+        this.flowType = EFlowType.START;
         this.currentIndex = 0;
         this.currentSubIndex = 0;
     }

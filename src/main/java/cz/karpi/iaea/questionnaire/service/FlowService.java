@@ -37,7 +37,7 @@ public class FlowService {
 
     public void moveCounterToNext() {
         switch (flow.getFlowType()) {
-            case INIT:
+            case START:
                 flow.setFlowType(Flow.EFlowType.INSTRUCTION);
                 flow.setCurrentIndex(0);
                 flow.setCurrentSubIndex(0);
@@ -65,7 +65,7 @@ public class FlowService {
     public void moveCounterToPrevious() {
         switch (flow.getFlowType()) {
             case INSTRUCTION:
-                flow.setFlowType(Flow.EFlowType.INIT);
+                flow.setFlowType(Flow.EFlowType.START);
                 flow.setCurrentIndex(0);
                 flow.setCurrentSubIndex(0);
                 break;
@@ -92,7 +92,7 @@ public class FlowService {
     public List<EAction> getPossibilityActions() {
         final List<EAction> actions;
         switch (flow.getFlowType()) {
-            case INIT:
+            case START:
                 actions = Collections.singletonList(EAction.NEXT);
                 break;
             case INSTRUCTION:

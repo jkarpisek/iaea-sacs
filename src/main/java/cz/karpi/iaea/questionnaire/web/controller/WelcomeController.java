@@ -12,10 +12,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
+import cz.karpi.iaea.questionnaire.model.Flow;
 import cz.karpi.iaea.questionnaire.service.QuestionnaireFacadeService;
 import cz.karpi.iaea.questionnaire.service.exception.ValidationException;
 import cz.karpi.iaea.questionnaire.service.to.CommonTo;
 import cz.karpi.iaea.questionnaire.web.converter.ViewConverter;
+import cz.karpi.iaea.questionnaire.web.interceptor.FlowInterceptor;
 import cz.karpi.iaea.questionnaire.web.model.AnswersVo;
 import cz.karpi.iaea.questionnaire.web.model.InitVo;
 
@@ -23,6 +25,7 @@ import cz.karpi.iaea.questionnaire.web.model.InitVo;
  * Created by karpi on 12.4.17.
  */
 @Controller
+@RequestMapping(value = "/")
 public class WelcomeController {
 
     private static final String MODEL_ATTRIBUTE_COMMON = "common";
@@ -34,23 +37,31 @@ public class WelcomeController {
 
     private final ViewConverter viewConverter;
 
-    /*todo pravo na stranku podle stavu flow*/
     @Autowired
     public WelcomeController(QuestionnaireFacadeService questionnaireFacadeService, ViewConverter viewConverter) {
         this.questionnaireFacadeService = questionnaireFacadeService;
         this.viewConverter = viewConverter;
     }
 
-    @RequestMapping("/")
-    public String index(Model model) throws Exception {
+    @FlowInterceptor.FlowCheck({Flow.EFlowType.START, Flow.EFlowType.INSTRUCTION, Flow.EFlowType.QUESTION, Flow.EFlowType.FINISH})
+    @RequestMapping
+    public String index() throws Exception {
+        final CommonTo commonTo = questionnaireFacadeService.getCommonTo();
+        return viewConverter.toPage(commonTo.getState(), true);
+    }
+
+    @FlowInterceptor.FlowCheck(Flow.EFlowType.START)
+    @RequestMapping("start")
+    public String start(Model model) throws Exception {
         final CommonTo commonTo = questionnaireFacadeService.getCommonTo();
         model.addAttribute(MODEL_ATTRIBUTE_COMMON, viewConverter.toCommonVo(commonTo));
         model.addAttribute(MODEL_ATTRIBUTE_INIT, new InitVo());
-        return commonTo.getState().toLowerCase();
+        return viewConverter.toPage(commonTo.getState(), false);
     }
 
-    @RequestMapping(value = "/init", method = RequestMethod.POST)
-    public String initQuestionnaire(@ModelAttribute(MODEL_ATTRIBUTE_INIT) InitVo initVo, BindingResult errors, Model model) throws Exception {
+    @FlowInterceptor.FlowCheck(Flow.EFlowType.START)
+    @RequestMapping(value = "start", method = RequestMethod.POST)
+    public String start(@ModelAttribute(MODEL_ATTRIBUTE_INIT) InitVo initVo, BindingResult errors, Model model) throws Exception {
         try {
             questionnaireFacadeService.init(viewConverter.toInitTo(initVo));
         } catch (ValidationException e) {
@@ -59,37 +70,41 @@ public class WelcomeController {
         final CommonTo commonTo = questionnaireFacadeService.getCommonTo();
         model.addAttribute(MODEL_ATTRIBUTE_COMMON, viewConverter.toCommonVo(commonTo));
         if (errors.hasErrors()) {
-            return commonTo.getState().toLowerCase();
+            return null;
         }
-        return "redirect:/" + commonTo.getState().toLowerCase();
+        return viewConverter.toPage(commonTo.getState(), true);
     }
 
-    @RequestMapping(value = "/instruction", method = RequestMethod.GET)
-    public String instructionGet(Model model) throws Exception {
+    @FlowInterceptor.FlowCheck(Flow.EFlowType.INSTRUCTION)
+    @RequestMapping(value = "instruction")
+    public String instruction(Model model) throws Exception {
         final CommonTo commonTo = questionnaireFacadeService.getCommonTo();
         model.addAttribute(MODEL_ATTRIBUTE_COMMON, viewConverter.toCommonVo(commonTo));
-        return commonTo.getState().toLowerCase();
+        return viewConverter.toPage(commonTo.getState(), false);
     }
 
-    @RequestMapping(value = "/instruction", method = RequestMethod.POST)
-    public String instructionPost(Model model, @RequestParam String action) throws Exception {
+    @FlowInterceptor.FlowCheck(Flow.EFlowType.INSTRUCTION)
+    @RequestMapping(value = "instruction", method = RequestMethod.POST)
+    public String instruction(Model model, @RequestParam String action) throws Exception {
         questionnaireFacadeService.instruction(viewConverter.convertToEAction(action));
         final CommonTo commonTo = questionnaireFacadeService.getCommonTo();
         model.addAttribute(MODEL_ATTRIBUTE_COMMON, viewConverter.toCommonVo(commonTo));
-        return "redirect:/" + commonTo.getState().toLowerCase();
+        return viewConverter.toPage(commonTo.getState(), true);
     }
 
-    @RequestMapping(value = "/question", method = RequestMethod.GET)
-    public String questionGet(Model model) throws Exception {
+    @FlowInterceptor.FlowCheck(Flow.EFlowType.QUESTION)
+    @RequestMapping(value = "question")
+    public String question  (Model model) throws Exception {
         final CommonTo commonTo = questionnaireFacadeService.getCommonTo();
         model.addAttribute(MODEL_ATTRIBUTE_COMMON, viewConverter.toCommonVo(commonTo));
         model.addAttribute(MODEL_ATTRIBUTE_QUESTION, viewConverter.toQuestionsVo(questionnaireFacadeService.getQuestionsTo()));
         model.addAttribute(MODEL_ATTRIBUTE_ANSWERS, viewConverter.toAnswersVo(questionnaireFacadeService.getAnswersTo()));
-        return commonTo.getState().toLowerCase();
+        return viewConverter.toPage(commonTo.getState(), false);
     }
 
-    @RequestMapping(value = "/question", method = RequestMethod.POST)
-    public String questionPost(@ModelAttribute(MODEL_ATTRIBUTE_ANSWERS) AnswersVo answerVo, @RequestParam String action, BindingResult errors, Model model) throws Exception {
+    @FlowInterceptor.FlowCheck(Flow.EFlowType.QUESTION)
+    @RequestMapping(value = "question", method = RequestMethod.POST)
+    public String question(@ModelAttribute(MODEL_ATTRIBUTE_ANSWERS) AnswersVo answerVo, @RequestParam String action, BindingResult errors, Model model) throws Exception {
         try {
             questionnaireFacadeService.question(viewConverter.toAnswersTo(answerVo), viewConverter.convertToEAction(action));
         } catch (ValidationException e) {
@@ -104,14 +119,14 @@ public class WelcomeController {
             return null;
         }
         model.addAttribute(MODEL_ATTRIBUTE_ANSWERS, viewConverter.toAnswersVo(questionnaireFacadeService.getAnswersTo()));
-        return "redirect:/" + commonTo.getState().toLowerCase();
+        return viewConverter.toPage(commonTo.getState(), true);
     }
 
-    @RequestMapping(value = "/finish", method = RequestMethod.GET)
-    public String finishGet(Model model) throws Exception {
+    @FlowInterceptor.FlowCheck(Flow.EFlowType.FINISH)
+    @RequestMapping(value = "finish")
+    public String finish(Model model) throws Exception {
         final CommonTo commonTo = questionnaireFacadeService.getCommonTo();
         model.addAttribute(MODEL_ATTRIBUTE_COMMON, viewConverter.toCommonVo(commonTo));
-        return commonTo.getState().toLowerCase();
+        return viewConverter.toPage(commonTo.getState(), false);
     }
-
 }
