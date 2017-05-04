@@ -4,7 +4,7 @@ package cz.karpi.iaea.questionnaire.model;
  * Created by karpi on 17.4.17.
  */
 public class Flow {
-    public enum EFlowType { START, INSTRUCTION, QUESTION, FINISH }
+    public enum EFlowType { START, INSTRUCTION, QUESTION, ASSESSMENT, PLANNER, CDP }
     private EFlowType flowType;
     private Integer currentIndex;
     private Integer currentSubIndex;

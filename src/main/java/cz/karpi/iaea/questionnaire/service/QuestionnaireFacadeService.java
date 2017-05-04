@@ -30,11 +30,12 @@ public class QuestionnaireFacadeService {
         this.validateService = validateService;
     }
 
-    public void init(InitTo initTo) {
+    public Void init(InitTo initTo) {
         validateService.validate(initTo);
         formService.saveInit(initTo);
         formService.loadSACSForm();
         flowService.moveCounterToNext();
+        return null;
     }
 
     public AnswersTo getAnswersTo() {
@@ -44,13 +45,30 @@ public class QuestionnaireFacadeService {
         return answersTo;
     }
 
-    public void question(AnswersTo answersTo, FlowService.EAction action) {
+    public Void question(AnswersTo answersTo, FlowService.EAction action) {
         if (action.equals(FlowService.EAction.NEXT)) {
             validateService.validate(answersTo, formService.getCurrentAnswerRows());
             /*todo ukladani PI*/
             formService.saveAnswer(answersTo);
         }
         flowService.moveCounterTo(action);
+        return null;
+    }
+
+    public Void assessment(FlowService.EAction action) {
+        if (action.equals(FlowService.EAction.NEXT)) {
+            //todo
+        }
+        flowService.moveCounterTo(action);
+        return null;
+    }
+
+    public Void planner(FlowService.EAction action) {
+        if (action.equals(FlowService.EAction.NEXT)) {
+            //todo
+        }
+        flowService.moveCounterTo(action);
+        return null;
     }
 
     public CommonTo getCommonTo() {

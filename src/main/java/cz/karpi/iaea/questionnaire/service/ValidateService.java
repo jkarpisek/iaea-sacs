@@ -3,6 +3,7 @@ package cz.karpi.iaea.questionnaire.service;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -25,7 +26,7 @@ public class ValidateService {
 
     public void validate(InitTo initTo) {
         if (initTo.getCompanyName() == null || initTo.getCompanyName().isEmpty()) {
-            throw new ValidationException();
+            throw new ValidationException(Collections.emptyList());
         }
     }
 

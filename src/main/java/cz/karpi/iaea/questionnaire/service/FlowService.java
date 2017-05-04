@@ -3,7 +3,6 @@ package cz.karpi.iaea.questionnaire.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -48,16 +47,26 @@ public class FlowService {
                 flow.setCurrentSubIndex(0);
                 break;
             case QUESTION:
-                if (formService.getSacsForm().getCategories().get(flow.getCurrentIndex()).getSubCategories().size() > flow.getCurrentSubIndex() + 1) {
+                /*if (formService.getSacsForm().getCategories().get(flow.getCurrentIndex()).getSubCategories().size() > flow.getCurrentSubIndex() + 1) {
                     flow.setCurrentSubIndex(flow.getCurrentSubIndex() + 1);
                 } else if (formService.getSacsForm().getCategories().size() > flow.getCurrentIndex() + 1){
                     flow.setCurrentIndex(flow.getCurrentIndex() + 1);
                     flow.setCurrentSubIndex(0);
-                } else {
-                    flow.setFlowType(Flow.EFlowType.FINISH);
+                } else {*/
+                    flow.setFlowType(Flow.EFlowType.ASSESSMENT);
                     flow.setCurrentIndex(0);
                     flow.setCurrentSubIndex(0);
-                }
+                //}
+                break;
+            case ASSESSMENT:
+                flow.setFlowType(Flow.EFlowType.PLANNER);
+                flow.setCurrentIndex(0);
+                flow.setCurrentSubIndex(0);
+                break;
+            case PLANNER:
+                flow.setFlowType(Flow.EFlowType.CDP);
+                flow.setCurrentIndex(0);
+                flow.setCurrentSubIndex(0);
                 break;
         }
     }
@@ -81,10 +90,20 @@ public class FlowService {
                     flow.setCurrentSubIndex(0);
                 }
                 break;
-            case FINISH:
+            case ASSESSMENT:
                 flow.setFlowType(Flow.EFlowType.QUESTION);
                 flow.setCurrentIndex(formService.getSacsForm().getCategories().size() - 1);
                 flow.setCurrentSubIndex(formService.getSacsForm().getCategories().get(flow.getCurrentIndex()).getSubCategories().size() - 1);
+                break;
+            case PLANNER:
+                flow.setFlowType(Flow.EFlowType.ASSESSMENT);
+                flow.setCurrentIndex(0);
+                flow.setCurrentSubIndex(0);
+                break;
+            case CDP:
+                flow.setFlowType(Flow.EFlowType.PLANNER);
+                flow.setCurrentIndex(0);
+                flow.setCurrentSubIndex(0);
                 break;
         }
     }
@@ -96,17 +115,15 @@ public class FlowService {
                 actions = Collections.singletonList(EAction.NEXT);
                 break;
             case INSTRUCTION:
+            case QUESTION:
+            case ASSESSMENT:
                 actions = Arrays.asList(EAction.PREVIOUS, EAction.NEXT);
                 break;
-            case QUESTION:
-                actions = new ArrayList<>();
-                actions.add(EAction.PREVIOUS);
-                if (formService.getSacsForm().getCategories().get(flow.getCurrentIndex()).getSubCategories().size() > flow.getCurrentSubIndex() + 1
-                    || formService.getSacsForm().getCategories().size() > flow.getCurrentIndex() + 1){
-                    actions.add(EAction.NEXT);
-                } else {
-                    actions.add(EAction.FINISH);
-                }
+            case PLANNER:
+                actions = Arrays.asList(EAction.PREVIOUS, EAction.FINISH);
+                break;
+            case CDP:
+                actions = Collections.singletonList(EAction.PREVIOUS);
                 break;
             default:
                 actions = Collections.emptyList();
