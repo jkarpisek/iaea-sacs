@@ -90,18 +90,15 @@ public class FormService {
         }).collect(Collectors.toList());
     }
 
-    @Cacheable(value="questionCache", key="#number")
     public Question getQuestion(String number) {
         return getCategories().stream().flatMap(category -> category.getSubCategories().stream())
             .flatMap(subCategory -> subCategory.getQuestions().stream()).filter(question -> question.getNumber().equals(number)).findFirst().orElse(null);
     }
 
-    @Cacheable(value="questionCache", key="#number")
     public Integer sequenceOfSubCategory(SubCategory subCategory) {
         return 1 + getCategories().stream().flatMap(category -> category.getSubCategories().stream()).collect(Collectors.toList()).indexOf(subCategory);
     }
 
-    @Cacheable(value="questionCache", key="#number")
     public Integer countOfSubCategory() {
         return getCategories().stream().mapToInt(category -> category.getSubCategories().size()).sum();
     }
