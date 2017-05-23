@@ -1,22 +1,31 @@
 package cz.karpi.iaea.questionnaire.web.converter;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import cz.karpi.iaea.questionnaire.model.Quarter;
 import cz.karpi.iaea.questionnaire.service.FlowService;
-import cz.karpi.iaea.questionnaire.service.to.AnswerTo;
 import cz.karpi.iaea.questionnaire.service.to.AnswersTo;
+import cz.karpi.iaea.questionnaire.service.to.AssessmentAnswersTo;
+import cz.karpi.iaea.questionnaire.service.to.AssessmentQuestionTo;
+import cz.karpi.iaea.questionnaire.service.to.AssessmentTo;
 import cz.karpi.iaea.questionnaire.service.to.CommonTo;
 import cz.karpi.iaea.questionnaire.service.to.InitTo;
+import cz.karpi.iaea.questionnaire.service.to.PlannerAnswerTo;
+import cz.karpi.iaea.questionnaire.service.to.PlannerAnswersTo;
+import cz.karpi.iaea.questionnaire.service.to.PlannerQuestionTo;
+import cz.karpi.iaea.questionnaire.service.to.PlannerTo;
 import cz.karpi.iaea.questionnaire.service.to.QuestionTo;
 import cz.karpi.iaea.questionnaire.service.to.QuestionsTo;
-import cz.karpi.iaea.questionnaire.web.model.AnswerVo;
-import cz.karpi.iaea.questionnaire.web.model.AnswersVo;
+import cz.karpi.iaea.questionnaire.web.interceptor.QuestionnaireDialectUtils;
 import cz.karpi.iaea.questionnaire.web.model.CommonVo;
 import cz.karpi.iaea.questionnaire.web.model.InitVo;
-import cz.karpi.iaea.questionnaire.web.model.QuestionVo;
-import cz.karpi.iaea.questionnaire.web.model.QuestionsVo;
+import cz.karpi.iaea.questionnaire.web.model.MatrixMap;
+import cz.karpi.iaea.questionnaire.web.model.MatrixModel;
 
 /**
  * Created by karpi on 15.4.17.
@@ -24,30 +33,37 @@ import cz.karpi.iaea.questionnaire.web.model.QuestionsVo;
 @Component
 public class ViewConverter {
 
-    public AnswersVo toAnswersVo(AnswersTo answersTo) {
-        final AnswersVo answersVo = new AnswersVo();
-        answersVo.setAnswerList(answersTo.getAnswerList().stream().map(this::mapAnswerVo).collect(Collectors.toList()));
+    private static final String FIELD_ANSWER_PIGRADE = "piGrade";
+    private static final String FIELD_ANSWER_COMMENTS = "comments";
+    private static final String FIELD_PLANNER_ANSWER_TASK = "task";
+    private static final String FIELD_PLANNER_ANSWER_OWNERSHIP = "ownership";
+
+    private final QuestionnaireDialectUtils questionnaireDialectUtils;
+
+    @Autowired
+    public ViewConverter(QuestionnaireDialectUtils questionnaireDialectUtils) {
+        this.questionnaireDialectUtils = questionnaireDialectUtils;
+    }
+
+    public MatrixModel toQuestionsFormVo(AnswersTo answersTo) {
+        final MatrixModel answersVo = new MatrixModel();
+        final MatrixMap matrixMap = answersVo.getValue();
+        answersTo.getAnswerList().forEach(answerTo -> {
+            matrixMap.put(questionnaireDialectUtils.getPropertyName(answerTo.getNumber(), FIELD_ANSWER_COMMENTS), answerTo.getComments());
+            matrixMap.put(questionnaireDialectUtils.getPropertyName(answerTo.getNumber(), FIELD_ANSWER_PIGRADE), answerTo.getPiGrade());
+        });
         return answersVo;
     }
 
-    private AnswerVo mapAnswerVo(AnswerTo answerTo) {
-        final AnswerVo answerVo = new AnswerVo();
-        answerVo.setPiGrade(answerTo.getPiGrade());
-        answerVo.setComments(answerTo.getComments());
-        return answerVo;
-    }
-
-    public AnswersTo toAnswersTo(AnswersVo answersVo) {
-        final AnswersTo answersTo = new AnswersTo();
-        answersTo.setAnswerList(answersVo.getAnswerList().stream().map(this::mapAnswerTo).collect(Collectors.toList()));
+    public AnswersTo toAnswersTo(MatrixModel answersVo, AnswersTo answersTo) {
+        final MatrixMap matrixMap = answersVo.getValue();
+        answersTo.getAnswerList().forEach(answerTo -> {
+            final Object comments = matrixMap.get(questionnaireDialectUtils.getPropertyName(answerTo.getNumber(), FIELD_ANSWER_COMMENTS));
+            answerTo.setComments(comments != null ? comments.toString() : null);
+            final Object piGrade = matrixMap.get(questionnaireDialectUtils.getPropertyName(answerTo.getNumber(), FIELD_ANSWER_PIGRADE));
+            answerTo.setPiGrade(piGrade != null ? Integer.valueOf(piGrade.toString()) : null);
+        });
         return answersTo;
-    }
-
-    private AnswerTo mapAnswerTo(AnswerVo answerVo) {
-        final AnswerTo answerTo = new AnswerTo();
-        answerTo.setPiGrade(answerVo.getPiGrade());
-        answerTo.setComments(answerVo.getComments());
-        return answerTo;
     }
 
     public InitTo toInitTo(InitVo initVo) {
@@ -63,32 +79,123 @@ public class ViewConverter {
         return commonVo;
     }
 
-    public QuestionsVo toQuestionsVo(QuestionsTo questionsTo) {
-        final QuestionsVo questionsVo = new QuestionsVo();
-        questionsVo.setCategory(questionsTo.getCategory());
-        questionsVo.setSubCategory(questionsTo.getSubCategory());
-        questionsVo.setQuestionList(questionsTo.getQuestionList().stream().map(this::mapQuestionVo).collect(Collectors.toList()));
-        return questionsVo;
+    public Map<String, Object> toQuestionsMetaVo(QuestionsTo questionsTo) {
+        final Map<String, Object> map = new HashMap<>();
+        map.put("category", questionsTo.getCategory());
+        map.put("subCategory", questionsTo.getSubCategory());
+        map.put("currentPage", questionsTo.getCurrentPage());
+        map.put("maxPage", questionsTo.getMaxPage());
+        map.put("sacsAnswers", questionsTo.getQuestions().stream().map(this::mapQuestionVo).collect(Collectors.toList()));
+        return map;
     }
 
-    private QuestionVo mapQuestionVo(QuestionTo questionTo) {
-        final QuestionVo questionVo = new QuestionVo();
-        questionVo.setNumber(questionTo.getNumber());
-        questionVo.setText(questionTo.getText());
-        questionVo.setType(questionTo.getType());
-        return questionVo;
+    private Map<String, Object> mapQuestionVo(QuestionTo questionTo) {
+        final Map<String, Object> question = new HashMap<>();
+        question.put("number", questionTo.getNumber());
+        question.put("question", questionTo.getText());
+        question.put("type", questionTo.getType());
+        return question;
     }
 
     public FlowService.EAction convertToEAction(String action) {
         return FlowService.EAction.valueOf(action.toUpperCase());
     }
 
-    public Object toAssessmentVo(Object o) {
-        return null;
+    public Map<String, Object> toAssessmentMetaVo(AssessmentTo assessmentTo) {
+        final Map<String, Object> map = new HashMap<>();
+        map.put("category", assessmentTo.getCategory());
+        map.put("subCategory", assessmentTo.getSubCategory());
+        map.put("elements", assessmentTo.getElements());
+        map.put("sacsAnswers", assessmentTo.getAssessmentQuestions().stream().map(this::mapAssessmentVo).collect(Collectors.toList()));
+        map.put("currentPage", assessmentTo.getCurrentPage());
+        map.put("maxPage", assessmentTo.getMaxPage());
+        return map;
     }
 
-    public Object toPlannerVo(Object o) {
-        return null;
+    private Map<String, Object> mapAssessmentVo(AssessmentQuestionTo questionTo) {
+        final Map<String, Object> question = new HashMap<>();
+        question.put("number", questionTo.getNumber());
+        question.put("question", questionTo.getText());
+        question.put("type", questionTo.getType());
+        question.put("answer", questionTo.getAnswer());
+        return question;
+    }
+
+    private Map<String, Object> mapPlannerVo(PlannerQuestionTo questionTo) {
+        final Map<String, Object> question = new HashMap<>();
+        question.put("number", questionTo.getNumber());
+        question.put("question", questionTo.getText());
+        question.put("type", questionTo.getType());
+        question.put("answer", questionTo.getAnswer());
+        question.put("piGrade", questionTo.getPiGrade());
+        return question;
+    }
+
+    public MatrixModel toAssessmentFormVo(AssessmentAnswersTo assessmentAnswersTo) {
+        final MatrixModel assessmentVo = new MatrixModel();
+        assessmentAnswersTo.getAnswerList().forEach(assessmentAnswerTo ->
+            assessmentAnswerTo.getPiGrades().forEach(
+                (key, value) -> assessmentVo.getValue().put(questionnaireDialectUtils.getPropertyName(assessmentAnswerTo.getNumber(), key.getName()), value)
+            )
+        );
+        return assessmentVo;
+    }
+
+    public AssessmentAnswersTo toAssessmentAnswerTo(MatrixModel assessmentVo, AssessmentAnswersTo assessmentAnswersTo) {
+        final MatrixMap matrixMap = assessmentVo.getValue();
+        assessmentAnswersTo.getAnswerList().forEach(assessmentAnswerTo ->
+            assessmentAnswerTo.getPiGrades().forEach((key, value) ->
+                 assessmentAnswerTo.getPiGrades()
+                     .put(key, Integer.parseInt(matrixMap.get(questionnaireDialectUtils.getPropertyName(assessmentAnswerTo.getNumber(), key.getName())).toString()))
+            )
+        );
+        return assessmentAnswersTo;
+    }
+
+    public Map<String, Object> toPlannerMetaVo(PlannerTo plannerTo) {
+        final Map<String, Object> map = new HashMap<>();
+        map.put("category", plannerTo.getCategory());
+        map.put("subCategory", plannerTo.getSubCategory());
+        map.put("years", plannerTo.getYears());
+        map.put("elements", plannerTo.getElements());
+        map.put("sacsAnswers", plannerTo.getPlannerQuestions().stream().map(this::mapPlannerVo).collect(Collectors.toList()));
+        map.put("currentPage", plannerTo.getCurrentPage());
+        map.put("maxPage", plannerTo.getMaxPage());
+        return map;
+    }
+
+    public MatrixModel toPlannerFormVo(PlannerAnswersTo plannerAnswersTo) {
+        final MatrixModel plannerVo = new MatrixModel();
+        plannerAnswersTo.getAnswerList().forEach(plannerAnswerTo -> {
+            final String prefix = getPlannerKey(plannerAnswerTo);
+            plannerVo.getValue().put(questionnaireDialectUtils.getPropertyName(prefix, FIELD_PLANNER_ANSWER_TASK), plannerAnswerTo.getTask());
+            plannerVo.getValue().put(questionnaireDialectUtils.getPropertyName(prefix, FIELD_PLANNER_ANSWER_OWNERSHIP), plannerAnswerTo.getOwnership());
+            plannerAnswerTo.getPlanned().forEach(
+                (quarter, value) -> plannerVo.getValue().put(questionnaireDialectUtils.getPropertyName(prefix, getQuarterKey(quarter)), value)
+            );
+        });
+        return plannerVo;
+    }
+
+    private String getPlannerKey(PlannerAnswerTo plannerAnswerTo) {
+        return plannerAnswerTo.getNumber() + "-" + plannerAnswerTo.getElement().getName();
+    }
+
+    private String getQuarterKey(Quarter quarter) {
+        return quarter.getYear().getName() + "-" + quarter.getName();
+    }
+
+    public PlannerAnswersTo toPlannerAnswerTo(MatrixModel plannerVo, PlannerAnswersTo plannerAnswersTo) {
+        final MatrixMap matrixMap = plannerVo.getValue();
+        plannerAnswersTo.getAnswerList().forEach(plannerAnswerTo -> {
+            final String prefix = getPlannerKey(plannerAnswerTo);
+            plannerAnswerTo.setTask(matrixMap.get(questionnaireDialectUtils.getPropertyName(prefix, FIELD_PLANNER_ANSWER_TASK)).toString());
+            plannerAnswerTo.setOwnership(matrixMap.get(questionnaireDialectUtils.getPropertyName(prefix, FIELD_PLANNER_ANSWER_OWNERSHIP)).toString());
+            plannerAnswerTo.getPlanned().forEach(
+                (quarter, value) -> plannerAnswerTo.getPlanned().put(quarter, Boolean.valueOf(String.valueOf(matrixMap.get(questionnaireDialectUtils.getPropertyName(prefix, getQuarterKey(quarter))))))
+            );
+        });
+        return plannerAnswersTo;
     }
 
     public Object toCdpVo(Object o) {

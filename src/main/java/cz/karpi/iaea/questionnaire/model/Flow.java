@@ -6,36 +6,70 @@ package cz.karpi.iaea.questionnaire.model;
 public class Flow {
     public enum EFlowType { START, INSTRUCTION, QUESTION, ASSESSMENT, PLANNER, CDP }
     private EFlowType flowType;
-    private Integer currentIndex;
-    private Integer currentSubIndex;
+    private Integer currentCategoryIndex;
+    private Integer currentSubCategoryIndex;
+    private Integer maxSubCategoryIndex;
 
     public Flow() {
-        this.flowType = EFlowType.START;
-        this.currentIndex = 0;
-        this.currentSubIndex = 0;
+        resetFlow(EFlowType.START);
+        this.maxSubCategoryIndex = 0;
     }
 
     public EFlowType getFlowType() {
         return flowType;
     }
 
-    public void setFlowType(EFlowType flowType) {
+    public Integer getCurrentCategoryIndex() {
+        return currentCategoryIndex;
+    }
+
+    public Integer getCurrentSubCategoryIndex() {
+        return currentSubCategoryIndex;
+    }
+
+    public Integer getMaxSubCategoryIndex() {
+        return maxSubCategoryIndex;
+    }
+
+    public void setMaxSubCategoryIndex(Integer maxSubCategoryIndex) {
+        this.maxSubCategoryIndex = maxSubCategoryIndex;
+    }
+
+    public void resetFlow(Flow.EFlowType flowType) {
         this.flowType = flowType;
+        resetCategory();
     }
 
-    public Integer getCurrentIndex() {
-        return currentIndex;
+    public void resetCategory() {
+        currentCategoryIndex = 0;
+        resetSubCategory();
     }
 
-    public void setCurrentIndex(Integer currentIndex) {
-        this.currentIndex = currentIndex;
+    public void upCategory() {
+        currentCategoryIndex = getCurrentCategoryIndex() + 1;
+        resetSubCategory();
     }
 
-    public Integer getCurrentSubIndex() {
-        return currentSubIndex;
+    public void downCategory(Integer subCategory) {
+        currentCategoryIndex = getCurrentCategoryIndex() - 1;
+        currentSubCategoryIndex = subCategory;
     }
 
-    public void setCurrentSubIndex(Integer currentSubIndex) {
-        this.currentSubIndex = currentSubIndex;
+    public void resetSubCategory() {
+        currentSubCategoryIndex =  0;
     }
+
+    public void upSubCategory() {
+        currentSubCategoryIndex = getCurrentSubCategoryIndex() + 1;
+    }
+
+    public void downSubCategory() {
+        currentSubCategoryIndex = getCurrentSubCategoryIndex() - 1;
+    }
+
+    public void setCategoryAndSubCategory(Integer category, Integer subCategory) {
+        currentCategoryIndex = category;
+        currentSubCategoryIndex = subCategory;
+    }
+
 }

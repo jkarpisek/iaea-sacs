@@ -14,21 +14,19 @@ import cz.karpi.iaea.questionnaire.service.QuestionnaireFacadeService;
 import cz.karpi.iaea.questionnaire.service.to.CommonTo;
 import cz.karpi.iaea.questionnaire.web.converter.ViewConverter;
 import cz.karpi.iaea.questionnaire.web.interceptor.FlowInterceptor;
-import cz.karpi.iaea.questionnaire.web.model.AnswersVo;
 import cz.karpi.iaea.questionnaire.web.model.InitVo;
+import cz.karpi.iaea.questionnaire.web.model.MatrixModel;
+
+import static cz.karpi.iaea.questionnaire.web.controller.ControllerUtils.MODEL_ATTRIBUTE_CDP;
+import static cz.karpi.iaea.questionnaire.web.controller.ControllerUtils.MODEL_ATTRIBUTE_FORM;
+import static cz.karpi.iaea.questionnaire.web.controller.ControllerUtils.MODEL_ATTRIBUTE_INIT;
+import static cz.karpi.iaea.questionnaire.web.controller.ControllerUtils.MODEL_ATTRIBUTE_META;
 
 /**
  * Created by karpi on 12.4.17.
  */
 @Controller
 public class QuestionnaireController {
-
-    private static final String MODEL_ATTRIBUTE_INIT = "init";
-    private static final String MODEL_ATTRIBUTE_ANSWERS = "answers";
-    private static final String MODEL_ATTRIBUTE_QUESTION = "questions";
-    private static final String MODEL_ATTRIBUTE_ASSESSMENT = "assessment";
-    private static final String MODEL_ATTRIBUTE_PLANNER = "planner";
-    private static final String MODEL_ATTRIBUTE_CDP = "cdp";
 
     private final QuestionnaireFacadeService questionnaireFacadeService;
 
@@ -61,7 +59,7 @@ public class QuestionnaireController {
     @RequestMapping(value = "/start", method = RequestMethod.POST)
     public String start(@ModelAttribute(MODEL_ATTRIBUTE_INIT) InitVo initVo, BindingResult errors, Model model) {
         controllerUtils.catchValidationException(errors, () -> questionnaireFacadeService.init(viewConverter.toInitTo(initVo)));
-        return controllerUtils.returnPost(model, errors);
+        return controllerUtils.returnPost(model, null, errors);
     }
 
     @FlowInterceptor.FlowCheck(Flow.EFlowType.INSTRUCTION)
@@ -74,50 +72,52 @@ public class QuestionnaireController {
     @RequestMapping(value = "instruction", method = RequestMethod.POST)
     public String instruction(Model model, @RequestParam String action) {
         questionnaireFacadeService.instruction(viewConverter.convertToEAction(action));
-        return controllerUtils.returnPost(model, null);
+        return controllerUtils.returnPost(model, null,null);
     }
 
     @FlowInterceptor.FlowCheck(Flow.EFlowType.QUESTION)
     @RequestMapping(value = "/question")
     public String question  (Model model) {
-        model.addAttribute(MODEL_ATTRIBUTE_QUESTION, viewConverter.toQuestionsVo(questionnaireFacadeService.getQuestionsTo()));
-        model.addAttribute(MODEL_ATTRIBUTE_ANSWERS, viewConverter.toAnswersVo(questionnaireFacadeService.getAnswersTo()));
+        model.addAttribute(MODEL_ATTRIBUTE_META, viewConverter.toQuestionsMetaVo(questionnaireFacadeService.getQuestionsTo()));
+        model.addAttribute(MODEL_ATTRIBUTE_FORM, viewConverter.toQuestionsFormVo(questionnaireFacadeService.getAnswersTo()));
         return controllerUtils.returnGet(model);
     }
 
     @FlowInterceptor.FlowCheck(Flow.EFlowType.QUESTION)
     @RequestMapping(value = "/question", method = RequestMethod.POST)
-    public String question(@ModelAttribute(MODEL_ATTRIBUTE_ANSWERS) AnswersVo answerVo, @RequestParam String action, BindingResult errors, Model model) {
-        controllerUtils.catchValidationException(errors, () -> questionnaireFacadeService.question(viewConverter.toAnswersTo(answerVo), viewConverter.convertToEAction(action)));
-        return controllerUtils.returnPost(model, errors);
+    public String question(@ModelAttribute(MODEL_ATTRIBUTE_FORM) MatrixModel answerVo, @RequestParam String action, BindingResult errors, Model model) {
+        controllerUtils.catchValidationException(errors, () -> questionnaireFacadeService.question(viewConverter.toAnswersTo(answerVo, questionnaireFacadeService.getAnswersTo()), viewConverter.convertToEAction(action)));
+        return controllerUtils.returnPost(model, viewConverter.toQuestionsMetaVo(questionnaireFacadeService.getQuestionsTo()), errors);
     }
 
     @FlowInterceptor.FlowCheck(Flow.EFlowType.ASSESSMENT)
     @RequestMapping(value = "/assessment")
     public String assessment(Model model) {
-        model.addAttribute(MODEL_ATTRIBUTE_ASSESSMENT, viewConverter.toAssessmentVo(null));
+        model.addAttribute(MODEL_ATTRIBUTE_META, viewConverter.toAssessmentMetaVo(questionnaireFacadeService.getAssessmentTo()));
+        model.addAttribute(MODEL_ATTRIBUTE_FORM, viewConverter.toAssessmentFormVo(questionnaireFacadeService.getAssessmentAnswersTo()));
         return controllerUtils.returnGet(model);
     }
 
     @FlowInterceptor.FlowCheck(Flow.EFlowType.ASSESSMENT)
     @RequestMapping(value = "/assessment", method = RequestMethod.POST)
-    public String assessmentPost(@ModelAttribute(MODEL_ATTRIBUTE_ASSESSMENT) AnswersVo answerVo, @RequestParam String action, BindingResult errors, Model model) {
-        controllerUtils.catchValidationException(errors, () -> questionnaireFacadeService.assessment(viewConverter.convertToEAction(action)));
-        return controllerUtils.returnPost(model, errors);
+    public String assessmentPost(@ModelAttribute(MODEL_ATTRIBUTE_FORM) MatrixModel assessmentVo, @RequestParam String action, BindingResult errors, Model model) {
+        controllerUtils.catchValidationException(errors, () -> questionnaireFacadeService.assessment(viewConverter.toAssessmentAnswerTo(assessmentVo, questionnaireFacadeService.getAssessmentAnswersTo()), viewConverter.convertToEAction(action)));
+        return controllerUtils.returnPost(model, viewConverter.toAssessmentMetaVo(questionnaireFacadeService.getAssessmentTo()), errors);
     }
 
     @FlowInterceptor.FlowCheck(Flow.EFlowType.PLANNER)
     @RequestMapping(value = "/planner")
     public String planner(Model model) {
-        model.addAttribute(MODEL_ATTRIBUTE_PLANNER, viewConverter.toPlannerVo(null));
+        model.addAttribute(MODEL_ATTRIBUTE_META, viewConverter.toPlannerMetaVo(questionnaireFacadeService.getPlannerTo()));
+        model.addAttribute(MODEL_ATTRIBUTE_FORM, viewConverter.toPlannerFormVo(questionnaireFacadeService.getPlannerAnswersTo()));
         return controllerUtils.returnGet(model);
     }
 
     @FlowInterceptor.FlowCheck(Flow.EFlowType.PLANNER)
     @RequestMapping(value = "/planner", method = RequestMethod.POST)
-    public String plannerPost(@ModelAttribute(MODEL_ATTRIBUTE_PLANNER) AnswersVo answerVo, @RequestParam String action, BindingResult errors, Model model) {
-        controllerUtils.catchValidationException(errors, () -> questionnaireFacadeService.planner(viewConverter.convertToEAction(action)));
-        return controllerUtils.returnPost(model, errors);
+    public String plannerPost(@ModelAttribute(MODEL_ATTRIBUTE_FORM) MatrixModel plannerVo, @RequestParam String action, BindingResult errors, Model model) {
+        controllerUtils.catchValidationException(errors, () -> questionnaireFacadeService.planner(viewConverter.toPlannerAnswerTo(plannerVo, questionnaireFacadeService.getPlannerAnswersTo()), viewConverter.convertToEAction(action)));
+        return controllerUtils.returnPost(model, viewConverter.toPlannerMetaVo(questionnaireFacadeService.getPlannerTo()), errors);
     }
 
     @FlowInterceptor.FlowCheck(Flow.EFlowType.CDP)

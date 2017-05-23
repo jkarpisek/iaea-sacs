@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 import cz.karpi.iaea.questionnaire.model.Flow;
+import cz.karpi.iaea.questionnaire.model.SubCategory;
 
 /**
  * Created by karpi on 18.4.17.
@@ -35,82 +36,63 @@ public class FlowService {
     }
 
     public void moveCounterToNext() {
-        switch (flow.getFlowType()) {
+        switch (getFlow().getFlowType()) {
             case START:
-                flow.setFlowType(Flow.EFlowType.INSTRUCTION);
-                flow.setCurrentIndex(0);
-                flow.setCurrentSubIndex(0);
+                getFlow().resetFlow(Flow.EFlowType.INSTRUCTION);
                 break;
             case INSTRUCTION:
-                flow.setFlowType(Flow.EFlowType.QUESTION);
-                flow.setCurrentIndex(0);
-                flow.setCurrentSubIndex(0);
+                getFlow().resetFlow(Flow.EFlowType.ASSESSMENT);
                 break;
             case QUESTION:
-                /*if (formService.getSacsForm().getCategories().get(flow.getCurrentIndex()).getSubCategories().size() > flow.getCurrentSubIndex() + 1) {
-                    flow.setCurrentSubIndex(flow.getCurrentSubIndex() + 1);
-                } else if (formService.getSacsForm().getCategories().size() > flow.getCurrentIndex() + 1){
-                    flow.setCurrentIndex(flow.getCurrentIndex() + 1);
-                    flow.setCurrentSubIndex(0);
-                } else {*/
-                    flow.setFlowType(Flow.EFlowType.ASSESSMENT);
-                    flow.setCurrentIndex(0);
-                    flow.setCurrentSubIndex(0);
-                //}
+                if (getCurrentSubCategory().getCategory().getSubCategories().size() > getFlow().getCurrentSubCategoryIndex() + 1) {
+                    getFlow().upSubCategory();
+                } else if (formService.getCategories().size() > getFlow().getCurrentCategoryIndex() + 1){
+                    getFlow().upCategory();
+                } else {
+                    getFlow().resetFlow(Flow.EFlowType.ASSESSMENT);
+                }
                 break;
             case ASSESSMENT:
-                flow.setFlowType(Flow.EFlowType.PLANNER);
-                flow.setCurrentIndex(0);
-                flow.setCurrentSubIndex(0);
+                getFlow().resetFlow(Flow.EFlowType.PLANNER);
                 break;
             case PLANNER:
-                flow.setFlowType(Flow.EFlowType.CDP);
-                flow.setCurrentIndex(0);
-                flow.setCurrentSubIndex(0);
+                getFlow().resetFlow(Flow.EFlowType.CDP);
                 break;
         }
     }
 
     public void moveCounterToPrevious() {
-        switch (flow.getFlowType()) {
+        switch (getFlow().getFlowType()) {
             case INSTRUCTION:
-                flow.setFlowType(Flow.EFlowType.START);
-                flow.setCurrentIndex(0);
-                flow.setCurrentSubIndex(0);
+                getFlow().resetFlow(Flow.EFlowType.START);
                 break;
             case QUESTION:
-                if (flow.getCurrentSubIndex() > 0) {
-                    flow.setCurrentSubIndex(flow.getCurrentSubIndex() - 1);
-                } else if (flow.getCurrentIndex() > 0){
-                    flow.setCurrentIndex(flow.getCurrentIndex() - 1);
-                    flow.setCurrentSubIndex(formService.getSacsForm().getCategories().get(flow.getCurrentIndex()).getSubCategories().size() - 1);
+                if (getFlow().getCurrentSubCategoryIndex() > 0) {
+                    getFlow().downSubCategory();
+                } else if (getFlow().getCurrentCategoryIndex() > 0){
+                    getFlow().downCategory(getCurrentSubCategory().getCategory().getSubCategories().size() - 1);
                 } else {
-                    flow.setFlowType(Flow.EFlowType.INSTRUCTION);
-                    flow.setCurrentIndex(0);
-                    flow.setCurrentSubIndex(0);
+                    getFlow().resetFlow(Flow.EFlowType.INSTRUCTION);
                 }
                 break;
             case ASSESSMENT:
-                flow.setFlowType(Flow.EFlowType.QUESTION);
-                flow.setCurrentIndex(formService.getSacsForm().getCategories().size() - 1);
-                flow.setCurrentSubIndex(formService.getSacsForm().getCategories().get(flow.getCurrentIndex()).getSubCategories().size() - 1);
+                getFlow().resetFlow(Flow.EFlowType.QUESTION);
+                getFlow().setCategoryAndSubCategory(formService.getCategories().size() - 1, getCurrentSubCategory().getCategory().getSubCategories().size() - 1);
                 break;
             case PLANNER:
-                flow.setFlowType(Flow.EFlowType.ASSESSMENT);
-                flow.setCurrentIndex(0);
-                flow.setCurrentSubIndex(0);
+                getFlow().resetFlow(Flow.EFlowType.ASSESSMENT);
+                getFlow().setCategoryAndSubCategory(formService.getCategories().size() - 1, getCurrentSubCategory().getCategory().getSubCategories().size() - 1);
                 break;
             case CDP:
-                flow.setFlowType(Flow.EFlowType.PLANNER);
-                flow.setCurrentIndex(0);
-                flow.setCurrentSubIndex(0);
+                getFlow().resetFlow(Flow.EFlowType.PLANNER);
+                getFlow().setCategoryAndSubCategory(formService.getCategories().size() - 1, getCurrentSubCategory().getCategory().getSubCategories().size() - 1);
                 break;
         }
     }
 
     public List<EAction> getPossibilityActions() {
         final List<EAction> actions;
-        switch (flow.getFlowType()) {
+        switch (getFlow().getFlowType()) {
             case START:
                 actions = Collections.singletonList(EAction.NEXT);
                 break;
@@ -129,6 +111,19 @@ public class FlowService {
                 actions = Collections.emptyList();
         }
         return actions;
+    }
+
+    public Integer getCurrentPage() {
+        return getFlow().getCurrentSubCategoryIndex();
+    }
+
+    public Integer getMaxPage() {
+        return getFlow().getMaxSubCategoryIndex();
+    }
+
+    public SubCategory getCurrentSubCategory() {
+        return formService.getCategories().get(getFlow().getCurrentCategoryIndex()).getSubCategories()
+            .get(getFlow().getCurrentSubCategoryIndex());
     }
 
 }

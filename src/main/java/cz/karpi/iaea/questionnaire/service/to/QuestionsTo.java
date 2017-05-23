@@ -6,35 +6,17 @@ import java.util.List;
 /**
  * Created by karpi on 15.4.17.
  */
-public class QuestionsTo {
-    private String category;
-    private String subCategory;
-    private List<QuestionTo> questionList;
+public class QuestionsTo extends AbstractTo {
+    private List<QuestionTo> questions;
 
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public String getSubCategory() {
-        return subCategory;
-    }
-
-    public void setSubCategory(String subCategory) {
-        this.subCategory = subCategory;
-    }
-
-    public List<QuestionTo> getQuestionList() {
-        if (questionList == null) {
-            questionList = new ArrayList<>();
+    public List<QuestionTo> getQuestions() {
+        if (questions == null) {
+            questions = new ArrayList<>();
         }
-        return questionList;
+        return questions;
     }
 
-    public void setQuestionList(List<QuestionTo> questionList) {
-        this.questionList = questionList;
+    public void setQuestions(List<QuestionTo> questions) {
+        this.questions = questions;
     }
 }

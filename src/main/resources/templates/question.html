@@ -7,20 +7,20 @@
 
 <div class="container">
     <div class="starter-template">
-        <h1 th:text="${questions.category}">1) Overarching Capabilities</h1>
-        <h2 th:text="${questions.subCategory}">Multi-Agency Command, Control and Coordination</h2>
-        <form th:object="${answers}" method="post" class="form-horizontal">
+        <h2 class="sheet-title"><strong>SACS</strong> <span th:text="${#strings.concat('(', meta.currentPage, '/', meta.maxPage, ')')}">(2/10)</span></h2>
+        <h3><span th:text="${meta.category}">1) Overarching Capabilities</span> - <strong th:text="${meta.subCategory}">Multi-Agency Command, Control and Coordination</strong></h3>
+        <form th:object="${form}" method="post" class="form-horizontal">
             <div class="row common-errors" th:if="${#fields.hasAnyErrors()}">
                 <div class="col-xs-12">Form contains errors, please correct it.</div>
             </div>
-            <div th:each="question,questionStat : ${questions.questionList}" class="question-box">
+            <div th:each="question : ${meta.sacsAnswers}" class="question-box">
                 <div class="row">
                     <div class="col-xs-3"><strong>No.:</strong> <span th:text="${question.number}"></span></div>
-                    <div th:if="${question.type == 'AnswerWithPiGradeRow'}" class="col-xs-9"><strong>Response action:</strong> <span th:text="${question.text}"></span></div>
+                    <div th:if="${question.type == 'WITH_PIGRADE'}" class="col-xs-9"><strong>Response action:</strong> <span th:text="${question.question}"></span></div>
                 </div>
                 <div class="row">
-                    <div th:if="${question.type == 'AnswerWithPiGradeRow'}" th:class="${#fields.hasErrors('answerList[__${questionStat.index}__].piGrade')} ? 'col-xs-3 has-error' : 'col-xs-3'">
-                        <select title="PI Grade" th:field="*{answerList[__${questionStat.index}__].piGrade}" class="form-control pi-grade" required="required">
+                    <div th:if="${question.type == 'WITH_PIGRADE'}" th:class="'col-xs-3'">
+                        <select title="PI Grade" th:field="*{value[__${#questionnaireUtils.getPropertyName(question.number, 'piGrade')}__]}" class="form-control pi-grade">
                             <option value="">select PI Grade..</option>
                             <option value="3">3 - MS has full confidence in its capability</option>
                             <option value="2">2 - good confidence in the MS capability</option>
@@ -28,11 +28,11 @@
                             <option value="0">0 - no capability in place</option>
                         </select>
                     </div>
-                    <div th:if="${question.type == 'AnswerWithPiGradeRow'}" th:class="${#fields.hasErrors('answerList[__${questionStat.index}__].comments')} ? 'col-xs-9 has-error' : 'col-xs-9'">
-                        <textarea th:field="*{answerList[__${questionStat.index}__].comments}" class="form-control" placeholder="enter comments" required="required"></textarea>
+                    <div th:if="${question.type == 'WITH_PIGRADE'}" th:class="'col-xs-9'">
+                        <textarea th:field="*{value[__${#questionnaireUtils.getPropertyName(question.number, 'comments')}__]}" class="form-control" placeholder="enter comments"></textarea>
                     </div>
-                    <div th:if="${question.type == 'AdditionalCommentsRow'}" th:class="${#fields.hasErrors('answerList[__${questionStat.index}__].comments')} ? 'col-xs-12 has-error' : 'col-xs-12'">
-                        <textarea th:field="*{answerList[__${questionStat.index}__].comments}" class="form-control" placeholder="enter additional comments"></textarea>
+                    <div th:if="${question.type == 'ADDITIONAL_COMMENT'}" th:class="'col-xs-12'">
+                        <textarea th:field="*{value[__${#questionnaireUtils.getPropertyName(question.number, 'comments')}__]}" class="form-control" placeholder="enter additional comments"></textarea>
                     </div>
                 </div>
             </div>

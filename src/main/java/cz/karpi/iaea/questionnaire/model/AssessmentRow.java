@@ -6,16 +6,16 @@ import java.util.Map;
 /**
  * Created by karpi on 2.5.17.
  */
-public class AssessmentGridRow {
-    private AbstractAnswerRow answerRow;
+public class AssessmentRow {
+    private Question question;
     private Map<Element, Integer> elementsPiGrade;
 
-    public AbstractAnswerRow getAnswerRow() {
-        return answerRow;
+    public Question getQuestion() {
+        return question;
     }
 
-    public void setAnswerRow(AbstractAnswerRow answerRow) {
-        this.answerRow = answerRow;
+    public void setQuestion(Question question) {
+        this.question = question;
     }
 
     public Map<Element, Integer> getElementsPiGrade() {

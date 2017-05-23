@@ -1,6 +1,5 @@
 package cz.karpi.iaea.questionnaire.service.to;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,9 +9,6 @@ public class AnswersTo {
     private List<AnswerTo> answerList;
 
     public List<AnswerTo> getAnswerList() {
-        if (answerList == null) {
-            answerList = new ArrayList<>();
-        }
         return answerList;
     }
 

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public class SubCategory {
     private Category category;
     private String name;
-    private List<AbstractAnswerRow> answerRows;
+    private List<Question> questions;
 
     public Category getCategory() {
         return category;
@@ -27,14 +27,10 @@ public class SubCategory {
         this.name = name;
     }
 
-    public List<AbstractAnswerRow> getAnswerRows() {
-        if (answerRows == null) {
-            answerRows = new ArrayList<>();
+    public List<Question> getQuestions() {
+        if (questions == null) {
+            questions = new ArrayList<>();
         }
-        return answerRows;
-    }
-
-    public void setAnswerRows(List<AbstractAnswerRow> answerRows) {
-        this.answerRows = answerRows;
+        return questions;
     }
 }

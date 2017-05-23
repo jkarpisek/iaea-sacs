@@ -5,37 +5,57 @@
 
 <nav th:replace="fragments :: navigation"></nav>
 
-<div class="container">
+<div class="container-fluid">
     <div class="starter-template">
-        <h1>1) Overarching Capabilities</h1>
-        <h2>Multi-Agency Command, Control and Coordination</h2>
-        <form method="post" class="form-horizontal">
-            <!--<div class="row common-errors" th:if="${#fields.hasAnyErrors()}">
+        <h2 class="sheet-title"><strong>Capability Development Plan</strong> <span th:text="${#strings.concat('(', meta.currentPage, '/', meta.maxPage, ')')}">(2/10)</span></h2>
+        <h3><span th:text="${meta.category}">1) Overarching Capabilities</span> - <strong th:text="${meta.subCategory}">Multi-Agency Command, Control and Coordination</strong></h3>
+        <form method="post" class="form-horizontal" th:object="${form}">
+            <div class="row common-errors" th:if="${#fields.hasAnyErrors()}">
                 <div class="col-xs-12">Form contains errors, please correct it.</div>
             </div>
-            <div th:each="question,questionStat : ${questions.questionList}" class="question-box">
-                <div class="row">
-                    <div class="col-xs-3"><strong>No.:</strong> <span th:text="${question.number}"></span></div>
-                    <div th:if="${question.type == 'AnswerWithPiGradeRow'}" class="col-xs-9"><strong>Response action:</strong> <span th:text="${question.text}"></span></div>
-                </div>
-                <div class="row">
-                    <div th:if="${question.type == 'AnswerWithPiGradeRow'}" th:class="${#fields.hasErrors('answerList[__${questionStat.index}__].piGrade')} ? 'col-xs-3 has-error' : 'col-xs-3'">
-                        <select title="PI Grade" th:field="*{answerList[__${questionStat.index}__].piGrade}" class="form-control pi-grade" required="required">
-                            <option value="">select PI Grade..</option>
-                            <option value="3">3 - MS has full confidence in its capability</option>
-                            <option value="2">2 - good confidence in the MS capability</option>
-                            <option value="1">1 - low confidence in the MS capability</option>
-                            <option value="0">0 - no capability in place</option>
-                        </select>
-                    </div>
-                    <div th:if="${question.type == 'AnswerWithPiGradeRow'}" th:class="${#fields.hasErrors('answerList[__${questionStat.index}__].comments')} ? 'col-xs-9 has-error' : 'col-xs-9'">
-                        <textarea th:field="*{answerList[__${questionStat.index}__].comments}" class="form-control" placeholder="enter comments" required="required"></textarea>
-                    </div>
-                    <div th:if="${question.type == 'AdditionalCommentsRow'}" th:class="${#fields.hasErrors('answerList[__${questionStat.index}__].comments')} ? 'col-xs-12 has-error' : 'col-xs-12'">
-                        <textarea th:field="*{answerList[__${questionStat.index}__].comments}" class="form-control" placeholder="enter additional comments"></textarea>
-                    </div>
-                </div>
-            </div>-->
+            <table class="table">
+                <thead>
+                <tr>
+                    <th rowspan="2">No.</th>
+                    <th rowspan="2">Response action</th>
+                    <th rowspan="2">Comment</th>
+                    <th rowspan="2">Element</th>
+                    <th rowspan="2">PI grade</th>
+                    <th rowspan="2" style="min-width: 250px;">Development plan</th>
+                    <th rowspan="2" style="min-width: 250px;">Ownership</th>
+                    <th th:each="year : ${meta.years}" th:text="${year.name}" colspan="4">2017</th>
+                </tr>
+                <tr>
+                    <th:block th:each="year : ${meta.years}">
+                        <th th:each="quarter : ${year.quarters}" th:text="${#strings.concat(quarter.name, 'Q')}">1Q</th>
+                    </th:block>
+                </tr>
+                </thead>
+                <tbody>
+                    <th:block th:each="answer : ${meta.sacsAnswers}">
+                        <tr>
+                            <td th:rowspan="${1 + #lists.size(meta.elements)}" th:text="${answer.number}">O-1</td>
+                            <td th:rowspan="${1 + #lists.size(meta.elements)}" th:text="${answer.question}">All agencies to be involved in response to NSE identified</td>
+                            <td th:rowspan="${1 + #lists.size(meta.elements)}" th:text="${answer.answer}">Most of the agencies involved in the response have been identified, but the formal policies, protocols and agreements are not yet all completed. This includes the national response plan.</td>
+                        </tr>
+                        <tr th:each="element : ${meta.elements}">
+                            <td th:text="${element.name}">Policy</td>
+                            <td th:text="${answer.piGrade[__${element.name}__]}">1</td>
+                            <td><input th:field="*{value[__${#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', element.name), 'task')}__]}" class="form-control"/></td>
+                            <td><input th:field="*{value[__${#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', element.name), 'ownership')}__]}" class="form-control"/></td>
+                            <th:block th:each="year : ${meta.years}">
+                                <td class="planning-column" th:each="quarter: ${year.quarters}">
+                                    <input th:field="*{value[__${#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', element.name), #strings.concat(year.name, '-', quarter.name))}__]}" th:id="${#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', element.name), #strings.concat(year.name, '-', quarter.name))}" type="checkbox" class="planning-checkbox" value="true"/>
+                                    <label th:for="${#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', element.name), #strings.concat(year.name, '-', quarter.name))}" class="planning-label">
+                                        <span class="planning-line"></span>
+                                    </label>
+                                </td>
+                            </th:block>
+                        </tr>
+                    </th:block>
+                </tbody>
+            </table>
+
             <span th:replace="fragments :: buttons"></span>
         </form>
     </div>

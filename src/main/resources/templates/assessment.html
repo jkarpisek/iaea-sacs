@@ -5,37 +5,46 @@
 
 <nav th:replace="fragments :: navigation"></nav>
 
-<div class="container">
+<div class="container-fluid">
     <div class="starter-template">
-        <h1>1) Overarching Capabilities</h1>
-        <h2>Multi-Agency Command, Control and Coordination</h2>
-        <form method="post" class="form-horizontal">
-            <!--<div class="row common-errors" th:if="${#fields.hasAnyErrors()}">
+        <h2 class="sheet-title"><strong>Assessment grid</strong> <span th:text="${#strings.concat('(', meta.currentPage, '/', meta.maxPage, ')')}">(2/10)</span></h2>
+        <h3><span th:text="${meta.category}">1) Overarching Capabilities</span> - <strong th:text="${meta.subCategory}">Multi-Agency Command, Control and Coordination</strong></h3>
+        <form method="post" class="form-horizontal" th:object="${form}">
+            <div class="row common-errors" th:if="${#fields.hasAnyErrors()}">
                 <div class="col-xs-12">Form contains errors, please correct it.</div>
             </div>
-            <div th:each="question,questionStat : ${questions.questionList}" class="question-box">
-                <div class="row">
-                    <div class="col-xs-3"><strong>No.:</strong> <span th:text="${question.number}"></span></div>
-                    <div th:if="${question.type == 'AnswerWithPiGradeRow'}" class="col-xs-9"><strong>Response action:</strong> <span th:text="${question.text}"></span></div>
-                </div>
-                <div class="row">
-                    <div th:if="${question.type == 'AnswerWithPiGradeRow'}" th:class="${#fields.hasErrors('answerList[__${questionStat.index}__].piGrade')} ? 'col-xs-3 has-error' : 'col-xs-3'">
-                        <select title="PI Grade" th:field="*{answerList[__${questionStat.index}__].piGrade}" class="form-control pi-grade" required="required">
-                            <option value="">select PI Grade..</option>
-                            <option value="3">3 - MS has full confidence in its capability</option>
-                            <option value="2">2 - good confidence in the MS capability</option>
-                            <option value="1">1 - low confidence in the MS capability</option>
-                            <option value="0">0 - no capability in place</option>
-                        </select>
-                    </div>
-                    <div th:if="${question.type == 'AnswerWithPiGradeRow'}" th:class="${#fields.hasErrors('answerList[__${questionStat.index}__].comments')} ? 'col-xs-9 has-error' : 'col-xs-9'">
-                        <textarea th:field="*{answerList[__${questionStat.index}__].comments}" class="form-control" placeholder="enter comments" required="required"></textarea>
-                    </div>
-                    <div th:if="${question.type == 'AdditionalCommentsRow'}" th:class="${#fields.hasErrors('answerList[__${questionStat.index}__].comments')} ? 'col-xs-12 has-error' : 'col-xs-12'">
-                        <textarea th:field="*{answerList[__${questionStat.index}__].comments}" class="form-control" placeholder="enter additional comments"></textarea>
-                    </div>
-                </div>
-            </div>-->
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>SACS Overall PI Grade</th>
+                        <th th:each="element : ${meta.elements}" th:text="${element.name}">Policy</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <th:block th:each="answer : ${meta.sacsAnswers}">
+                        <tr>
+                            <td rowspan="3" style="white-space: nowrap; vertical-align: middle;" th:text="${answer.number}">O-1</td>
+                            <td colspan="10"><i>Response action: </i><span th:text="${answer.question}">All agencies to be involved in response to NSE identified</span></td>
+                        </tr>
+                        <tr>
+                            <td colspan="10"><i>SACS Comment: </i><!--<span th:text="${answer.answer}">Most of the agencies involved in the response have been identified, but the formal policies, protocols and agreements are not yet all completed. This includes the national response plan.</span>--></td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td th:each="element : ${meta.elements}">
+                                <select th:title="${#strings.concat(element.name, ' grade')}" th:field="*{value[__${#questionnaireUtils.getPropertyName(answer.number, element.name)}__]}" class="form-control pi-grade">
+                                    <option value="" th:text="${#strings.concat(element.name, ' grade')}">Policy grade...</option>
+                                    <option value="3">3 - MS has full confidence in its capability</option>
+                                    <option value="2">2 - good confidence in the MS capability</option>
+                                    <option value="1">1 - low confidence in the MS capability</option>
+                                    <option value="0">0 - no capability in place</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </th:block>
+                </tbody>
+            </table>
             <span th:replace="fragments :: buttons"></span>
         </form>
     </div>

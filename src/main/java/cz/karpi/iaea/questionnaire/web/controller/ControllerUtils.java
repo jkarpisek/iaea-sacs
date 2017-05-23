@@ -4,9 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 
-import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import cz.karpi.iaea.questionnaire.service.QuestionnaireFacadeService;
@@ -23,7 +23,11 @@ public class ControllerUtils {
     private static final String PATTERN_PAGE = "%s";
     private static final String PATTERN_PAGE_REDIRECT = "redirect:/%s";
 
-    private static final String MODEL_ATTRIBUTE_COMMON = "common";
+    protected static final String MODEL_ATTRIBUTE_COMMON = "common";
+    protected static final String MODEL_ATTRIBUTE_INIT = "init";
+    protected static final String MODEL_ATTRIBUTE_CDP = "cdp";
+    protected static final String MODEL_ATTRIBUTE_FORM = "form";
+    protected static final String MODEL_ATTRIBUTE_META = "meta";
 
     private final QuestionnaireFacadeService questionnaireFacadeService;
 
@@ -39,10 +43,11 @@ public class ControllerUtils {
         try {
             serviceCall.get();
         } catch (ValidationException e) {
+            errors.addError(new ObjectError(MODEL_ATTRIBUTE_FORM, "Form contains some errors"));
             //todo ATTRIBUTE, answerList, message
-            ((List<Object[]>) e.getErrors()).forEach(objs -> {
+            /*((List<Object[]>) e.getErrors()).forEach(objs -> {
                 errors.addError(new FieldError("", "answerList[" + objs[0] + "]." + objs[1], "Cannot be empty"));
-            });
+            });*/
         }
     }
 
@@ -52,10 +57,11 @@ public class ControllerUtils {
         return toPage(commonTo.getState(), false);
     }
 
-    protected String returnPost(Model model, BindingResult errors) {
+    protected String returnPost(Model model, Map<String, Object> meta, BindingResult errors) {
         final CommonTo commonTo = questionnaireFacadeService.getCommonTo();
         if (errors != null && errors.hasErrors()) {
             model.addAttribute(MODEL_ATTRIBUTE_COMMON, viewConverter.toCommonVo(commonTo));
+            model.addAttribute(MODEL_ATTRIBUTE_META, meta);
             return null;
         }
         return toPage(commonTo.getState(), true);
