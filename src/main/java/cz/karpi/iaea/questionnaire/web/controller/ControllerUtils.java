@@ -24,7 +24,6 @@ public class ControllerUtils {
     private static final String PATTERN_PAGE_REDIRECT = "redirect:/%s";
 
     protected static final String MODEL_ATTRIBUTE_COMMON = "common";
-    protected static final String MODEL_ATTRIBUTE_INIT = "init";
     protected static final String MODEL_ATTRIBUTE_CDP = "cdp";
     protected static final String MODEL_ATTRIBUTE_FORM = "form";
     protected static final String MODEL_ATTRIBUTE_META = "meta";

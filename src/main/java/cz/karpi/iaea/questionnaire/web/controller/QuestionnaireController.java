@@ -19,7 +19,6 @@ import cz.karpi.iaea.questionnaire.web.model.MatrixModel;
 
 import static cz.karpi.iaea.questionnaire.web.controller.ControllerUtils.MODEL_ATTRIBUTE_CDP;
 import static cz.karpi.iaea.questionnaire.web.controller.ControllerUtils.MODEL_ATTRIBUTE_FORM;
-import static cz.karpi.iaea.questionnaire.web.controller.ControllerUtils.MODEL_ATTRIBUTE_INIT;
 import static cz.karpi.iaea.questionnaire.web.controller.ControllerUtils.MODEL_ATTRIBUTE_META;
 
 /**
@@ -52,13 +51,13 @@ public class QuestionnaireController {
     @RequestMapping("/start")
     public String start(Model model) {
         questionnaireFacadeService.reset();
-        model.addAttribute(MODEL_ATTRIBUTE_INIT, new InitVo());
+        model.addAttribute(MODEL_ATTRIBUTE_FORM, viewConverter.toInitFormVo());
         return controllerUtils.returnGet(model);
     }
 
     @FlowInterceptor.FlowCheck(Flow.EFlowType.START)
     @RequestMapping(value = "/start", method = RequestMethod.POST)
-    public String start(@ModelAttribute(MODEL_ATTRIBUTE_INIT) InitVo initVo, BindingResult errors, Model model) {
+    public String start(@ModelAttribute(MODEL_ATTRIBUTE_FORM) InitVo initVo, BindingResult errors, Model model) {
         controllerUtils.catchValidationException(errors, () -> questionnaireFacadeService.init(viewConverter.toInitTo(initVo)));
         return controllerUtils.returnPost(model, null, errors);
     }

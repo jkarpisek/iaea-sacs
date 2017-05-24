@@ -8,7 +8,7 @@
 <div class="container">
     <div class="starter-template">
         <h1>SACS questionnaire</h1>
-        <form th:object="${init}" method="post">
+        <form th:object="${form}" method="post">
             <div class="row common-errors" th:if="${#fields.hasAnyErrors()}">
                 <div class="col-xs-12">Form contains errors, please correct it.</div>
             </div>
