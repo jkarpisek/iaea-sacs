@@ -5,6 +5,9 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.FileCopyUtils;
 
@@ -50,49 +53,54 @@ public class FormDao {
     private static final Integer PI_GRADE_CELL_INDEX = 3;
     private static final Integer COMMENTS_CELL_INDEX = 4;
 
-    private Map<Element, Integer> assessmentElementColumn = new HashMap<>();
-    private Map<Element, Integer> plannerElementIndex = new HashMap<>();
-    private Map<Quarter, Integer> plannerQuarterIndex = new HashMap<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(FormDao.class);
+
+    private File excelFile;
+    private Map<Element, Integer> assessmentElementColumn;
+    private Map<Element, Integer> plannerElementIndex;
+    private Map<Quarter, Integer> plannerQuarterIndex;
 
     public void reset() {
-        assessmentElementColumn.clear();
-        plannerElementIndex.clear();
-        plannerQuarterIndex.clear();
+        excelFile = null;
+        assessmentElementColumn = new HashMap<>();
+        plannerElementIndex = new HashMap<>();
+        plannerQuarterIndex = new HashMap<>();
     }
 
-    private Workbook getWorkbook(String companyName) {
+    private Workbook getWorkbook() {
         try {
-            final String excelName = MessageFormat.format(EXCEL_NAME, companyName);
-            final File myFile = new File(excelName);
-            final FileInputStream fis = new FileInputStream(myFile);
-            return new XSSFWorkbook(fis);
+            final FileInputStream fis = new FileInputStream(excelFile);
+            final Workbook workbook = new XSSFWorkbook(fis);
+            fis.close();
+            return workbook;
         } catch (Exception e) {
             throw new DaoExpcetion("Load file failed", e);
         }
     }
 
-    private void saveWorkbook(Workbook workbook, String companyName) {
+    private synchronized void saveWorkbook(Workbook workbook) {
         try {
-            final String excelName = MessageFormat.format(EXCEL_NAME, companyName);
-            final FileOutputStream os = new FileOutputStream(new File(excelName));
+            final FileOutputStream os = new FileOutputStream(excelFile);
             workbook.write(os);
+            os.close();
         } catch (Exception e) {
             throw new DaoExpcetion("Save file failed", e);
         }
     }
 
     public void copyForm(String companyName) {
-        final File source = new File(EXCEL_TEMPLATE_NAME);
-        final File dest = new File(MessageFormat.format(EXCEL_NAME, companyName));
         try {
-            FileCopyUtils.copy(source, dest);
+            final File source = new File(EXCEL_TEMPLATE_NAME);
+            excelFile = new File(MessageFormat.format(EXCEL_NAME, companyName));
+            FileCopyUtils.copy(source, excelFile);
         } catch (IOException e) {
             throw new DaoExpcetion("Copy template file failed", e);
         }
     }
 
-    public void saveForm(String companyName, List<AnswerRow> answerRows) {
-        save(companyName, EXCEL_SHEET_SACS_NAME, (mySheet) -> {
+    @Async
+    public void saveForm(List<AnswerRow> answerRows) {
+        save(EXCEL_SHEET_SACS_NAME, (mySheet) -> {
             answerRows.forEach(answerRow -> {
                 final Row row = mySheet.getRow(getRowNum(mySheet, FIRST_CELL_INDEX, answerRow.getQuestion().getNumber()));
                 if (answerRow.getQuestion().getType().equals(EQuestionType.ADDITIONAL_COMMENT)) {
@@ -111,8 +119,8 @@ public class FormDao {
             .findFirst().orElseThrow(() -> new DaoExpcetion("Row #" + content + " not found", null));
     }
 
-    public List<Category> getSACSDefinition(String companyName) {
-        final Sheet mySheet = getWorkbook(companyName).getSheet(EXCEL_SHEET_SACS_NAME);
+    public List<Category> getSACSDefinition() {
+        final Sheet mySheet = getWorkbook().getSheet(EXCEL_SHEET_SACS_NAME);
         final List<Category> categories = new ArrayList<>();
         Category category = null;
         SubCategory subCategory = null;
@@ -152,7 +160,7 @@ public class FormDao {
     }
 
     public List<Category> getSACSData(String companyName) {
-        final Sheet mySheet = getWorkbook(companyName).getSheet(EXCEL_SHEET_SACS_NAME);
+        final Sheet mySheet = getWorkbook().getSheet(EXCEL_SHEET_SACS_NAME);
         final List<Category> categories = new ArrayList<>();
         Category category = null;
         SubCategory subCategory = null;
@@ -196,8 +204,8 @@ public class FormDao {
         return categories;
     }
 
-    public List<Element> getAssessmentDefinition(String companyName) {
-        final Sheet mySheet = getWorkbook(companyName).getSheet(EXCEL_SHEET_ASSESSMENT_NAME);
+    public List<Element> getAssessmentDefinition() {
+        final Sheet mySheet = getWorkbook().getSheet(EXCEL_SHEET_ASSESSMENT_NAME);
         final Row row = mySheet.getRow(1);
         final Iterable<Cell> cellIterable = row::cellIterator;
         return StreamSupport.stream(cellIterable.spliterator(), false).filter(cell -> cell.getColumnIndex() >= 4 && !cell.getStringCellValue().equals("")).map(cell -> {
@@ -208,8 +216,9 @@ public class FormDao {
         }).collect(Collectors.toList());
     }
 
-    public void saveAssessmentAnswers(String companyName, List<AssessmentRow> answerRows) {
-        save(companyName, EXCEL_SHEET_ASSESSMENT_NAME, (mySheet) ->
+    @Async
+    public void saveAssessmentAnswers(List<AssessmentRow> answerRows) {
+        save(EXCEL_SHEET_ASSESSMENT_NAME, (mySheet) ->
             answerRows.forEach(answerRow -> {
                 final Row row = mySheet.getRow(getRowNum(mySheet, FIRST_CELL_INDEX, answerRow.getQuestion().getNumber()));
                 /*TODO ulozit AnswerRow*/
@@ -218,8 +227,9 @@ public class FormDao {
         );
     }
 
-    public void savePlannerAnswers(String companyName, List<PlannerRow> answerRows) {
-        save(companyName, convertNumberToSheetName(answerRows.get(0).getQuestion().getNumber()), (mySheet) ->
+    @Async
+    public void savePlannerAnswers(List<PlannerRow> answerRows) {
+        save( convertNumberToSheetName(answerRows.get(0).getQuestion().getNumber()), (mySheet) ->
             answerRows.forEach(answerRow -> {
                 final Row row = mySheet.getRow(getRowNum(mySheet, FIRST_CELL_INDEX, answerRow.getQuestion().getNumber()) + getPlannerElementIndex(answerRow.getElement()));
                 /*TODO ulozit AssessmentRow*/
@@ -230,10 +240,10 @@ public class FormDao {
         );
     }
 
-    private void save(String companyName, String sheetName, Consumer<Sheet> fillData) {
-        final Workbook workbook = getWorkbook(companyName);
+    private void save(String sheetName, Consumer<Sheet> fillData) {
+        final Workbook workbook = getWorkbook();
         fillData.accept(getSheet(workbook, sheetName));
-        saveWorkbook(workbook, companyName);
+        saveWorkbook(workbook);
     }
 
     private Integer getPlannerElementIndex(Element element) {
@@ -253,12 +263,11 @@ public class FormDao {
             .mapToObj(workbook::getSheetAt).findFirst().orElseThrow(() -> new RuntimeException("Sheet with name " + sheetName + " not found"));
     }
 
-    //todo vytvaret nove
-    public List<Year> getPlannerDefinition(String companyName, String number, List<Year> defaultYears) {
-        final Sheet sheet = getSheet(getWorkbook(companyName), convertNumberToSheetName(number));
+    public List<Year> getPlannerDefinition(String number, List<Year> defaultYears) {
+        final Sheet sheet = getSheet(getWorkbook(), convertNumberToSheetName(number));
         final Row row = sheet.getRow(1);
         final Iterable<Cell> cellIterable = row::cellIterator;
-        //todo najit stavajici, kdyz nejsou vzit default, zapsat do XLS. vratit
+        //todo najit stavajici, kdyz nejsou vzit, pak default zapsat do XLS a vratit
         final Map<Integer, Year> years = new HashMap<>();
         final List<Quarter> quarters = StreamSupport.stream(cellIterable.spliterator(), false)
             .filter(cell -> cell.getStringCellValue().replaceAll("\\s", "").matches("[1-4]Q20[0-9]{2}"))
@@ -280,7 +289,7 @@ public class FormDao {
             return yearsSorted;
         } else {
             throw new RuntimeException("Load quarters is not supported");
-            //return defaultYears;
+            //todo return defaultYears;
         }
     }
 }

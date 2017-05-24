@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -38,41 +40,38 @@ public class FormService {
 
     private List<Year> years;
 
+    private Map<Question, AnswerRow> sacsRows;
+
+    private Map<Question, AssessmentRow> assessmentRows;
+
+    private Map<Question, Map<Element, PlannerRow>> plannerRows;
+
     @Autowired
     private FormDao formDao;
 
     public void reset() {
         companyName = null;
         categories = null;
+        sacsRows = null;
         elements = null;
+        assessmentRows = null;
         years = null;
+        plannerRows = null;
         formDao.reset();
-    }
-
-    public void saveAnswer(AnswersTo answersTo) {
-        final List<AnswerRow> answers = answersTo.getAnswerList().stream().map(answerTo -> {
-            final Question question = getQuestion(answerTo.getNumber());
-            final AnswerRow answerRow = new AnswerRow();
-            answerRow.setQuestion(question);
-            answerRow.setComments(answerTo.getComments());
-            if (question.getType().equals(EQuestionType.WITH_PIGRADE)) {
-                answerRow.setPiGrade(answerTo.getPiGrade());
-            }
-            return answerRow;
-        }).collect(Collectors.toList());
-
-        formDao.saveForm(getCompanyName(), answers);
-    }
-
-    public void saveInit(InitTo initTo) {
-        this.companyName = initTo.getCompanyName();
     }
 
     public void loadDefinitions() {
         formDao.copyForm(companyName);
-        categories = formDao.getSACSDefinition(companyName);
-        elements = formDao.getAssessmentDefinition(companyName);
-        years = formDao.getPlannerDefinition(companyName, categories.get(0).getSubCategories().get(0).getQuestions().get(0).getNumber(), generateYears());
+        categories = formDao.getSACSDefinition();
+        sacsRows = new HashMap<>();
+        elements = formDao.getAssessmentDefinition();
+        assessmentRows = new HashMap<>();
+        years = formDao.getPlannerDefinition(categories.get(0).getSubCategories().get(0).getQuestions().get(0).getNumber(), generateYears());
+        plannerRows = new HashMap<>();
+    }
+
+    public void saveInit(InitTo initTo) {
+        this.companyName = initTo.getCompanyName();
     }
 
     public List<Category> getCategories() {
@@ -114,14 +113,31 @@ public class FormService {
         return companyName;
     }
 
+    public void saveAnswer(AnswersTo answersTo) {
+        final List<AnswerRow> answers = answersTo.getAnswerList().stream().map(answerTo -> {
+            final Question question = getQuestion(answerTo.getNumber());
+            final AnswerRow answerRow = new AnswerRow();
+            answerRow.setQuestion(question);
+            answerRow.setComments(answerTo.getComments());
+            if (question.getType().equals(EQuestionType.WITH_PIGRADE)) {
+                answerRow.setPiGrade(answerTo.getPiGrade());
+            }
+            sacsRows.put(answerRow.getQuestion(), answerRow);
+            return answerRow;
+        }).collect(Collectors.toList());
+
+        formDao.saveForm(answers);
+    }
+
     public void saveAssessmentAnswer(AssessmentAnswersTo assessmentAnswersTo) {
         final List<AssessmentRow> answers = assessmentAnswersTo.getAnswerList().stream().map(assessmentAnswerTo -> {
             final AssessmentRow assessmentRow = new AssessmentRow();
             assessmentRow.setQuestion(getQuestion(assessmentAnswerTo.getNumber()));
             assessmentRow.setElementsPiGrade(assessmentAnswerTo.getPiGrades());
+            assessmentRows.put(assessmentRow.getQuestion(), assessmentRow);
             return assessmentRow;
         }).collect(Collectors.toList());
-        formDao.saveAssessmentAnswers(getCompanyName(), answers);
+        formDao.saveAssessmentAnswers(answers);
     }
 
     public void savePlannerAnswer(PlannerAnswersTo plannerAnswersTo) {
@@ -132,8 +148,21 @@ public class FormService {
             plannerRow.setOwnership(plannerAnswerTo.getOwnership());
             plannerRow.setTask(plannerAnswerTo.getTask());
             plannerRow.setPlanned(plannerAnswerTo.getPlanned());
+            plannerRows.putIfAbsent(plannerRow.getQuestion(), new HashMap<>()).put(plannerRow.getElement(), plannerRow);
             return plannerRow;
         }).collect(Collectors.toList());
-        formDao.savePlannerAnswers(getCompanyName(), answers);
+        formDao.savePlannerAnswers(answers);
+    }
+
+    public AnswerRow getAnswerRow(Question question) {
+        return sacsRows.getOrDefault(question, new AnswerRow());
+    }
+
+    public AssessmentRow getAssessmentRow(Question question) {
+        return assessmentRows.getOrDefault(question, new AssessmentRow());
+    }
+
+    public PlannerRow getPlannerRow(Question question, Element element) {
+        return plannerRows.putIfAbsent(question, new HashMap<>()).getOrDefault(element, new PlannerRow());
     }
 }

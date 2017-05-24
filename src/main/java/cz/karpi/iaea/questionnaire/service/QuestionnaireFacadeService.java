@@ -9,8 +9,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import cz.karpi.iaea.questionnaire.model.AnswerRow;
+import cz.karpi.iaea.questionnaire.model.AssessmentRow;
 import cz.karpi.iaea.questionnaire.model.EQuestionType;
 import cz.karpi.iaea.questionnaire.model.Element;
+import cz.karpi.iaea.questionnaire.model.PlannerRow;
 import cz.karpi.iaea.questionnaire.model.Question;
 import cz.karpi.iaea.questionnaire.model.SubCategory;
 import cz.karpi.iaea.questionnaire.service.to.AnswerTo;
@@ -95,9 +98,10 @@ public class QuestionnaireFacadeService {
     private AnswerTo mapToAnswer(Question question) {
         final AnswerTo answerTo = new AnswerTo();
         answerTo.setNumber(question.getNumber());
-        answerTo.setComments(/*TODO*/"");
+        final AnswerRow answerRow = formService.getAnswerRow(question);
+        answerTo.setComments(answerRow.getComments());
         if (question.getType().equals(EQuestionType.WITH_PIGRADE)) {
-            answerTo.setPiGrade(/*TODO*/0);
+            answerTo.setPiGrade(answerRow.getPiGrade());
         }
         return answerTo;
     }
@@ -154,8 +158,13 @@ public class QuestionnaireFacadeService {
     private AssessmentAnswerTo mapToAssessmentAnswer(Question question) {
         final AssessmentAnswerTo answerTo = new AssessmentAnswerTo();
         answerTo.setNumber(question.getNumber());
-        answerTo.setPiGrades(formService.getElements().stream().collect(Collectors.toMap(e -> e, e -> /*TODO*/0)));
+        final AssessmentRow assessmentRow = formService.getAssessmentRow(question);
+        answerTo.setPiGrades(formService.getElements().stream().collect(Collectors.toMap(e -> e, e -> getPiGrade(assessmentRow.getElementsPiGrade().get(e)))));
         return answerTo;
+    }
+
+    private Integer getPiGrade(Integer piGrade) {
+        return piGrade != null ? piGrade : -1;
     }
 
     public Void assessment(AssessmentAnswersTo assessmentAnswersTo, FlowService.EAction action) {
@@ -200,12 +209,13 @@ public class QuestionnaireFacadeService {
         final List<PlannerAnswerTo> plannerAnswerToList = new ArrayList<>();
         formService.getElements().forEach(element -> {
             final PlannerAnswerTo plannerAnswerTo = new PlannerAnswerTo();
+            final PlannerRow plannerRow = formService.getPlannerRow(question, element);
             plannerAnswerTo.setElement(element);
             plannerAnswerTo.setNumber(question.getNumber());
             plannerAnswerTo.setPlanned(formService.getYears().stream().flatMap(year -> year.getQuarters().stream())
-                                           .collect(Collectors.toMap(quarter -> quarter, quarter -> /*TODO*/Boolean.FALSE)));
-            plannerAnswerTo.setOwnership(/*TODO*/"");
-            plannerAnswerTo.setTask(/*TODO*/"");
+                                           .collect(Collectors.toMap(quarter -> quarter, quarter -> Boolean.TRUE.equals(plannerRow.getPlanned().get(quarter)))));
+            plannerAnswerTo.setOwnership(plannerRow.getOwnership());
+            plannerAnswerTo.setTask(plannerRow.getTask());
             plannerAnswerToList.add(plannerAnswerTo);
         });
         return plannerAnswerToList.stream();
