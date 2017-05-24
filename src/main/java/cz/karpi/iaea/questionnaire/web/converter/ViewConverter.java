@@ -61,7 +61,7 @@ public class ViewConverter {
             final Object comments = matrixMap.get(questionnaireDialectUtils.getPropertyName(answerTo.getNumber(), FIELD_ANSWER_COMMENTS));
             answerTo.setComments(comments != null ? comments.toString() : null);
             final Object piGrade = matrixMap.get(questionnaireDialectUtils.getPropertyName(answerTo.getNumber(), FIELD_ANSWER_PIGRADE));
-            answerTo.setPiGrade(piGrade != null ? Integer.valueOf(piGrade.toString()) : null);
+            answerTo.setPiGrade(piGrade != null && piGrade.toString().matches("[0-9]+")? Integer.valueOf(piGrade.toString()) : null);
         });
         return answersTo;
     }
@@ -200,5 +200,9 @@ public class ViewConverter {
 
     public Object toCdpVo(Object o) {
         return null;
+    }
+
+    public InitVo toInitFormVo() {
+        return new InitVo();
     }
 }
