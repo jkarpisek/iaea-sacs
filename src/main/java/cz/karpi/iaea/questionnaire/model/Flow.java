@@ -1,5 +1,7 @@
 package cz.karpi.iaea.questionnaire.model;
 
+import java.util.function.Supplier;
+
 /**
  * Created by karpi on 17.4.17.
  */
@@ -8,11 +10,9 @@ public class Flow {
     private EFlowType flowType;
     private Integer currentCategoryIndex;
     private Integer currentSubCategoryIndex;
-    private Integer maxSubCategoryIndex;
 
     public Flow() {
         resetFlow(EFlowType.START);
-        this.maxSubCategoryIndex = 0;
     }
 
     public EFlowType getFlowType() {
@@ -25,14 +25,6 @@ public class Flow {
 
     public Integer getCurrentSubCategoryIndex() {
         return currentSubCategoryIndex;
-    }
-
-    public Integer getMaxSubCategoryIndex() {
-        return maxSubCategoryIndex;
-    }
-
-    public void setMaxSubCategoryIndex(Integer maxSubCategoryIndex) {
-        this.maxSubCategoryIndex = maxSubCategoryIndex;
     }
 
     public void resetFlow(Flow.EFlowType flowType) {
@@ -50,9 +42,9 @@ public class Flow {
         resetSubCategory();
     }
 
-    public void downCategory(Integer subCategory) {
+    public void downCategory(Supplier<Integer> subCategory) {
         currentCategoryIndex = getCurrentCategoryIndex() - 1;
-        currentSubCategoryIndex = subCategory;
+        currentSubCategoryIndex = subCategory.get();
     }
 
     public void resetSubCategory() {
@@ -67,9 +59,9 @@ public class Flow {
         currentSubCategoryIndex = getCurrentSubCategoryIndex() - 1;
     }
 
-    public void setCategoryAndSubCategory(Integer category, Integer subCategory) {
+    public void setCategoryAndSubCategory(Integer category, Supplier<Integer> subCategory) {
         currentCategoryIndex = category;
-        currentSubCategoryIndex = subCategory;
+        currentSubCategoryIndex = subCategory.get();
     }
 
 }

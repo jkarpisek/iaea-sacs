@@ -41,23 +41,27 @@ public class FlowService {
                 getFlow().resetFlow(Flow.EFlowType.INSTRUCTION);
                 break;
             case INSTRUCTION:
-                getFlow().resetFlow(Flow.EFlowType.ASSESSMENT);
+                getFlow().resetFlow(Flow.EFlowType.QUESTION);
                 break;
             case QUESTION:
-                if (getCurrentSubCategory().getCategory().getSubCategories().size() > getFlow().getCurrentSubCategoryIndex() + 1) {
-                    getFlow().upSubCategory();
-                } else if (formService.getCategories().size() > getFlow().getCurrentCategoryIndex() + 1){
-                    getFlow().upCategory();
-                } else {
-                    getFlow().resetFlow(Flow.EFlowType.ASSESSMENT);
-                }
+                resolveCategoryNext(Flow.EFlowType.ASSESSMENT);
                 break;
             case ASSESSMENT:
-                getFlow().resetFlow(Flow.EFlowType.PLANNER);
+                resolveCategoryNext(Flow.EFlowType.PLANNER);
                 break;
             case PLANNER:
-                getFlow().resetFlow(Flow.EFlowType.CDP);
+                resolveCategoryNext(Flow.EFlowType.CDP);
                 break;
+        }
+    }
+
+    private void resolveCategoryNext(Flow.EFlowType next) {
+        if (getCurrentSubCategory().getCategory().getSubCategories().size() > getFlow().getCurrentSubCategoryIndex() + 1) {
+            getFlow().upSubCategory();
+        } else if (formService.getCategories().size() > getFlow().getCurrentCategoryIndex() + 1){
+            getFlow().upCategory();
+        } else {
+            getFlow().resetFlow(next);
         }
     }
 
@@ -67,26 +71,28 @@ public class FlowService {
                 getFlow().resetFlow(Flow.EFlowType.START);
                 break;
             case QUESTION:
-                if (getFlow().getCurrentSubCategoryIndex() > 0) {
-                    getFlow().downSubCategory();
-                } else if (getFlow().getCurrentCategoryIndex() > 0){
-                    getFlow().downCategory(getCurrentSubCategory().getCategory().getSubCategories().size() - 1);
-                } else {
-                    getFlow().resetFlow(Flow.EFlowType.INSTRUCTION);
-                }
+                resolveCategoryPrevious(Flow.EFlowType.INSTRUCTION, 0);
                 break;
             case ASSESSMENT:
-                getFlow().resetFlow(Flow.EFlowType.QUESTION);
-                getFlow().setCategoryAndSubCategory(formService.getCategories().size() - 1, getCurrentSubCategory().getCategory().getSubCategories().size() - 1);
+                resolveCategoryPrevious(Flow.EFlowType.QUESTION, formService.getCategories().size() - 1);
                 break;
             case PLANNER:
-                getFlow().resetFlow(Flow.EFlowType.ASSESSMENT);
-                getFlow().setCategoryAndSubCategory(formService.getCategories().size() - 1, getCurrentSubCategory().getCategory().getSubCategories().size() - 1);
+                resolveCategoryPrevious(Flow.EFlowType.ASSESSMENT, formService.getCategories().size() - 1);
                 break;
             case CDP:
-                getFlow().resetFlow(Flow.EFlowType.PLANNER);
-                getFlow().setCategoryAndSubCategory(formService.getCategories().size() - 1, getCurrentSubCategory().getCategory().getSubCategories().size() - 1);
+                resolveCategoryPrevious(Flow.EFlowType.PLANNER, formService.getCategories().size() - 1);
                 break;
+        }
+    }
+
+    private void resolveCategoryPrevious(Flow.EFlowType previous, Integer categoryIndex) {
+        if (getFlow().getCurrentSubCategoryIndex() > 0) {
+            getFlow().downSubCategory();
+        } else if (getFlow().getCurrentCategoryIndex() > 0){
+            getFlow().downCategory(() -> getCurrentSubCategory().getCategory().getSubCategories().size() - 1);
+        } else {
+            getFlow().resetFlow(previous);
+            getFlow().setCategoryAndSubCategory(categoryIndex, () -> getCurrentSubCategory().getCategory().getSubCategories().size() - 1);
         }
     }
 
@@ -114,11 +120,11 @@ public class FlowService {
     }
 
     public Integer getCurrentPage() {
-        return getFlow().getCurrentSubCategoryIndex();
+        return formService.sequenceOfSubCategory(getCurrentSubCategory());
     }
 
     public Integer getMaxPage() {
-        return getFlow().getMaxSubCategoryIndex();
+        return formService.countOfSubCategory();
     }
 
     public SubCategory getCurrentSubCategory() {
