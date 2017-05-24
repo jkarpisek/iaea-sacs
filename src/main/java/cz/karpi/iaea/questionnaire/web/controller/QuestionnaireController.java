@@ -51,6 +51,7 @@ public class QuestionnaireController {
     @FlowInterceptor.FlowCheck(Flow.EFlowType.START)
     @RequestMapping("/start")
     public String start(Model model) {
+        questionnaireFacadeService.reset();
         model.addAttribute(MODEL_ATTRIBUTE_INIT, new InitVo());
         return controllerUtils.returnGet(model);
     }
@@ -63,7 +64,7 @@ public class QuestionnaireController {
     }
 
     @FlowInterceptor.FlowCheck(Flow.EFlowType.INSTRUCTION)
-    @RequestMapping(value = "/instruction")
+    @RequestMapping("/instruction")
     public String instruction(Model model) {
         return controllerUtils.returnGet(model);
     }
@@ -76,7 +77,7 @@ public class QuestionnaireController {
     }
 
     @FlowInterceptor.FlowCheck(Flow.EFlowType.QUESTION)
-    @RequestMapping(value = "/question")
+    @RequestMapping("/question")
     public String question  (Model model) {
         model.addAttribute(MODEL_ATTRIBUTE_META, viewConverter.toQuestionsMetaVo(questionnaireFacadeService.getQuestionsTo()));
         model.addAttribute(MODEL_ATTRIBUTE_FORM, viewConverter.toQuestionsFormVo(questionnaireFacadeService.getAnswersTo()));
@@ -91,7 +92,7 @@ public class QuestionnaireController {
     }
 
     @FlowInterceptor.FlowCheck(Flow.EFlowType.ASSESSMENT)
-    @RequestMapping(value = "/assessment")
+    @RequestMapping("/assessment")
     public String assessment(Model model) {
         model.addAttribute(MODEL_ATTRIBUTE_META, viewConverter.toAssessmentMetaVo(questionnaireFacadeService.getAssessmentTo()));
         model.addAttribute(MODEL_ATTRIBUTE_FORM, viewConverter.toAssessmentFormVo(questionnaireFacadeService.getAssessmentAnswersTo()));
@@ -106,7 +107,7 @@ public class QuestionnaireController {
     }
 
     @FlowInterceptor.FlowCheck(Flow.EFlowType.PLANNER)
-    @RequestMapping(value = "/planner")
+    @RequestMapping("/planner")
     public String planner(Model model) {
         model.addAttribute(MODEL_ATTRIBUTE_META, viewConverter.toPlannerMetaVo(questionnaireFacadeService.getPlannerTo()));
         model.addAttribute(MODEL_ATTRIBUTE_FORM, viewConverter.toPlannerFormVo(questionnaireFacadeService.getPlannerAnswersTo()));
@@ -121,9 +122,16 @@ public class QuestionnaireController {
     }
 
     @FlowInterceptor.FlowCheck(Flow.EFlowType.CDP)
-    @RequestMapping(value = "/cdp")
+    @RequestMapping("/cdp")
     public String cdp(Model model) {
         model.addAttribute(MODEL_ATTRIBUTE_CDP, viewConverter.toCdpVo(null));
+        return controllerUtils.returnGet(model);
+    }
+
+    @FlowInterceptor.FlowCheck({Flow.EFlowType.START, Flow.EFlowType.INSTRUCTION, Flow.EFlowType.QUESTION, Flow.EFlowType.ASSESSMENT, Flow.EFlowType.PLANNER, Flow.EFlowType.CDP})
+    @RequestMapping("/reset")
+    public String reset(Model model) {
+        questionnaireFacadeService.reset();
         return controllerUtils.returnGet(model);
     }
 }

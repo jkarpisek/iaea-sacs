@@ -17,6 +17,7 @@
             <span class="navbar-brand">IAEA - SACS</span>
         </div>
         <div class="navbar-header" style="float: right">
+            <span class="navbar-brand" th:if="${#lists.contains(common.actions, 'RESET')}"><a th:href="@{reset}">Reset</a></span>
             <span class="navbar-brand" th:text="${common.companyName}">Company</span>
         </div>
     </div>

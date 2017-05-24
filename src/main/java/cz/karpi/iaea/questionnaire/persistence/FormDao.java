@@ -55,9 +55,9 @@ public class FormDao {
     private Map<Quarter, Integer> plannerQuarterIndex = new HashMap<>();
 
     public void reset() {
-        assessmentElementColumn = null;
-        plannerElementIndex = null;
-        plannerQuarterIndex = null;
+        assessmentElementColumn.clear();
+        plannerElementIndex.clear();
+        plannerQuarterIndex.clear();
     }
 
     private Workbook getWorkbook(String companyName) {

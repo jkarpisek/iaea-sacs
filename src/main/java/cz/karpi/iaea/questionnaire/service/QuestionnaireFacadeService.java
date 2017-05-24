@@ -45,6 +45,11 @@ public class QuestionnaireFacadeService {
         this.validateService = validateService;
     }
 
+    public void reset() {
+        formService.reset();
+        flowService.reset();
+    }
+
     public CommonTo getCommonTo() {
         final CommonTo commonTo = new CommonTo();
         commonTo.setCompanyName(formService.getCompanyName());

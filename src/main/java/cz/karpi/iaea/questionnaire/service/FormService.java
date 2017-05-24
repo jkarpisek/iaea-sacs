@@ -41,6 +41,14 @@ public class FormService {
     @Autowired
     private FormDao formDao;
 
+    public void reset() {
+        companyName = null;
+        categories = null;
+        elements = null;
+        years = null;
+        formDao.reset();
+    }
+
     public void saveAnswer(AnswersTo answersTo) {
         final List<AnswerRow> answers = answersTo.getAnswerList().stream().map(answerTo -> {
             final Question question = getQuestion(answerTo.getNumber());
