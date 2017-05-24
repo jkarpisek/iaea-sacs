@@ -19,4 +19,12 @@ public class Quarter {
     public Year getYear() {
         return year;
     }
+
+    @Override
+    public String toString() {
+        return "Quarter{" +
+               "name=" + name +
+               ", year=" + year +
+               '}';
+    }
 }

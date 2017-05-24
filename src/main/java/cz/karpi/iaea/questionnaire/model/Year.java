@@ -28,4 +28,12 @@ public class Year {
     public void setQuarters(List<Quarter> quarters) {
         this.quarters = quarters;
     }
+
+    @Override
+    public String toString() {
+        return "Year{" +
+               "name=" + name +
+               ", quarters=" + quarters +
+               '}';
+    }
 }

@@ -64,4 +64,12 @@ public class Flow {
         currentSubCategoryIndex = subCategory.get();
     }
 
+    @Override
+    public String toString() {
+        return "Flow{" +
+               "flowType=" + flowType +
+               ", currentCategoryIndex=" + currentCategoryIndex +
+               ", currentSubCategoryIndex=" + currentSubCategoryIndex +
+               '}';
+    }
 }

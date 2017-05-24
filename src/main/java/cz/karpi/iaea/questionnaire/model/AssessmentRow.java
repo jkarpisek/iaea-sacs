@@ -28,4 +28,12 @@ public class AssessmentRow {
     public void setElementsPiGrade(Map<Element, Integer> elementsPiGrade) {
         this.elementsPiGrade = elementsPiGrade;
     }
+
+    @Override
+    public String toString() {
+        return "AssessmentRow{" +
+               "question=" + question +
+               ", elementsPiGrade=" + elementsPiGrade +
+               '}';
+    }
 }

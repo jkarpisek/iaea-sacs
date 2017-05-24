@@ -40,4 +40,14 @@ public class Question {
     public void setType(EQuestionType type) {
         this.type = type;
     }
+
+    @Override
+    public String toString() {
+        return "Question{" +
+               "number='" + number + '\'' +
+               ", question='" + question + '\'' +
+               ", subCategory=" + subCategory +
+               ", type=" + type +
+               '}';
+    }
 }

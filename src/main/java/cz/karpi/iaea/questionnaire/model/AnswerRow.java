@@ -31,4 +31,13 @@ public class AnswerRow {
     public void setPiGrade(Integer piGrade) {
         this.piGrade = piGrade;
     }
+
+    @Override
+    public String toString() {
+        return "AnswerRow{" +
+               "question=" + question +
+               ", comments='" + comments + '\'' +
+               ", piGrade=" + piGrade +
+               '}';
+    }
 }

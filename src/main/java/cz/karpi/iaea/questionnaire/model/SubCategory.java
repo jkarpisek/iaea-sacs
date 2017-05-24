@@ -33,4 +33,13 @@ public class SubCategory {
         }
         return questions;
     }
+
+    @Override
+    public String toString() {
+        return "SubCategory{" +
+               "category=" + category +
+               ", name='" + name + '\'' +
+               ", questions=" + questions +
+               '}';
+    }
 }

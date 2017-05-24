@@ -1,5 +1,6 @@
 package cz.karpi.iaea.questionnaire.model;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -29,6 +30,9 @@ public class PlannerRow {
     }
 
     public Map<Quarter, Boolean> getPlanned() {
+        if (planned == null) {
+            planned = new HashMap<>();
+        }
         return planned;
     }
 
@@ -50,5 +54,16 @@ public class PlannerRow {
 
     public void setOwnership(String ownership) {
         this.ownership = ownership;
+    }
+
+    @Override
+    public String toString() {
+        return "PlannerRow{" +
+               "question=" + question +
+               ", element=" + element +
+               ", planned=" + planned +
+               ", task='" + task + '\'' +
+               ", ownership='" + ownership + '\'' +
+               '}';
     }
 }
