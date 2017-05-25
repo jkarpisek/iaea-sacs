@@ -163,6 +163,7 @@ public class FormService {
     }
 
     public PlannerRow getPlannerRow(Question question, Element element) {
-        return plannerRows.putIfAbsent(question, new HashMap<>()).getOrDefault(element, new PlannerRow());
+        plannerRows.putIfAbsent(question, new HashMap<>());
+        return plannerRows.get(question).getOrDefault(element, new PlannerRow());
     }
 }

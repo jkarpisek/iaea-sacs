@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -159,12 +159,8 @@ public class QuestionnaireFacadeService {
         final AssessmentAnswerTo answerTo = new AssessmentAnswerTo();
         answerTo.setNumber(question.getNumber());
         final AssessmentRow assessmentRow = formService.getAssessmentRow(question);
-        answerTo.setPiGrades(formService.getElements().stream().collect(Collectors.toMap(e -> e, e -> getPiGrade(assessmentRow.getElementsPiGrade().get(e)))));
+        answerTo.setPiGrades(formService.getElements().stream().collect(HashMap::new, (m, e) -> m.put(e, assessmentRow.getElementsPiGrade().get(e)), HashMap::putAll));
         return answerTo;
-    }
-
-    private Integer getPiGrade(Integer piGrade) {
-        return piGrade != null ? piGrade : -1;
     }
 
     public Void assessment(AssessmentAnswersTo assessmentAnswersTo, FlowService.EAction action) {
@@ -194,7 +190,7 @@ public class QuestionnaireFacadeService {
         plannerQuestionTo.setNumber(question.getNumber());
         plannerQuestionTo.setText(question.getQuestion());
         plannerQuestionTo.setPiGrade(answerTo.getPiGrades().entrySet().stream()
-                                         .collect(Collectors.toMap(k -> k.getKey().getName(), Map.Entry::getValue)));
+                                    .collect(HashMap::new, (m, e) -> m.put(e.getKey().getName(), e.getValue()), HashMap::putAll));
         return plannerQuestionTo;
     }
 
@@ -213,7 +209,7 @@ public class QuestionnaireFacadeService {
             plannerAnswerTo.setElement(element);
             plannerAnswerTo.setNumber(question.getNumber());
             plannerAnswerTo.setPlanned(formService.getYears().stream().flatMap(year -> year.getQuarters().stream())
-                                           .collect(Collectors.toMap(quarter -> quarter, quarter -> Boolean.TRUE.equals(plannerRow.getPlanned().get(quarter)))));
+                                       .collect(HashMap::new, (m, quarter) -> m.put(quarter, plannerRow.getPlanned().get(quarter)), HashMap::putAll));
             plannerAnswerTo.setOwnership(plannerRow.getOwnership());
             plannerAnswerTo.setTask(plannerRow.getTask());
             plannerAnswerToList.add(plannerAnswerTo);

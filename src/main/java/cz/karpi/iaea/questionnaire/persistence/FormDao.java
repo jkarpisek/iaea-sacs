@@ -78,7 +78,7 @@ public class FormDao {
         }
     }
 
-    private synchronized void saveWorkbook(Workbook workbook) {
+    private void saveWorkbook(Workbook workbook) {
         try {
             final FileOutputStream os = new FileOutputStream(excelFile);
             workbook.write(os);
@@ -222,7 +222,7 @@ public class FormDao {
             answerRows.forEach(answerRow -> {
                 final Row row = mySheet.getRow(getRowNum(mySheet, FIRST_CELL_INDEX, answerRow.getQuestion().getNumber()));
                 /*TODO ulozit AnswerRow*/
-                answerRow.getElementsPiGrade().forEach((element, value) -> row.getCell(assessmentElementColumn.get(element)).setCellValue(value));
+                answerRow.getElementsPiGrade().forEach((element, value) -> row.getCell(assessmentElementColumn.get(element)).setCellValue(getOrEmpty(value)));
             })
         );
     }
@@ -240,7 +240,7 @@ public class FormDao {
         );
     }
 
-    private void save(String sheetName, Consumer<Sheet> fillData) {
+    private synchronized void save(String sheetName, Consumer<Sheet> fillData) {
         final Workbook workbook = getWorkbook();
         fillData.accept(getSheet(workbook, sheetName));
         saveWorkbook(workbook);
@@ -291,5 +291,9 @@ public class FormDao {
             throw new RuntimeException("Load quarters is not supported");
             //todo return defaultYears;
         }
+    }
+
+    private String getOrEmpty(Object value) {
+        return value != null ? value.toString() : "";
     }
 }

@@ -144,10 +144,10 @@ public class ViewConverter {
     public AssessmentAnswersTo toAssessmentAnswerTo(MatrixModel assessmentVo, AssessmentAnswersTo assessmentAnswersTo) {
         final MatrixMap matrixMap = assessmentVo.getValue();
         assessmentAnswersTo.getAnswerList().forEach(assessmentAnswerTo ->
-            assessmentAnswerTo.getPiGrades().forEach((key, value) ->
-                 assessmentAnswerTo.getPiGrades()
-                     .put(key, Integer.parseInt(matrixMap.get(questionnaireDialectUtils.getPropertyName(assessmentAnswerTo.getNumber(), key.getName())).toString()))
-            )
+            assessmentAnswerTo.getPiGrades().forEach((key, value) -> {
+                final Object piGrade = matrixMap.get(questionnaireDialectUtils.getPropertyName(assessmentAnswerTo.getNumber(), key.getName()));
+                assessmentAnswerTo.getPiGrades().put(key, piGrade != null && piGrade.toString().matches("[0-9]+")? Integer.valueOf(piGrade.toString()) : null);
+            })
         );
         return assessmentAnswersTo;
     }
