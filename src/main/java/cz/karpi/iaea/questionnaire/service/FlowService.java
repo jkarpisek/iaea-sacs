@@ -112,7 +112,9 @@ public class FlowService {
                 actions = Arrays.asList(EAction.PREVIOUS, EAction.NEXT, EAction.RESET);
                 break;
             case PLANNER:
-                actions = Arrays.asList(EAction.PREVIOUS, EAction.FINISH, EAction.RESET);
+                actions = !getCurrentPage().equals(getMaxPage())
+                          ? Arrays.asList(EAction.PREVIOUS, EAction.NEXT, EAction.RESET)
+                          : Arrays.asList(EAction.PREVIOUS, EAction.FINISH, EAction.RESET);
                 break;
             case CDP:
                 actions = Arrays.asList(EAction.PREVIOUS, EAction.RESET);
