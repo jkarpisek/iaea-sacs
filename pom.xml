@@ -5,10 +5,9 @@
 
 	<groupId>cz.karpi.iaea.questionnaire</groupId>
 	<artifactId>iaea-questionnaire</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0</version>
 	<packaging>jar</packaging>
 
-	<companyName>iaea-questionnaire</companyName>
 	<description>Demo project for Spring Boot</description>
 
 	<parent>
