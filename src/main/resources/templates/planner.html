@@ -40,7 +40,7 @@
                         </tr>
                         <tr th:each="element : ${meta.elements}">
                             <td th:text="${element.name}">Policy</td>
-                            <td th:text="${answer.piGrade[__${element.name}__]}">1</td>
+                            <td th:text="${answer.piGrades[__${element.name}__]}">1</td>
                             <td><input th:field="*{value[__${#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', element.name), 'task')}__]}" class="form-control"/></td>
                             <td><input th:field="*{value[__${#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', element.name), 'ownership')}__]}" class="form-control"/></td>
                             <th:block th:each="year : ${meta.years}">

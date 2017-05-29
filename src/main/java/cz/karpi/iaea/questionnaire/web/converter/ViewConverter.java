@@ -118,6 +118,7 @@ public class ViewConverter {
         question.put("question", questionTo.getText());
         question.put("type", questionTo.getType());
         question.put("answer", questionTo.getAnswer());
+        question.put("piGrade", questionTo.getPiGrade());
         return question;
     }
 
@@ -128,6 +129,7 @@ public class ViewConverter {
         question.put("type", questionTo.getType());
         question.put("answer", questionTo.getAnswer());
         question.put("piGrade", questionTo.getPiGrade());
+        question.put("piGrades", questionTo.getPiGrades());
         return question;
     }
 

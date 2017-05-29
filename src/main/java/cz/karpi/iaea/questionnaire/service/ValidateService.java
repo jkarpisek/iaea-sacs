@@ -46,10 +46,10 @@ public class ValidateService {
         final List<Object[]> errors = new ArrayList<>();
         if (row.getType().equals(EQuestionType.WITH_PIGRADE)) {
             if (answerTo.getComments().isEmpty()) {
-                errors.add(new Object[] { answerTo.getNumber(), "comments" });
+                //errors.add(new Object[] { answerTo.getNumber(), "comments" });
             }
             if (answerTo.getPiGrade() == null || answerTo.getPiGrade() < MIN_PI_GRADE || answerTo.getPiGrade() > MAX_PI_GRADE) {
-                errors.add(new Object[] { answerTo.getNumber(), "piGrade" });
+                //errors.add(new Object[] { answerTo.getNumber(), "piGrade" });
             }
         }
         return errors;

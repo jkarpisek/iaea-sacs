@@ -3,9 +3,7 @@ package cz.karpi.iaea.questionnaire.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -141,6 +139,7 @@ public class QuestionnaireFacadeService {
     private AssessmentQuestionTo mapToAssessmentQuestion(AnswerTo answerTo) {
         final AssessmentQuestionTo assessmentQuestionTo = new AssessmentQuestionTo();
         assessmentQuestionTo.setAnswer(answerTo.getComments());
+        assessmentQuestionTo.setPiGrade(answerTo.getPiGrade());
         final Question question = formService.getQuestion(answerTo.getNumber());
         assessmentQuestionTo.setNumber(question.getNumber());
         assessmentQuestionTo.setText(question.getQuestion());
@@ -189,7 +188,7 @@ public class QuestionnaireFacadeService {
         final Question question = formService.getQuestion(answerTo.getNumber());
         plannerQuestionTo.setNumber(question.getNumber());
         plannerQuestionTo.setText(question.getQuestion());
-        plannerQuestionTo.setPiGrade(answerTo.getPiGrades().entrySet().stream()
+        plannerQuestionTo.setPiGrades(answerTo.getPiGrades().entrySet().stream()
                                     .collect(HashMap::new, (m, e) -> m.put(e.getKey().getName(), e.getValue()), HashMap::putAll));
         return plannerQuestionTo;
     }
@@ -202,19 +201,18 @@ public class QuestionnaireFacadeService {
     }
 
     private Stream<PlannerAnswerTo> mapToPlannerAnswer(Question question) {
-        final List<PlannerAnswerTo> plannerAnswerToList = new ArrayList<>();
-        formService.getElements().forEach(element -> {
-            final PlannerAnswerTo plannerAnswerTo = new PlannerAnswerTo();
-            final PlannerRow plannerRow = formService.getPlannerRow(question, element);
-            plannerAnswerTo.setElement(element);
-            plannerAnswerTo.setNumber(question.getNumber());
-            plannerAnswerTo.setPlanned(formService.getYears().stream().flatMap(year -> year.getQuarters().stream())
-                                       .collect(HashMap::new, (m, quarter) -> m.put(quarter, plannerRow.getPlanned().get(quarter)), HashMap::putAll));
-            plannerAnswerTo.setOwnership(plannerRow.getOwnership());
-            plannerAnswerTo.setTask(plannerRow.getTask());
-            plannerAnswerToList.add(plannerAnswerTo);
-        });
-        return plannerAnswerToList.stream();
+        return formService.getElements().stream()
+            .map(element -> {
+                final PlannerAnswerTo plannerAnswerTo = new PlannerAnswerTo();
+                final PlannerRow plannerRow = formService.getPlannerRow(question, element);
+                plannerAnswerTo.setElement(element);
+                plannerAnswerTo.setNumber(question.getNumber());
+                plannerAnswerTo.setPlanned(formService.getYears().stream().flatMap(year -> year.getQuarters().stream())
+                                           .collect(HashMap::new, (m, quarter) -> m.put(quarter, plannerRow.getPlanned().get(quarter)), HashMap::putAll));
+                plannerAnswerTo.setOwnership(plannerRow.getOwnership());
+                plannerAnswerTo.setTask(plannerRow.getTask());
+                return plannerAnswerTo;
+            });
     }
 
     public Void planner(PlannerAnswersTo plannerAnswersTo, FlowService.EAction action) {

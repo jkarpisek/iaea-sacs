@@ -6,13 +6,13 @@ import java.util.Map;
  * Created by karpi on 15.4.17.
  */
 public class PlannerQuestionTo extends AssessmentQuestionTo {
-    private Map<String, Integer> piGrade;
+    private Map<String, Integer> piGrades;
 
-    public Map<String, Integer> getPiGrade() {
-        return piGrade;
+    public Map<String, Integer> getPiGrades() {
+        return piGrades;
     }
 
-    public void setPiGrade(Map<String, Integer> piGrade) {
-        this.piGrade = piGrade;
+    public void setPiGrades(Map<String, Integer> piGrades) {
+        this.piGrades = piGrades;
     }
 }

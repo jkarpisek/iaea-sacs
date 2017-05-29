@@ -106,7 +106,7 @@ public class FormDao {
                 if (answerRow.getQuestion().getType().equals(EQuestionType.ADDITIONAL_COMMENT)) {
                     row.getCell(ADDITIONAL_COMMENTS_CELL_INDEX).setCellValue(answerRow.getComments());
                 } else if (answerRow.getQuestion().getType().equals(EQuestionType.WITH_PIGRADE)) {
-                    row.getCell(PI_GRADE_CELL_INDEX).setCellValue(answerRow.getPiGrade());
+                    row.getCell(PI_GRADE_CELL_INDEX).setCellValue(getOrEmpty(answerRow.getPiGrade()));
                     row.getCell(COMMENTS_CELL_INDEX).setCellValue(answerRow.getComments());
                 }
             });

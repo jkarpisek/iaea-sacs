@@ -28,10 +28,10 @@
                             <td colspan="10"><i>Response action: </i><span th:text="${answer.question}">All agencies to be involved in response to NSE identified</span></td>
                         </tr>
                         <tr>
-                            <td colspan="10"><i>SACS Comment: </i><!--<span th:text="${answer.answer}">Most of the agencies involved in the response have been identified, but the formal policies, protocols and agreements are not yet all completed. This includes the national response plan.</span>--></td>
+                            <td colspan="10"><i>SACS Comment: </i><span th:text="${answer.answer}">Most of the agencies involved in the response have been identified, but the formal policies, protocols and agreements are not yet all completed. This includes the national response plan.</span></td>
                         </tr>
                         <tr>
-                            <td>1</td>
+                            <td th:text="${answer.piGrade}">1</td>
                             <td th:each="element : ${meta.elements}">
                                 <select th:title="${#strings.concat(element.name, ' grade')}" th:field="*{value[__${#questionnaireUtils.getPropertyName(answer.number, element.name)}__]}" class="form-control pi-grade">
                                     <option value="" th:text="${#strings.concat(element.name, ' grade')}">Policy grade...</option>
