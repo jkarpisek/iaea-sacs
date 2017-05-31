@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -122,8 +124,7 @@ public class QuestionnaireFacadeService {
         final SubCategory subCategory = flowService.getCurrentSubCategory();
         assessmentTo.setSubCategory(subCategory.getName());
         assessmentTo.setCategory(subCategory.getCategory().getName());
-        assessmentTo.setAssessmentQuestions(getAnswersTo().getAnswerList().stream()
-                                                .map(this::mapToAssessmentQuestion).collect(Collectors.toList()));
+        assessmentTo.setAssessmentQuestions(filter(getAnswersTo()).map(this::mapToAssessmentQuestion).collect(Collectors.toList()));
         assessmentTo.setCurrentPage(flowService.getCurrentPage());
         assessmentTo.setMaxPage(flowService.getMaxPage());
         assessmentTo.setElements(formService.getElements().stream().map(this::mapToElement).collect(Collectors.toList()));
@@ -148,18 +149,22 @@ public class QuestionnaireFacadeService {
 
     public AssessmentAnswersTo getAssessmentAnswersTo() {
         final AssessmentAnswersTo assessmentAnswersTo = new AssessmentAnswersTo();
-        assessmentAnswersTo.setAnswerList(flowService.getCurrentSubCategory().getQuestions().stream()
-                                    .map(this::mapToAssessmentAnswer).collect(Collectors.toList()));
+        assessmentAnswersTo.setAnswerList(filter(getAnswersTo()).map(this::mapToAssessmentAnswer).collect(Collectors.toList()));
         return assessmentAnswersTo;
     }
 
 
-    private AssessmentAnswerTo mapToAssessmentAnswer(Question question) {
-        final AssessmentAnswerTo answerTo = new AssessmentAnswerTo();
-        answerTo.setNumber(question.getNumber());
-        final AssessmentRow assessmentRow = formService.getAssessmentRow(question);
-        answerTo.setPiGrades(formService.getElements().stream().collect(HashMap::new, (m, e) -> m.put(e, assessmentRow.getElementsPiGrade().get(e)), HashMap::putAll));
-        return answerTo;
+    private AssessmentAnswerTo mapToAssessmentAnswer(AnswerTo answerTo) {
+        final AssessmentAnswerTo assessmentAnswerTo = new AssessmentAnswerTo();
+        assessmentAnswerTo.setNumber(answerTo.getNumber());
+        final AssessmentRow assessmentRow = formService.getAssessmentRow(formService.getQuestion(answerTo.getNumber()));
+        assessmentAnswerTo.setPiGrades(formService.getElements().stream().collect(HashMap::new, (m, e) -> m.put(e, assessmentRow.getElementsPiGrade().get(e)), HashMap::putAll));
+        return assessmentAnswerTo;
+    }
+
+    private Stream<AnswerTo> filter(AnswersTo answersTo) {
+        return answersTo.getAnswerList().stream()
+            .filter(answerTo -> answerTo.getPiGrade() != null);
     }
 
     public Void assessment(AssessmentAnswersTo assessmentAnswersTo, FlowService.EAction action) {
@@ -175,7 +180,7 @@ public class QuestionnaireFacadeService {
         final SubCategory subCategory = flowService.getCurrentSubCategory();
         plannerTo.setSubCategory(subCategory.getName());
         plannerTo.setCategory(subCategory.getCategory().getName());
-        plannerTo.setPlannerQuestions(getAssessmentAnswersTo().getAnswerList().stream().map(this::mapToPlanner).collect(Collectors.toList()));
+        plannerTo.setPlannerQuestions(filter(getAssessmentAnswersTo()).map(this::mapToPlanner).collect(Collectors.toList()));
         plannerTo.setCurrentPage(flowService.getCurrentPage());
         plannerTo.setMaxPage(flowService.getMaxPage());
         plannerTo.setElements(formService.getElements().stream().map(this::mapToElement).collect(Collectors.toList()));
@@ -183,30 +188,36 @@ public class QuestionnaireFacadeService {
         return plannerTo;
     }
 
+    private Stream<AssessmentAnswerTo> filter(AssessmentAnswersTo assessmentAnswersTo) {
+        return assessmentAnswersTo.getAnswerList().stream()
+            .filter(assessmentAnswerTo -> assessmentAnswerTo.getPiGrades().values().stream().anyMatch(Objects::nonNull));
+    }
+
     private PlannerQuestionTo mapToPlanner(AssessmentAnswerTo answerTo) {
         final PlannerQuestionTo plannerQuestionTo = new PlannerQuestionTo();
         final Question question = formService.getQuestion(answerTo.getNumber());
         plannerQuestionTo.setNumber(question.getNumber());
         plannerQuestionTo.setText(question.getQuestion());
-        plannerQuestionTo.setPiGrades(answerTo.getPiGrades().entrySet().stream()
-                                    .collect(HashMap::new, (m, e) -> m.put(e.getKey().getName(), e.getValue()), HashMap::putAll));
+        plannerQuestionTo.setPiGrades(filter2(answerTo).collect(HashMap::new, (m, e) -> m.put(e.getKey().getName(), e.getValue()), HashMap::putAll));
         return plannerQuestionTo;
     }
 
     public PlannerAnswersTo getPlannerAnswersTo() {
         final PlannerAnswersTo plannerAnswersTo = new PlannerAnswersTo();
-        plannerAnswersTo.setAnswerList(flowService.getCurrentSubCategory().getQuestions().stream()
-                                              .flatMap(this::mapToPlannerAnswer).collect(Collectors.toList()));
+        plannerAnswersTo.setAnswerList(filter(getAssessmentAnswersTo()).flatMap(this::mapToPlannerAnswer).collect(Collectors.toList()));
         return plannerAnswersTo;
     }
 
-    private Stream<PlannerAnswerTo> mapToPlannerAnswer(Question question) {
-        return formService.getElements().stream()
-            .map(element -> {
+    private Stream<Map.Entry<Element, Integer>> filter2(AssessmentAnswerTo assessmentAnswerTo) {
+        return assessmentAnswerTo.getPiGrades().entrySet().stream().filter(element -> element.getValue() != null);
+    }
+
+    private Stream<PlannerAnswerTo> mapToPlannerAnswer(AssessmentAnswerTo assessmentAnswerTo) {
+        return filter2(assessmentAnswerTo).map(element -> {
                 final PlannerAnswerTo plannerAnswerTo = new PlannerAnswerTo();
-                final PlannerRow plannerRow = formService.getPlannerRow(question, element);
-                plannerAnswerTo.setElement(element);
-                plannerAnswerTo.setNumber(question.getNumber());
+                final PlannerRow plannerRow = formService.getPlannerRow(formService.getQuestion(assessmentAnswerTo.getNumber()), element.getKey());
+                plannerAnswerTo.setElement(element.getKey());
+                plannerAnswerTo.setNumber(assessmentAnswerTo.getNumber());
                 plannerAnswerTo.setPlanned(formService.getYears().stream().flatMap(year -> year.getQuarters().stream())
                                            .collect(HashMap::new, (m, quarter) -> m.put(quarter, plannerRow.getPlanned().get(quarter)), HashMap::putAll));
                 plannerAnswerTo.setOwnership(plannerRow.getOwnership());

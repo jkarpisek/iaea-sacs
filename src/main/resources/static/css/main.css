@@ -57,6 +57,10 @@ th {
     cursor: pointer;
 }
 
+.planning-label:hover {
+    background-color: #ddd;
+}
+
 .planning-label > .planning-line {
     display: block;
     width: 100%;

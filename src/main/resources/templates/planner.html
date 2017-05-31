@@ -13,7 +13,8 @@
             <div class="row common-errors" th:if="${#fields.hasAnyErrors()}">
                 <div class="col-xs-12">Form contains errors, please correct it.</div>
             </div>
-            <table class="table">
+            <h3 th:if="${#lists.isEmpty(meta.sacsAnswers)}"><em>Nothing to show.</em></h3>
+            <table class="table" th:if="${!#lists.isEmpty(meta.sacsAnswers)}">
                 <thead>
                 <tr>
                     <th rowspan="2">No.</th>
@@ -34,19 +35,19 @@
                 <tbody>
                     <th:block th:each="answer : ${meta.sacsAnswers}">
                         <tr>
-                            <td th:rowspan="${1 + #lists.size(meta.elements)}" th:text="${answer.number}">O-1</td>
-                            <td th:rowspan="${1 + #lists.size(meta.elements)}" th:text="${answer.question}">All agencies to be involved in response to NSE identified</td>
-                            <td th:rowspan="${1 + #lists.size(meta.elements)}" th:text="${answer.answer}">Most of the agencies involved in the response have been identified, but the formal policies, protocols and agreements are not yet all completed. This includes the national response plan.</td>
+                            <td th:rowspan="${1 + #maps.size(answer.piGrades)}" th:text="${answer.number}">O-1</td>
+                            <td th:rowspan="${1 + #maps.size(answer.piGrades)}" th:text="${answer.question}">All agencies to be involved in response to NSE identified</td>
+                            <td th:rowspan="${1 + #maps.size(answer.piGrades)}" th:text="${answer.answer}">Most of the agencies involved in the response have been identified, but the formal policies, protocols and agreements are not yet all completed. This includes the national response plan.</td>
                         </tr>
-                        <tr th:each="element : ${meta.elements}">
-                            <td th:text="${element.name}">Policy</td>
-                            <td th:text="${answer.piGrades[__${element.name}__]}">1</td>
-                            <td><input th:field="*{value[__${#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', element.name), 'task')}__]}" class="form-control"/></td>
-                            <td><input th:field="*{value[__${#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', element.name), 'ownership')}__]}" class="form-control"/></td>
+                        <tr th:each="elementEntry : ${answer.piGrades}">
+                            <td th:text="${elementEntry.key}">Policy</td>
+                            <td th:text="${elementEntry.value}">1</td>
+                            <td><input th:field="*{value[__${#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', elementEntry.key), 'task')}__]}" class="form-control"/></td>
+                            <td><input th:field="*{value[__${#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', elementEntry.key), 'ownership')}__]}" class="form-control"/></td>
                             <th:block th:each="year : ${meta.years}">
                                 <td class="planning-column" th:each="quarter: ${year.quarters}">
-                                    <input th:field="*{value[__${#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', element.name), #strings.concat(year.name, '-', quarter.name))}__]}" th:id="${#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', element.name), #strings.concat(year.name, '-', quarter.name))}" type="checkbox" class="planning-checkbox" value="true"/>
-                                    <label th:for="${#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', element.name), #strings.concat(year.name, '-', quarter.name))}" class="planning-label">
+                                    <input th:field="*{value[__${#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', elementEntry.key), #strings.concat(year.name, '-', quarter.name))}__]}" th:id="${#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', elementEntry.key), #strings.concat(year.name, '-', quarter.name))}" type="checkbox" class="planning-checkbox" value="true"/>
+                                    <label th:for="${#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', elementEntry.key), #strings.concat(year.name, '-', quarter.name))}" class="planning-label">
                                         <span class="planning-line"></span>
                                     </label>
                                 </td>

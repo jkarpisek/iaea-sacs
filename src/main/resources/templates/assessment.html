@@ -13,7 +13,8 @@
             <div class="row common-errors" th:if="${#fields.hasAnyErrors()}">
                 <div class="col-xs-12">Form contains errors, please correct it.</div>
             </div>
-            <table class="table">
+            <h3 th:if="${#lists.isEmpty(meta.sacsAnswers)}"><em>Nothing to show.</em></h3>
+            <table class="table" th:if="${!#lists.isEmpty(meta.sacsAnswers)}">
                 <thead>
                     <tr>
                         <th>No.</th>

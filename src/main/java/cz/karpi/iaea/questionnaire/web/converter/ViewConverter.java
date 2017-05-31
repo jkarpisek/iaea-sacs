@@ -159,7 +159,6 @@ public class ViewConverter {
         map.put("category", plannerTo.getCategory());
         map.put("subCategory", plannerTo.getSubCategory());
         map.put("years", plannerTo.getYears());
-        map.put("elements", plannerTo.getElements());
         map.put("sacsAnswers", plannerTo.getPlannerQuestions().stream().map(this::mapPlannerVo).collect(Collectors.toList()));
         map.put("currentPage", plannerTo.getCurrentPage());
         map.put("maxPage", plannerTo.getMaxPage());

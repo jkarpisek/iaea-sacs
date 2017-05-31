@@ -100,17 +100,19 @@ public class FormDao {
 
     @Async
     public void saveForm(List<AnswerRow> answerRows) {
-        save(EXCEL_SHEET_SACS_NAME, (mySheet) -> {
-            answerRows.forEach(answerRow -> {
-                final Row row = mySheet.getRow(getRowNum(mySheet, FIRST_CELL_INDEX, answerRow.getQuestion().getNumber()));
-                if (answerRow.getQuestion().getType().equals(EQuestionType.ADDITIONAL_COMMENT)) {
-                    row.getCell(ADDITIONAL_COMMENTS_CELL_INDEX).setCellValue(answerRow.getComments());
-                } else if (answerRow.getQuestion().getType().equals(EQuestionType.WITH_PIGRADE)) {
-                    row.getCell(PI_GRADE_CELL_INDEX).setCellValue(getOrEmpty(answerRow.getPiGrade()));
-                    row.getCell(COMMENTS_CELL_INDEX).setCellValue(answerRow.getComments());
-                }
+        if (!answerRows.isEmpty()) {
+            save(EXCEL_SHEET_SACS_NAME, (mySheet) -> {
+                answerRows.forEach(answerRow -> {
+                    final Row row = mySheet.getRow(getRowNum(mySheet, FIRST_CELL_INDEX, answerRow.getQuestion().getNumber()));
+                    if (answerRow.getQuestion().getType().equals(EQuestionType.ADDITIONAL_COMMENT)) {
+                        row.getCell(ADDITIONAL_COMMENTS_CELL_INDEX).setCellValue(answerRow.getComments());
+                    } else if (answerRow.getQuestion().getType().equals(EQuestionType.WITH_PIGRADE)) {
+                        row.getCell(PI_GRADE_CELL_INDEX).setCellValue(getOrEmpty(answerRow.getPiGrade()));
+                        row.getCell(COMMENTS_CELL_INDEX).setCellValue(answerRow.getComments());
+                    }
+                });
             });
-        });
+        }
     }
 
     private Integer getRowNum(Sheet mySheet, Integer column, String content) {
@@ -218,32 +220,42 @@ public class FormDao {
 
     @Async
     public void saveAssessmentAnswers(List<AssessmentRow> answerRows) {
-        save(EXCEL_SHEET_ASSESSMENT_NAME, (mySheet) ->
-            answerRows.forEach(answerRow -> {
-                final Row row = mySheet.getRow(getRowNum(mySheet, FIRST_CELL_INDEX, answerRow.getQuestion().getNumber()));
-                /*TODO ulozit AnswerRow*/
-                answerRow.getElementsPiGrade().forEach((element, value) -> row.getCell(assessmentElementColumn.get(element)).setCellValue(getOrEmpty(value)));
-            })
-        );
+        if (!answerRows.isEmpty()) {
+            save(EXCEL_SHEET_ASSESSMENT_NAME, (mySheet) ->
+                answerRows.forEach(answerRow -> {
+                    final Row row = mySheet.getRow(getRowNum(mySheet, FIRST_CELL_INDEX, answerRow.getQuestion().getNumber()));
+                    /*TODO ulozit AnswerRow*/
+                    answerRow.getElementsPiGrade()
+                        .forEach((element, value) -> row.getCell(assessmentElementColumn.get(element)).setCellValue(getOrEmpty(value)));
+                })
+            );
+        }
     }
 
     @Async
     public void savePlannerAnswers(List<PlannerRow> answerRows) {
-        save( convertNumberToSheetName(answerRows.get(0).getQuestion().getNumber()), (mySheet) ->
-            answerRows.forEach(answerRow -> {
-                final Row row = mySheet.getRow(getRowNum(mySheet, FIRST_CELL_INDEX, answerRow.getQuestion().getNumber()) + getPlannerElementIndex(answerRow.getElement()));
+        if (!answerRows.isEmpty()) {
+            save(convertNumberToSheetName(answerRows.get(0).getQuestion().getNumber()), (mySheet) ->
+                answerRows.forEach(answerRow -> {
+                    final Row
+                        row =
+                        mySheet
+                            .getRow(getRowNum(mySheet, FIRST_CELL_INDEX, answerRow.getQuestion().getNumber()) + getPlannerElementIndex(answerRow.getElement()));
                 /*TODO ulozit AssessmentRow*/
-                row.getCell(5).setCellValue(answerRow.getTask());
-                row.getCell(6).setCellValue(answerRow.getOwnership());
-                answerRow.getPlanned().forEach((quarter, value) -> row.getCell(getQuarterIndex(quarter)).setCellValue(value ? "x" : ""));
-            })
-        );
+                    row.getCell(5).setCellValue(answerRow.getTask());
+                    row.getCell(6).setCellValue(answerRow.getOwnership());
+                    answerRow.getPlanned().forEach((quarter, value) -> row.getCell(getQuarterIndex(quarter)).setCellValue(value ? "x" : ""));
+                })
+            );
+        }
     }
 
     private synchronized void save(String sheetName, Consumer<Sheet> fillData) {
+        LOGGER.info("Save Excel - start");
         final Workbook workbook = getWorkbook();
         fillData.accept(getSheet(workbook, sheetName));
         saveWorkbook(workbook);
+        LOGGER.info("Save Excel - end");
     }
 
     private Integer getPlannerElementIndex(Element element) {
