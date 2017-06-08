@@ -40,3 +40,11 @@ function timelineBorder($this) {
         $label.removeClass('planning-start planning-end');
     }
 }
+
+function closeApplication() {
+    $.ajax('closeApplication', { async: false, complete: function() { window.close() } });
+}
+
+window.onbeforeunload = function() {
+    closeApplication();
+};

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import cz.karpi.iaea.questionnaire.model.Flow;
 import cz.karpi.iaea.questionnaire.service.QuestionnaireFacadeService;
+import cz.karpi.iaea.questionnaire.service.ApplicationStatusManagerService;
 import cz.karpi.iaea.questionnaire.service.to.CommonTo;
 import cz.karpi.iaea.questionnaire.web.converter.ViewConverter;
 import cz.karpi.iaea.questionnaire.web.interceptor.FlowInterceptor;
@@ -32,6 +33,9 @@ public class QuestionnaireController {
     private final ViewConverter viewConverter;
 
     private final ControllerUtils controllerUtils;
+
+    @Autowired
+    private ApplicationStatusManagerService applicationStatusManagerService;
 
     @Autowired
     public QuestionnaireController(QuestionnaireFacadeService questionnaireFacadeService, ViewConverter viewConverter, ControllerUtils controllerUtils) {
@@ -132,5 +136,11 @@ public class QuestionnaireController {
     public String reset(Model model) {
         questionnaireFacadeService.reset();
         return controllerUtils.returnGet(model);
+    }
+
+    @FlowInterceptor.FlowCheck({Flow.EFlowType.START, Flow.EFlowType.INSTRUCTION, Flow.EFlowType.QUESTION, Flow.EFlowType.ASSESSMENT, Flow.EFlowType.PLANNER, Flow.EFlowType.CDP})
+    @RequestMapping("/closeApplication")
+    public void closeApplication() {
+        applicationStatusManagerService.closeApplication();
     }
 }
