@@ -166,4 +166,8 @@ public class FormService {
         plannerRows.putIfAbsent(question, new HashMap<>());
         return plannerRows.get(question).getOrDefault(element, new PlannerRow());
     }
+
+    public List<String> getExistedCompanies() {
+        return formDao.getExistedCompanies();
+    }
 }

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -232,5 +233,9 @@ public class QuestionnaireFacadeService {
         }
         flowService.moveCounterTo(action);
         return null;
+    }
+
+    public List<String> getExistedCompanies() {
+        return formService.getExistedCompanies();
     }
 }

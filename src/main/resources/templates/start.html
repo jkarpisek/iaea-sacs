@@ -14,7 +14,7 @@
             </div>
             <div class="row">
                 <div th:class="${#fields.hasErrors('companyName')} ? 'col-xs-6 has-error' : 'col-xs-6'">
-                    <input type="text" class="form-control" placeholder="Name of company" th:field="*{companyName}" />
+                    <input type="text" class="form-control" id="companyName" th:field="*{companyName}" th:attr="data-source=${meta.existedCompanies}"/>
                 </div>
                 <div class="col-xs-6">
                     <span th:replace="fragments :: buttonNext"></span>

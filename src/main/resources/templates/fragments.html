@@ -5,8 +5,10 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" type="text/css" href="webjars/bootstrap/3.3.7/css/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="webjars/open-sans/1.1.0/css/open-sans.min.css"/>
+    <link rel="stylesheet" type="text/css" href="webjars/jquery-ui/1.9.2/css/smoothness/jquery-ui-1.9.2.custom.min.css"/>
     <link rel="stylesheet" th:href="@{/css/main.css}" href="../../css/main.css" />
     <script type="text/javascript" src="webjars/jquery/1.11.1/jquery.min.js"></script>
+    <script type="text/javascript" src="webjars/jquery-ui/1.9.2/js/jquery-ui-1.9.2.custom.min.js"></script>
     <script type="text/javascript" src="webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" th:src="@{/js/main.js}" src="../../js/main.js"></script>
 </head>
@@ -17,7 +19,7 @@
             <span class="navbar-brand">IAEA - SACS</span>
         </div>
         <div class="navbar-header" style="float: right">
-            <span class="navbar-brand"><a onclick="closeApplication()">Close</a></span>
+            <span class="navbar-brand"><a class="close-application" href="#">Close</a></span>
             <span class="navbar-brand" th:if="${#lists.contains(common.actions, 'RESET')}"><a th:href="@{reset}">Reset</a></span>
             <span class="navbar-brand" th:text="${common.companyName}">Company</span>
         </div>

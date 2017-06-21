@@ -1,8 +1,27 @@
 $(function() {
+    var $companyName = $('#companyName');
+    if ($companyName.length) {
+        var companies = $companyName.data('source').replace(/^'/, '').replace(/'$/, '').split("','");
+        var placeholder = 'type name of new company';
+        if (companies.length > 0) {
+            placeholder += ' or e.g. ' + companies[0];
+        }
+        if (companies.length > 1) {
+            placeholder += ', ' + companies[1];
+        }
+        if (companies.length > 2) {
+            placeholder += ' ...';
+        }
+        $companyName.attr('placeholder', placeholder).autocomplete({ source: companies });
+    }
     $('.planning-checkbox').each(function() {
         timelineBorder($(this));
     }).on('change', function() {
         timelineBorder($(this));
+    });
+    $('.close-application').click(function() {
+        $.ajax('closeApplication', { async: false });
+        alert('Application was terminated. Close this window, please.');
     });
 });
 
@@ -40,11 +59,3 @@ function timelineBorder($this) {
         $label.removeClass('planning-start planning-end');
     }
 }
-
-function closeApplication() {
-    $.ajax('closeApplication', { async: false, complete: function() { window.close() } });
-}
-
-window.onbeforeunload = function() {
-    closeApplication();
-};

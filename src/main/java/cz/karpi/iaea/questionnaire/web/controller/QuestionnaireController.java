@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import cz.karpi.iaea.questionnaire.model.Flow;
-import cz.karpi.iaea.questionnaire.service.QuestionnaireFacadeService;
 import cz.karpi.iaea.questionnaire.service.ApplicationStatusManagerService;
+import cz.karpi.iaea.questionnaire.service.QuestionnaireFacadeService;
 import cz.karpi.iaea.questionnaire.service.to.CommonTo;
 import cz.karpi.iaea.questionnaire.web.converter.ViewConverter;
 import cz.karpi.iaea.questionnaire.web.interceptor.FlowInterceptor;
@@ -55,6 +55,7 @@ public class QuestionnaireController {
     @RequestMapping("/start")
     public String start(Model model) {
         questionnaireFacadeService.reset();
+        model.addAttribute(MODEL_ATTRIBUTE_META, viewConverter.toInitMetaVo(questionnaireFacadeService.getExistedCompanies()));
         model.addAttribute(MODEL_ATTRIBUTE_FORM, viewConverter.toInitFormVo());
         return controllerUtils.returnGet(model);
     }

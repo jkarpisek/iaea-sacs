@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -205,5 +206,11 @@ public class ViewConverter {
 
     public InitVo toInitFormVo() {
         return new InitVo();
+    }
+
+    public Map<String, Object> toInitMetaVo(List<String> existedCompanies) {
+        final Map<String, Object> map = new HashMap<>();
+        map.put("existedCompanies", existedCompanies.stream().map(str -> "'" + str + "'").collect(Collectors.joining(",")));
+        return map;
     }
 }

@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
@@ -88,11 +90,23 @@ public class FormDao {
         }
     }
 
+    public List<String> getExistedCompanies() {
+        final List<String> existedCompanies = new ArrayList<>();
+        Pattern pattern = Pattern.compile(MessageFormat.format(EXCEL_NAME, "(.+)"));
+        for (String excel : new File(".").list((dir, name) -> pattern.matcher(name).matches())) {
+            final Matcher matcher = pattern.matcher(excel);
+            matcher.matches();
+            existedCompanies.add(matcher.group(1));
+        }
+        return existedCompanies;
+    }
+
     public void copyForm(String companyName) {
         try {
-            final File source = new File(EXCEL_TEMPLATE_NAME);
             excelFile = new File(MessageFormat.format(EXCEL_NAME, companyName));
-            FileCopyUtils.copy(source, excelFile);
+            if (!excelFile.exists()) {
+                FileCopyUtils.copy(new File(EXCEL_TEMPLATE_NAME), excelFile);
+            }
         } catch (IOException e) {
             throw new DaoExpcetion("Copy template file failed", e);
         }
