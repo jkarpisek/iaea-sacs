@@ -1,7 +1,6 @@
 package cz.karpi.iaea.questionnaire.model;
 
 import java.util.List;
-import java.util.ArrayList;
 
 /**
  * Created by karpi on 12.4.17.
@@ -27,10 +26,11 @@ public class SubCategory {
         this.name = name;
     }
 
+    public void setQuestions(List<Question> questions) {
+        this.questions = questions;
+    }
+
     public List<Question> getQuestions() {
-        if (questions == null) {
-            questions = new ArrayList<>();
-        }
         return questions;
     }
 

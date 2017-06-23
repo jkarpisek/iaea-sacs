@@ -63,11 +63,11 @@ public class FormService {
     public void loadDefinitions() {
         formDao.copyForm(companyName);
         categories = formDao.getSACSDefinition();
-        sacsRows = new HashMap<>();
+        sacsRows = formDao.getSACSAnswers(categories);
         elements = formDao.getAssessmentDefinition();
-        assessmentRows = new HashMap<>();
-        years = formDao.getPlannerDefinition(categories.get(0).getSubCategories().get(0).getQuestions().get(0).getNumber(), generateYears());
-        plannerRows = new HashMap<>();
+        assessmentRows = formDao.getAssessmentAnswers(categories, elements);
+        years = formDao.getPlannerDefinition(categories, generateYears());
+        plannerRows = formDao.getPlannerAnswers(categories, elements, years);
     }
 
     public void saveInit(InitTo initTo) {
@@ -137,7 +137,7 @@ public class FormService {
             assessmentRows.put(assessmentRow.getQuestion(), assessmentRow);
             return assessmentRow;
         }).collect(Collectors.toList());
-        formDao.saveAssessmentAnswers(answers);
+        formDao.saveAssessmentAnswers(answers, sacsRows);
     }
 
     public void savePlannerAnswer(PlannerAnswersTo plannerAnswersTo) {
@@ -151,7 +151,7 @@ public class FormService {
             plannerRows.putIfAbsent(plannerRow.getQuestion(), new HashMap<>()).put(plannerRow.getElement(), plannerRow);
             return plannerRow;
         }).collect(Collectors.toList());
-        formDao.savePlannerAnswers(answers);
+        formDao.savePlannerAnswers(answers, sacsRows, assessmentRows);
     }
 
     public AnswerRow getAnswerRow(Question question) {

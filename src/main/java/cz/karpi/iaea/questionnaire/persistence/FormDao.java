@@ -49,11 +49,20 @@ public class FormDao {
     private static final String EXCEL_SHEET_PLANNER_NAME = "-%s";
 
     private static final Integer FIRST_CELL_INDEX = 0;
-    private static final Integer SUBCATEGORY_CELL_INDEX = 1;
-    private static final Integer QUESTION_CELL_INDEX = 2;
-    private static final Integer ADDITIONAL_COMMENTS_CELL_INDEX = 2;
-    private static final Integer PI_GRADE_CELL_INDEX = 3;
-    private static final Integer COMMENTS_CELL_INDEX = 4;
+
+    private static final Integer SACS_SUBCATEGORY_CELL_INDEX = 1;
+    private static final Integer SACS_QUESTION_CELL_INDEX = 2;
+    private static final Integer SACS_PI_GRADE_CELL_INDEX = 3;
+    private static final Integer SACS_COMMENTS_CELL_INDEX = 4;
+
+    private static final Integer ASSESSMENT_PIGRADE_CELL_INDEX = 2;
+    private static final Integer ASSESSMENT_COMMENTS_CELL_INDEX = 3;
+
+    private static final Integer PLANNER_PIGRADE_CELL_INDEX = 3;
+    private static final Integer PLANNER_COMMENTS_CELL_INDEX = 4;
+    private static final Integer PLANNER_TASK_CELL_INDEX = 5;
+    private static final Integer PLANNER_OWNERSHIP_CELL_INDEX = 6;
+    private static final String PLANNED_VALUE = "x";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FormDao.class);
 
@@ -118,11 +127,9 @@ public class FormDao {
             save(EXCEL_SHEET_SACS_NAME, (mySheet) -> {
                 answerRows.forEach(answerRow -> {
                     final Row row = mySheet.getRow(getRowNum(mySheet, FIRST_CELL_INDEX, answerRow.getQuestion().getNumber()));
-                    if (answerRow.getQuestion().getType().equals(EQuestionType.ADDITIONAL_COMMENT)) {
-                        row.getCell(ADDITIONAL_COMMENTS_CELL_INDEX).setCellValue(answerRow.getComments());
-                    } else if (answerRow.getQuestion().getType().equals(EQuestionType.WITH_PIGRADE)) {
-                        row.getCell(PI_GRADE_CELL_INDEX).setCellValue(getOrEmpty(answerRow.getPiGrade()));
-                        row.getCell(COMMENTS_CELL_INDEX).setCellValue(answerRow.getComments());
+                    row.getCell(SACS_COMMENTS_CELL_INDEX).setCellValue(answerRow.getComments());
+                    if (answerRow.getQuestion().getType().equals(EQuestionType.WITH_PIGRADE)) {
+                        row.getCell(SACS_PI_GRADE_CELL_INDEX).setCellValue(getOrEmpty(answerRow.getPiGrade()));
                     }
                 });
             });
@@ -144,75 +151,32 @@ public class FormDao {
             if (row.getRowNum() > 0) {
                 final String firstCellContent = row.getCell(FIRST_CELL_INDEX).getStringCellValue();
                 if (firstCellContent.matches("[A-Z]+-[0-9]+")) {
-                    final String subCategoryName = row.getCell(SUBCATEGORY_CELL_INDEX).getStringCellValue();
+                    final String subCategoryName = row.getCell(SACS_SUBCATEGORY_CELL_INDEX).getStringCellValue();
                     if (!subCategoryName.isEmpty()) {
                         subCategory = new SubCategory();
                         subCategory.setName(subCategoryName);
                         subCategory.setCategory(category);
+                        subCategory.setQuestions(new ArrayList<>());
                         category.getSubCategories().add(subCategory);
                     }
                     final Question question = new Question();
                     question.setNumber(firstCellContent);
-                    question.setQuestion(row.getCell(QUESTION_CELL_INDEX).getStringCellValue());
+                    question.setQuestion(row.getCell(SACS_QUESTION_CELL_INDEX).getStringCellValue());
                     question.setSubCategory(subCategory);
                     question.setType(EQuestionType.WITH_PIGRADE);
                     subCategory.getQuestions().add(question);
                 } else if (firstCellContent.matches("[A-Z]+-X")
-                           || row.getCell(SUBCATEGORY_CELL_INDEX).getStringCellValue().equalsIgnoreCase("Additional written comments:")) {
+                           || row.getCell(SACS_SUBCATEGORY_CELL_INDEX).getStringCellValue().equalsIgnoreCase("Additional written comments:")) {
                     final Question question = new Question();
                     question.setNumber(firstCellContent);
-                    question.setQuestion(row.getCell(QUESTION_CELL_INDEX).getStringCellValue());
+                    question.setQuestion(row.getCell(SACS_QUESTION_CELL_INDEX).getStringCellValue());
                     question.setSubCategory(subCategory);
                     question.setType(EQuestionType.ADDITIONAL_COMMENT);
                     subCategory.getQuestions().add(question);
                 } else if (firstCellContent.matches("[0-9]+\\).+")) {
                     category = new Category();
                     category.setName(firstCellContent);
-                    categories.add(category);
-                }
-            }
-        }
-        return categories;
-    }
-
-    public List<Category> getSACSData(String companyName) {
-        final Sheet mySheet = getWorkbook().getSheet(EXCEL_SHEET_SACS_NAME);
-        final List<Category> categories = new ArrayList<>();
-        Category category = null;
-        SubCategory subCategory = null;
-        for (Row row : mySheet) {
-            if (row.getRowNum() > 0) {
-                final String firstCellContent = row.getCell(FIRST_CELL_INDEX).getStringCellValue();
-                if (firstCellContent.matches("[A-Z]+-[0-9]+")) {
-                    final String subCategoryName = row.getCell(SUBCATEGORY_CELL_INDEX).getStringCellValue();
-                    if (!subCategoryName.isEmpty()) {
-                        subCategory = new SubCategory();
-                        subCategory.setName(subCategoryName);
-                        subCategory.setCategory(category);
-                        category.getSubCategories().add(subCategory);
-                    }
-                    final Question question = new Question();
-                    question.setNumber(firstCellContent);
-                    question.setQuestion(row.getCell(QUESTION_CELL_INDEX).getStringCellValue());
-                    question.setSubCategory(subCategory);
-                    question.setType(EQuestionType.WITH_PIGRADE);
-                    final AnswerRow answerRow = new AnswerRow();
-                    answerRow.setQuestion(question);
-                    answerRow.setPiGrade(Double.valueOf(row.getCell(PI_GRADE_CELL_INDEX).getNumericCellValue()).intValue());
-                    answerRow.setComments(row.getCell(COMMENTS_CELL_INDEX).getStringCellValue());
-                } else if (firstCellContent.matches("[A-Z]+-X")
-                           || row.getCell(SUBCATEGORY_CELL_INDEX).getStringCellValue().equalsIgnoreCase("Additional written comments:")) {
-                    final Question question = new Question();
-                    question.setNumber(firstCellContent);
-                    question.setQuestion(row.getCell(QUESTION_CELL_INDEX).getStringCellValue());
-                    question.setSubCategory(subCategory);
-                    question.setType(EQuestionType.ADDITIONAL_COMMENT);
-                    final AnswerRow answerRow = new AnswerRow();
-                    answerRow.setComments(row.getCell(ADDITIONAL_COMMENTS_CELL_INDEX).getStringCellValue());
-                    answerRow.setQuestion(question);
-                } else if (firstCellContent.matches("[0-9]+\\).+")) {
-                    category = new Category();
-                    category.setName(firstCellContent);
+                    category.setSubCategories(new ArrayList<>());
                     categories.add(category);
                 }
             }
@@ -233,12 +197,14 @@ public class FormDao {
     }
 
     @Async
-    public void saveAssessmentAnswers(List<AssessmentRow> answerRows) {
+    public void saveAssessmentAnswers(List<AssessmentRow> answerRows,
+                                      Map<Question, AnswerRow> sacsRows) {
         if (!answerRows.isEmpty()) {
             save(EXCEL_SHEET_ASSESSMENT_NAME, (mySheet) ->
                 answerRows.forEach(answerRow -> {
                     final Row row = mySheet.getRow(getRowNum(mySheet, FIRST_CELL_INDEX, answerRow.getQuestion().getNumber()));
-                    /*TODO ulozit AnswerRow*/
+                    row.getCell(ASSESSMENT_PIGRADE_CELL_INDEX).setCellValue(sacsRows.get(answerRow.getQuestion()).getPiGrade());
+                    row.getCell(ASSESSMENT_COMMENTS_CELL_INDEX).setCellValue(sacsRows.get(answerRow.getQuestion()).getComments());
                     answerRow.getElementsPiGrade()
                         .forEach((element, value) -> row.getCell(assessmentElementColumn.get(element)).setCellValue(getOrEmpty(value)));
                 })
@@ -247,18 +213,19 @@ public class FormDao {
     }
 
     @Async
-    public void savePlannerAnswers(List<PlannerRow> answerRows) {
+    public void savePlannerAnswers(List<PlannerRow> answerRows,
+                                   Map<Question, AnswerRow> sacsRows,
+                                   Map<Question, AssessmentRow> assessmentRows) {
         if (!answerRows.isEmpty()) {
             save(convertNumberToSheetName(answerRows.get(0).getQuestion().getNumber()), (mySheet) ->
                 answerRows.forEach(answerRow -> {
-                    final Row
-                        row =
-                        mySheet
-                            .getRow(getRowNum(mySheet, FIRST_CELL_INDEX, answerRow.getQuestion().getNumber()) + getPlannerElementIndex(answerRow.getElement()));
-                /*TODO ulozit AssessmentRow*/
-                    row.getCell(5).setCellValue(answerRow.getTask());
-                    row.getCell(6).setCellValue(answerRow.getOwnership());
-                    answerRow.getPlanned().forEach((quarter, value) -> row.getCell(getQuarterIndex(quarter)).setCellValue(value ? "x" : ""));
+                    final Row row = mySheet.getRow(getRowNum(mySheet, FIRST_CELL_INDEX, answerRow.getQuestion().getNumber()) + getPlannerElementIndex(answerRow.getElement()));
+                    //todo constant
+                    row.getCell(PLANNER_PIGRADE_CELL_INDEX).setCellValue(assessmentRows.get(answerRow.getQuestion()).getElementsPiGrade().get(answerRow.getElement()));
+                    row.getCell(PLANNER_COMMENTS_CELL_INDEX).setCellValue(sacsRows.get(answerRow.getQuestion()).getComments());
+                    row.getCell(PLANNER_TASK_CELL_INDEX).setCellValue(answerRow.getTask());
+                    row.getCell(PLANNER_OWNERSHIP_CELL_INDEX).setCellValue(answerRow.getOwnership());
+                    answerRow.getPlanned().forEach((quarter, value) -> row.getCell(getQuarterIndex(quarter)).setCellValue(value ? PLANNED_VALUE : ""));
                 })
             );
         }
@@ -289,8 +256,8 @@ public class FormDao {
             .mapToObj(workbook::getSheetAt).findFirst().orElseThrow(() -> new RuntimeException("Sheet with name " + sheetName + " not found"));
     }
 
-    public List<Year> getPlannerDefinition(String number, List<Year> defaultYears) {
-        final Sheet sheet = getSheet(getWorkbook(), convertNumberToSheetName(number));
+    public List<Year> getPlannerDefinition(List<Category> categories, List<Year> defaultYears) {
+        final Sheet sheet = getSheet(getWorkbook(), convertNumberToSheetName(categories.get(0).getSubCategories().get(0).getQuestions().get(0).getNumber()));
         final Row row = sheet.getRow(1);
         final Iterable<Cell> cellIterable = row::cellIterator;
         //todo najit stavajici, kdyz nejsou vzit, pak default zapsat do XLS a vratit
@@ -321,5 +288,74 @@ public class FormDao {
 
     private String getOrEmpty(Object value) {
         return value != null ? value.toString() : "";
+    }
+
+    public Map<Question, AnswerRow> getSACSAnswers(List<Category> categories) {
+        final Sheet mySheet = getWorkbook().getSheet(EXCEL_SHEET_SACS_NAME);
+        final Map<Question, AnswerRow> answers = new HashMap<>();
+        categories.stream().flatMap(category -> category.getSubCategories().stream().flatMap(subCategory -> subCategory.getQuestions().stream()))
+            .forEach(question -> {
+                final Row row = mySheet.getRow(getRowNum(mySheet, FIRST_CELL_INDEX, question.getNumber()));
+                final AnswerRow answerRow = new AnswerRow();
+                answerRow.setQuestion(question);
+                if (question.getType().equals(EQuestionType.WITH_PIGRADE)) {
+                    answerRow.setPiGrade(getInteger(row.getCell(SACS_PI_GRADE_CELL_INDEX).getStringCellValue()));
+                }
+                answerRow.setComments(row.getCell(SACS_COMMENTS_CELL_INDEX).getStringCellValue());
+                answers.put(question, answerRow);
+            });
+        return answers;
+    }
+
+    public Map<Question, AssessmentRow> getAssessmentAnswers(List<Category> categories, List<Element> elements) {
+        final Sheet mySheet = getWorkbook().getSheet(EXCEL_SHEET_ASSESSMENT_NAME);
+        final Map<Question, AssessmentRow> answers = new HashMap<>();
+        categories.stream().flatMap(category -> category.getSubCategories().stream().flatMap(subCategory -> subCategory.getQuestions().stream()))
+            .forEach(question -> {
+                final Row row = mySheet.getRow(getRowNum(mySheet, FIRST_CELL_INDEX, question.getNumber()));
+                final AssessmentRow answerRow = new AssessmentRow();
+                answerRow.setQuestion(question);
+                answerRow.setElementsPiGrade(new HashMap<>());
+                elements.forEach(element -> {
+                    final Integer piGrade = getInteger(row.getCell(assessmentElementColumn.get(element)).getStringCellValue());
+                    answerRow.getElementsPiGrade().put(element, piGrade);
+                });
+                answers.put(question, answerRow);
+            });
+        return answers;
+    }
+
+    public Map<Question, Map<Element, PlannerRow>> getPlannerAnswers(List<Category> categories,
+                                                                     List<Element> elements, List<Year> years) {
+        final Map<Question, Map<Element, PlannerRow>> map = new HashMap<>();
+        categories.stream().flatMap(category -> category.getSubCategories().stream()).forEach(subCategory -> {
+            final Sheet sheet = getSheet(getWorkbook(), convertNumberToSheetName(subCategory.getQuestions().get(0).getNumber()));
+            subCategory.getQuestions().forEach(question -> {
+                map.put(question, new HashMap<>());
+                elements.forEach(element -> {
+                    final Row row = sheet.getRow(getRowNum(sheet, FIRST_CELL_INDEX, question.getNumber()) + getPlannerElementIndex(element));
+                    final PlannerRow plannerRow = new PlannerRow();
+                    plannerRow.setQuestion(question);
+                    plannerRow.setElement(element);
+                    plannerRow.setTask(row.getCell(PLANNER_TASK_CELL_INDEX).getStringCellValue());
+                    plannerRow.setOwnership(row.getCell(PLANNER_OWNERSHIP_CELL_INDEX).getStringCellValue());
+                    plannerRow.setPlanned(new HashMap<>());
+                    years.stream().flatMap(year -> year.getQuarters().stream()).forEach(quarter -> {
+                        final Boolean isChecked = row.getCell(getQuarterIndex(quarter)).getStringCellValue().equals(PLANNED_VALUE);
+                        plannerRow.getPlanned().put(quarter, isChecked);
+                    });
+                    map.get(question).put(element, plannerRow);
+                });
+            });
+        });
+        return map;
+    }
+
+    private Integer getInteger(String value) {
+        if (value == null) {
+            return null;
+        }
+        value = value.trim();
+        return value.matches("[0-9]+") ? Integer.parseInt(value) : null;
     }
 }

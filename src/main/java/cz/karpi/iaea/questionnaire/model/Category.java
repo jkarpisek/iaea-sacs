@@ -1,6 +1,5 @@
 package cz.karpi.iaea.questionnaire.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,9 +18,6 @@ public class Category {
     }
 
     public List<SubCategory> getSubCategories() {
-        if (subCategories == null) {
-            subCategories = new ArrayList<>();
-        }
         return subCategories;
     }
 
