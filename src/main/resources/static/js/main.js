@@ -58,4 +58,15 @@ function timelineBorder($this) {
     } else if (!checked && !prevChecked && !nextChecked) {
         $label.removeClass('planning-start planning-end');
     }
-}
+};
+
+function auto_grow(element) {
+    element.style.height = "5px";
+    element.style.height = (element.scrollHeight)+"px";
+};
+
+/*
+$('.tree-toggle').click(function () {
+    $(this).parent().children('ul.tree').toggle(200);
+});
+*/

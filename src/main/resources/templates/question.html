@@ -5,7 +5,7 @@
 
 <nav th:replace="fragments :: navigation"></nav>
 
-<div class="container">
+<div class="container-fluid">
     <div class="starter-template">
         <h2 class="sheet-title"><strong>SACS</strong> <span th:text="${#strings.concat('(', meta.currentPage, '/', meta.maxPage, ')')}">(2/10)</span></h2>
         <h3><span th:text="${meta.category}">1) Overarching Capabilities</span> - <strong th:text="${meta.subCategory}">Multi-Agency Command, Control and Coordination</strong></h3>
@@ -13,29 +13,37 @@
             <div class="row common-errors" th:if="${#fields.hasAnyErrors()}">
                 <div class="col-xs-12">Form contains errors, please correct it.</div>
             </div>
-            <div th:each="question : ${meta.sacsAnswers}" class="question-box">
-                <div class="row">
-                    <div class="col-xs-3"><strong>No.:</strong> <span th:text="${question.number}"></span></div>
-                    <div th:if="${question.type == 'WITH_PIGRADE'}" class="col-xs-9"><strong>Response action:</strong> <span th:text="${question.question}"></span></div>
-                </div>
-                <div class="row">
-                    <div th:if="${question.type == 'WITH_PIGRADE'}" th:class="'col-xs-3'">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Response Action</th>
+                    <th>PI Grade</th>
+                    <th>Comment</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="question : ${meta.sacsAnswers}" class="question-box">
+                    <td class="col-xs-1"><span th:text="${question.number}"></span></td>
+                    <td th:if="${question.type == 'WITH_PIGRADE'}" class="col-xs-4"><span th:text="${question.question}"></span></td>
+                    <td th:if="${question.type == 'WITH_PIGRADE'}" th:class="'col-xs-1'">
                         <select title="PI Grade" th:field="*{value[__${#questionnaireUtils.getPropertyName(question.number, 'piGrade')}__]}" class="form-control pi-grade">
-                            <option value="">select PI Grade..</option>
-                            <option value="3">3 - MS has full confidence in its capability</option>
-                            <option value="2">2 - good confidence in the MS capability</option>
-                            <option value="1">1 - low confidence in the MS capability</option>
-                            <option value="0">0 - no capability in place</option>
+                            <option value="">PI Grade..</option>
+                            <option value="3">3</option>
+                            <option value="2">2</option>
+                            <option value="1">1</option>
+                            <option value="0">0</option>
                         </select>
-                    </div>
-                    <div th:if="${question.type == 'WITH_PIGRADE'}" th:class="'col-xs-9'">
-                        <textarea th:field="*{value[__${#questionnaireUtils.getPropertyName(question.number, 'comments')}__]}" class="form-control" placeholder="enter comments"></textarea>
-                    </div>
-                    <div th:if="${question.type == 'ADDITIONAL_COMMENT'}" th:class="'col-xs-12'">
+                    </td>
+                    <td th:if="${question.type == 'WITH_PIGRADE'}" th:class="'col-xs-6'">
+                        <textarea th:field="*{value[__${#questionnaireUtils.getPropertyName(question.number, 'comments')}__]}" class="form-control" placeholder="enter comments" rows="1" onkeyup="auto_grow(this)"></textarea>
+                    </td>
+                    <td th:if="${question.type == 'ADDITIONAL_COMMENT'}" th:class="'col-xs-11'" th:colspan="'3'">
                         <textarea th:field="*{value[__${#questionnaireUtils.getPropertyName(question.number, 'comments')}__]}" class="form-control" placeholder="enter additional comments"></textarea>
-                    </div>
-                </div>
-            </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
             <span th:replace="fragments :: buttons"></span>
         </form>
     </div>

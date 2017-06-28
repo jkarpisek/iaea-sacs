@@ -7,20 +7,56 @@
 
 <div class="container">
     <div class="starter-template">
-        <h1>SACS questionnaire</h1>
-        <form th:object="${form}" method="post">
-            <div class="row common-errors" th:if="${#fields.hasAnyErrors()}">
-                <div class="col-xs-12">Form contains errors, please correct it.</div>
+        <h1>Self-Assessment Capability Survey Form (SACS)</h1>
+        <div class="row">
+            <div class="col-xs-12">
+                In order to address the numerous IAEA Member States’ requests for assistance with their national infrastructure
+                for responding to nuclear security events (NSE), the IAEA has developed a new assistance programme entitled
+                “IAEA Assistance programme on Nuclear Security Response Capabilities” (Program).
+                A Member State taking part in the Programme  is on the list of the States that requested such support from IAEA.
             </div>
-            <div class="row">
-                <div th:class="${#fields.hasErrors('companyName')} ? 'col-xs-6 has-error' : 'col-xs-6'">
-                    <input type="text" class="form-control" id="companyName" th:field="*{companyName}" th:attr="data-source=${meta.existedCompanies}"/>
-                </div>
-                <div class="col-xs-6">
-                    <span th:replace="fragments :: buttonNext"></span>
-                </div>
+        </div>
+        <br/>
+        <div class="row">
+            <div class="col-xs-12">
+                The Programme consists of three phases (Planning Phase, Implementing Phase, Sustaining Phase).
+                This application is an instrument developed by IAEA in order to help its Member States to complete the objective
+                of the first - Planning Phase. This application is designed to enable participating States to i) identify areas for improvement
+                in existing States’ nuclear security response capabilities and ii) to develop a comprehensive plan of actions,
+                Capability Development Plan (CDP) to address any nuclear security response capability which has been identified for improvement.
             </div>
-        </form>
+        </div>
+        <br/>
+        <div class="row">
+            <div class="col-xs-12">
+                Once such a CDP is developed and nationally endorsed, a second phase of the Programme, the implementation phase, can be initiated.
+                The existence of the approved CDP will ensure provision of IAEA assistance and support therein identified.
+            </div>
+        </div>
+        <br/>
+        <div class="row">
+            <div class="col-xs-12">
+                <form th:object="${form}" method="post">
+                    <div class="row common-errors" th:if="${#fields.hasAnyErrors()}">
+                        <div class="col-xs-12">Form contains errors, please correct it.</div>
+                    </div>
+                    <div class="row">
+                        <div th:class="${#fields.hasErrors('companyName')} ? 'col-xs-6 has-error' : 'col-xs-6'">
+                            <input type="text" class="form-control" id="companyName" th:field="*{companyName}" th:attr="data-source=${meta.existedCompanies}"/>
+                        </div>
+                        <div class="col-xs-6">
+                            <span th:replace="fragments :: buttonNext"></span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="text-center">
+                <img src="images/sacs_logo.png"/>
+                <img src="images/iaea_logo.png"  height="187px"/>
+            </div>
+        </div>
     </div>
 </div>
 
