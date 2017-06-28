@@ -16,10 +16,13 @@
             <div th:each="question : ${meta.sacsAnswers}" class="question-box">
                 <div class="row">
                     <div class="col-xs-3"><strong>No.:</strong> <span th:text="${question.number}"></span></div>
-                    <div th:if="${question.type == 'WITH_PIGRADE'}" class="col-xs-9"><strong>Response action:</strong> <span th:text="${question.question}"></span></div>
+                    <div class="col-xs-9">
+                        <th:block th:if="${question.type == 'STANDARD_QUESTION'}"><strong>Response action:</strong> <span th:text="${question.question}"></span></th:block>
+                        <th:block th:if="${question.type == 'ADDITIONAL_COMMENT'}"><strong>Additional written comments</strong></th:block>
+                    </div>
                 </div>
                 <div class="row">
-                    <div th:if="${question.type == 'WITH_PIGRADE'}" th:class="'col-xs-3'">
+                    <div class="col-xs-3">
                         <select title="PI Grade" th:field="*{value[__${#questionnaireUtils.getPropertyName(question.number, 'piGrade')}__]}" class="form-control pi-grade">
                             <option value="">select PI Grade..</option>
                             <option value="3">3 - MS has full confidence in its capability</option>
@@ -28,11 +31,8 @@
                             <option value="0">0 - no capability in place</option>
                         </select>
                     </div>
-                    <div th:if="${question.type == 'WITH_PIGRADE'}" th:class="'col-xs-9'">
-                        <textarea th:field="*{value[__${#questionnaireUtils.getPropertyName(question.number, 'comments')}__]}" class="form-control" placeholder="enter comments"></textarea>
-                    </div>
-                    <div th:if="${question.type == 'ADDITIONAL_COMMENT'}" th:class="'col-xs-12'">
-                        <textarea th:field="*{value[__${#questionnaireUtils.getPropertyName(question.number, 'comments')}__]}" class="form-control" placeholder="enter additional comments"></textarea>
+                    <div class="col-xs-9">
+                        <textarea th:field="*{value[__${#questionnaireUtils.getPropertyName(question.number, 'comments')}__]}" class="form-control" th:placeholder="${question.type == 'STANDARD_QUESTION' ? 'enter comments' : 'enter additional comments'}"></textarea>
                     </div>
                 </div>
             </div>

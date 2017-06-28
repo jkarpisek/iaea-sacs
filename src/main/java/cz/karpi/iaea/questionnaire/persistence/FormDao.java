@@ -128,9 +128,7 @@ public class FormDao {
                 answerRows.forEach(answerRow -> {
                     final Row row = mySheet.getRow(getRowNum(mySheet, FIRST_CELL_INDEX, answerRow.getQuestion().getNumber()));
                     row.getCell(SACS_COMMENTS_CELL_INDEX).setCellValue(answerRow.getComments());
-                    if (answerRow.getQuestion().getType().equals(EQuestionType.WITH_PIGRADE)) {
-                        row.getCell(SACS_PI_GRADE_CELL_INDEX).setCellValue(getOrEmpty(answerRow.getPiGrade()));
-                    }
+                    row.getCell(SACS_PI_GRADE_CELL_INDEX).setCellValue(getOrEmpty(answerRow.getPiGrade()));
                 });
             });
         }
@@ -163,7 +161,7 @@ public class FormDao {
                     question.setNumber(firstCellContent);
                     question.setQuestion(row.getCell(SACS_QUESTION_CELL_INDEX).getStringCellValue());
                     question.setSubCategory(subCategory);
-                    question.setType(EQuestionType.WITH_PIGRADE);
+                    question.setType(EQuestionType.STANDARD_QUESTION);
                     subCategory.getQuestions().add(question);
                 } else if (firstCellContent.matches("[A-Z]+-X")
                            || row.getCell(SACS_SUBCATEGORY_CELL_INDEX).getStringCellValue().equalsIgnoreCase("Additional written comments:")) {
@@ -298,9 +296,7 @@ public class FormDao {
                 final Row row = mySheet.getRow(getRowNum(mySheet, FIRST_CELL_INDEX, question.getNumber()));
                 final AnswerRow answerRow = new AnswerRow();
                 answerRow.setQuestion(question);
-                if (question.getType().equals(EQuestionType.WITH_PIGRADE)) {
-                    answerRow.setPiGrade(getInteger(row.getCell(SACS_PI_GRADE_CELL_INDEX).getStringCellValue()));
-                }
+                answerRow.setPiGrade(getInteger(row.getCell(SACS_PI_GRADE_CELL_INDEX).getStringCellValue()));
                 answerRow.setComments(row.getCell(SACS_COMMENTS_CELL_INDEX).getStringCellValue());
                 answers.put(question, answerRow);
             });
