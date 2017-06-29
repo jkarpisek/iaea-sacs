@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import cz.karpi.iaea.questionnaire.model.EQuestionType;
 import cz.karpi.iaea.questionnaire.model.Question;
 import cz.karpi.iaea.questionnaire.service.exception.ValidationException;
 import cz.karpi.iaea.questionnaire.service.to.AnswerTo;
@@ -44,13 +43,11 @@ public class ValidateService {
 
     private List<Object[]> validate(AnswerTo answerTo, Question row) {
         final List<Object[]> errors = new ArrayList<>();
-        if (row.getType().equals(EQuestionType.WITH_PIGRADE)) {
-            if (answerTo.getComments().isEmpty()) {
-                //errors.add(new Object[] { answerTo.getNumber(), "comments" });
-            }
-            if (answerTo.getPiGrade() == null || answerTo.getPiGrade() < MIN_PI_GRADE || answerTo.getPiGrade() > MAX_PI_GRADE) {
-                //errors.add(new Object[] { answerTo.getNumber(), "piGrade" });
-            }
+        if (answerTo.getComments().isEmpty()) {
+            //errors.add(new Object[] { answerTo.getNumber(), "comments" });
+        }
+        if (answerTo.getPiGrade() == null || answerTo.getPiGrade() < MIN_PI_GRADE || answerTo.getPiGrade() > MAX_PI_GRADE) {
+            //errors.add(new Object[] { answerTo.getNumber(), "piGrade" });
         }
         return errors;
     }

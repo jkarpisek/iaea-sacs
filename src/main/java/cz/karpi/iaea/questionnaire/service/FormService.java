@@ -13,7 +13,6 @@ import java.util.stream.IntStream;
 import cz.karpi.iaea.questionnaire.model.AnswerRow;
 import cz.karpi.iaea.questionnaire.model.AssessmentRow;
 import cz.karpi.iaea.questionnaire.model.Category;
-import cz.karpi.iaea.questionnaire.model.EQuestionType;
 import cz.karpi.iaea.questionnaire.model.Element;
 import cz.karpi.iaea.questionnaire.model.PlannerRow;
 import cz.karpi.iaea.questionnaire.model.Quarter;
@@ -119,9 +118,7 @@ public class FormService {
             final AnswerRow answerRow = new AnswerRow();
             answerRow.setQuestion(question);
             answerRow.setComments(answerTo.getComments());
-            if (question.getType().equals(EQuestionType.WITH_PIGRADE)) {
-                answerRow.setPiGrade(answerTo.getPiGrade());
-            }
+            answerRow.setPiGrade(answerTo.getPiGrade());
             sacsRows.put(answerRow.getQuestion(), answerRow);
             return answerRow;
         }).collect(Collectors.toList());

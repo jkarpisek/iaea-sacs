@@ -12,7 +12,6 @@ import java.util.stream.Stream;
 
 import cz.karpi.iaea.questionnaire.model.AnswerRow;
 import cz.karpi.iaea.questionnaire.model.AssessmentRow;
-import cz.karpi.iaea.questionnaire.model.EQuestionType;
 import cz.karpi.iaea.questionnaire.model.Element;
 import cz.karpi.iaea.questionnaire.model.PlannerRow;
 import cz.karpi.iaea.questionnaire.model.Question;
@@ -101,9 +100,7 @@ public class QuestionnaireFacadeService {
         answerTo.setNumber(question.getNumber());
         final AnswerRow answerRow = formService.getAnswerRow(question);
         answerTo.setComments(answerRow.getComments());
-        if (question.getType().equals(EQuestionType.WITH_PIGRADE)) {
-            answerTo.setPiGrade(answerRow.getPiGrade());
-        }
+        answerTo.setPiGrade(answerRow.getPiGrade());
         return answerTo;
     }
 

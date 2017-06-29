@@ -5,5 +5,5 @@ package cz.karpi.iaea.questionnaire.model;
  */
 public enum EQuestionType {
     ADDITIONAL_COMMENT,
-    WITH_PIGRADE
+    STANDARD_QUESTION
 }
