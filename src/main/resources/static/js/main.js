@@ -19,10 +19,6 @@ $(function() {
     }).on('change', function() {
         timelineBorder($(this));
     });
-    $('.close-application').click(function() {
-        $.ajax('closeApplication', { async: false });
-        alert('Application was terminated. Close this window, please.');
-    });
 });
 
 function timelineBorder($this) {
@@ -58,4 +54,8 @@ function timelineBorder($this) {
     } else if (!checked && !prevChecked && !nextChecked) {
         $label.removeClass('planning-start planning-end');
     }
+}
+
+function savingInProgress() {
+    $('#savingInProgressAlert').modal('show');
 }
