@@ -60,7 +60,7 @@ public class QuestionnaireController {
     @RequestMapping(value = "/start", method = RequestMethod.POST)
     public String start(@ModelAttribute(MODEL_ATTRIBUTE_FORM) InitVo initVo, BindingResult errors, Model model) {
         controllerUtils.catchValidationException(errors, () -> questionnaireFacadeService.init(viewConverter.toInitTo(initVo)));
-        return controllerUtils.returnPost(model, null, errors);
+        return controllerUtils.returnPost(model, viewConverter.toInitMetaVo(questionnaireFacadeService.getExistedCompanies()), errors);
     }
 
     @FlowInterceptor.FlowCheck(Flow.EFlowType.INSTRUCTION)
@@ -70,7 +70,7 @@ public class QuestionnaireController {
     }
 
     @FlowInterceptor.FlowCheck(Flow.EFlowType.INSTRUCTION)
-    @RequestMapping(value = "instruction", method = RequestMethod.POST)
+    @RequestMapping(value = "/instruction", method = RequestMethod.POST)
     public String instruction(Model model, @RequestParam String action) {
         questionnaireFacadeService.instruction(viewConverter.convertToEAction(action));
         return controllerUtils.returnPost(model, null,null);
