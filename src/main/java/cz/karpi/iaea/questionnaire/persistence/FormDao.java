@@ -91,9 +91,12 @@ public class FormDao {
 
     private void saveWorkbook(Workbook workbook) {
         try {
-            final FileOutputStream os = new FileOutputStream(excelFile);
+            final File tmpExcel = new File(excelFile.getAbsolutePath() + ".tmp");
+            final FileOutputStream os = new FileOutputStream(tmpExcel);
             workbook.write(os);
             os.close();
+            FileCopyUtils.copy(tmpExcel, excelFile);
+            tmpExcel.deleteOnExit();
         } catch (Exception e) {
             throw new DaoExpcetion("Save file failed", e);
         }
@@ -218,7 +221,6 @@ public class FormDao {
             save(convertNumberToSheetName(answerRows.get(0).getQuestion().getNumber()), (mySheet) ->
                 answerRows.forEach(answerRow -> {
                     final Row row = mySheet.getRow(getRowNum(mySheet, FIRST_CELL_INDEX, answerRow.getQuestion().getNumber()) + getPlannerElementIndex(answerRow.getElement()));
-                    //todo constant
                     row.getCell(PLANNER_PIGRADE_CELL_INDEX).setCellValue(assessmentRows.get(answerRow.getQuestion()).getElementsPiGrade().get(answerRow.getElement()));
                     row.getCell(PLANNER_COMMENTS_CELL_INDEX).setCellValue(sacsRows.get(answerRow.getQuestion()).getComments());
                     row.getCell(PLANNER_TASK_CELL_INDEX).setCellValue(answerRow.getTask());
