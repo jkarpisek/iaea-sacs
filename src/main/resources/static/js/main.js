@@ -54,7 +54,19 @@ function timelineBorder($this) {
     } else if (!checked && !prevChecked && !nextChecked) {
         $label.removeClass('planning-start planning-end');
     }
-}
+};
+
+$( document ).ready(function() {
+    console.log(Date.now());
+    $("textarea.auto-grow").each(function(){
+        auto_grow(this);
+    });
+    console.log(Date.now());
+});
+
+function auto_grow(element) {
+    element.style.height = (element.scrollHeight)+"px";
+};
 
 function savingInProgress() {
     $('#savingInProgressAlert').modal('show');
