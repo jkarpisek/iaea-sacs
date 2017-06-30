@@ -13,29 +13,37 @@
             <div class="row common-errors" th:if="${#fields.hasAnyErrors()}">
                 <div class="col-xs-12">Form contains errors, please correct it.</div>
             </div>
-            <div th:each="question : ${meta.sacsAnswers}" class="question-box">
-                <div class="row">
-                    <div class="col-xs-3"><strong>No.:</strong> <span th:text="${question.number}"></span></div>
-                    <div class="col-xs-9">
-                        <th:block th:if="${question.type == 'STANDARD_QUESTION'}"><strong>Response action:</strong> <span th:text="${question.question}"></span></th:block>
-                        <th:block th:if="${question.type == 'ADDITIONAL_COMMENT'}"><strong>Additional written comments</strong></th:block>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-xs-3">
-                        <select title="PI Grade" th:field="*{value[__${#questionnaireUtils.getPropertyName(question.number, 'piGrade')}__]}" class="form-control pi-grade">
-                            <option value="">PI Grade..</option>
-                            <option value="3">3</option>
-                            <option value="2">2</option>
-                            <option value="1">1</option>
-                            <option value="0">0</option>
-                        </select>
-                    </div>
-                    <div class="col-xs-9">
-                        <textarea th:field="*{value[__${#questionnaireUtils.getPropertyName(question.number, 'comments')}__]}" class="form-control" th:placeholder="${question.type == 'STANDARD_QUESTION' ? 'enter comments' : 'enter additional comments'}"></textarea>
-                    </div>
-                </div>
-            </div>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Response Action</th>
+                    <th>PI Grade</th>
+                    <th>Comment</th>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="question : ${meta.sacsAnswers}" class="question-box">
+                        <div class="row">
+                            <td class="col-xs-1"><span th:text="${question.number}"></span></td>
+                            <td th:if="${question.type == 'STANDARD_QUESTION'}" class="col-xs-4"><span th:text="${question.question}"></span></td>
+                            <td th:if="${question.type == 'ADDITIONAL_COMMENT'}" th:class="'col-xs-4'">Additional comments (any other area for improvement)</td>
+                            <td class="col-xs-1">
+                                <select title="PI Grade" th:field="*{value[__${#questionnaireUtils.getPropertyName(question.number, 'piGrade')}__]}" class="form-control pi-grade">
+                                    <option value="">PI Grade..</option>
+                                    <option value="3">3</option>
+                                    <option value="2">2</option>
+                                    <option value="1">1</option>
+                                    <option value="0">0</option>
+                                </select>
+                            </td>
+                            <td class="col-xs-6">
+                                <textarea th:field="*{value[__${#questionnaireUtils.getPropertyName(question.number, 'comments')}__]}" class="form-control auto-grow" th:placeholder="${question.type == 'STANDARD_QUESTION' ? 'enter comments' : 'enter additional comments'}" rows="1" onkeyup="auto_grow(this)"></textarea>
+                            </td>
+                        </div>
+                    </tr>
+                </tbody>
+            </table>
             <span th:replace="fragments :: buttons"></span>
         </form>
     </div>
