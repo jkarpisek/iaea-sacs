@@ -19,10 +19,6 @@ $(function() {
     }).on('change', function() {
         timelineBorder($(this));
     });
-    $('.close-application').click(function() {
-        $.ajax('closeApplication', { async: false });
-        alert('Application was terminated. Close this window, please.');
-    });
 });
 
 function timelineBorder($this) {
@@ -58,15 +54,8 @@ function timelineBorder($this) {
     } else if (!checked && !prevChecked && !nextChecked) {
         $label.removeClass('planning-start planning-end');
     }
-};
+}
 
-function auto_grow(element) {
-    element.style.height = "5px";
-    element.style.height = (element.scrollHeight)+"px";
-};
-
-/*
-$('.tree-toggle').click(function () {
-    $(this).parent().children('ul.tree').toggle(200);
-});
-*/
+function savingInProgress() {
+    $('#savingInProgressAlert').modal('show');
+}

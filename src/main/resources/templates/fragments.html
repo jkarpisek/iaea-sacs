@@ -19,7 +19,6 @@
             <span class="navbar-brand">IAEA - SACS</span>
         </div>
         <div class="navbar-header" style="float: right">
-            <span class="navbar-brand"><a class="close-application" href="#">Close</a></span>
             <span class="navbar-brand" th:if="${#lists.contains(common.actions, 'RESET')}"><a th:href="@{reset}">Reset</a></span>
             <span class="navbar-brand" th:text="${common.companyName}">Company</span>
         </div>
@@ -41,6 +40,23 @@
 <button th:fragment="buttonPrevious" th:if="${#lists.contains(common.actions, 'PREVIOUS')}" type="submit" class="btn btn-primary btn-block" name="action" value="previous"><span class="glyphicon glyphicon-arrow-left"/> Previous</button>
 <button th:fragment="buttonNext" th:if="${#lists.contains(common.actions, 'NEXT')}" type="submit" class="btn btn-primary btn-block" name="action" value="next">Next <span class="glyphicon glyphicon-arrow-right"/></button>
 <button th:fragment="buttonFinish" th:if="${#lists.contains(common.actions, 'FINISH')}" type="submit" class="btn btn-primary btn-block" name="action" value="next">Finish <span class="glyphicon glyphicon-flag"/></button>
+
+<div th:fragment="savingInProgressAlert" id="savingInProgressAlert" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Close application</h4>
+            </div>
+            <div class="modal-body">
+                <p>Save in progress.</p>
+            </div>
+        </div>
+
+    </div>
+</div>
 
 </body>
 </html>
