@@ -1,3 +1,5 @@
+@import url(loader.css);
+
 body {
     background-color: #F1F1F2;
     font-family: 'Open Sans', Arial, sans-serif;
@@ -113,4 +115,9 @@ th.rotate > div {
 th.rotate > div > span {
     border-bottom: 1px solid #ccc;
     padding: 5px 10px;
+}
+
+#loadingAlert > .modal-dialog {
+    width: 266px;
+    margin: 25% auto;
 }

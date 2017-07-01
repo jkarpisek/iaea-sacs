@@ -56,11 +56,11 @@ public class ControllerUtils {
         return toPage(commonTo.getState(), false);
     }
 
-    protected String returnPost(Model model, Map<String, Object> meta, BindingResult errors) {
+    protected String returnPost(Model model, Supplier<Map<String, Object>> meta, BindingResult errors) {
         final CommonTo commonTo = questionnaireFacadeService.getCommonTo();
         if (errors != null && errors.hasErrors()) {
             model.addAttribute(MODEL_ATTRIBUTE_COMMON, viewConverter.toCommonVo(commonTo));
-            model.addAttribute(MODEL_ATTRIBUTE_META, meta);
+            model.addAttribute(MODEL_ATTRIBUTE_META, meta.get());
             return null;
         }
         return toPage(commonTo.getState(), true);

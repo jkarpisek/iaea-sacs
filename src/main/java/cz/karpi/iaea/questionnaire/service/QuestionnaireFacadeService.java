@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -41,11 +42,15 @@ public class QuestionnaireFacadeService {
 
     private ValidateService validateService;
 
+    private final SavingStatusService savingStatusService;
+
     @Autowired
-    public QuestionnaireFacadeService(FormService formService, FlowService flowService, ValidateService validateService) {
+    public QuestionnaireFacadeService(FormService formService, FlowService flowService, ValidateService validateService,
+                                      SavingStatusService savingStatusService) {
         this.formService = formService;
         this.flowService = flowService;
         this.validateService = validateService;
+        this.savingStatusService = savingStatusService;
     }
 
     public void reset() {
@@ -105,11 +110,11 @@ public class QuestionnaireFacadeService {
     }
 
     public Void question(AnswersTo answersTo, FlowService.EAction action) {
-        if (action.equals(FlowService.EAction.NEXT)) {
+        processAction(() -> {
             validateService.validate(answersTo);
             formService.saveAnswer(answersTo);
-        }
-        flowService.moveCounterTo(action);
+            return null;
+        }, action);
         return null;
     }
 
@@ -166,10 +171,7 @@ public class QuestionnaireFacadeService {
     }
 
     public Void assessment(AssessmentAnswersTo assessmentAnswersTo, FlowService.EAction action) {
-        if (action.equals(FlowService.EAction.NEXT)) {
-            formService.saveAssessmentAnswer(assessmentAnswersTo);
-        }
-        flowService.moveCounterTo(action);
+        processAction(() -> { formService.saveAssessmentAnswer(assessmentAnswersTo); return null; }, action);
         return null;
     }
 
@@ -225,14 +227,27 @@ public class QuestionnaireFacadeService {
     }
 
     public Void planner(PlannerAnswersTo plannerAnswersTo, FlowService.EAction action) {
-        if (action.equals(FlowService.EAction.NEXT)) {
-            formService.savePlannerAnswer(plannerAnswersTo);
-        }
-        flowService.moveCounterTo(action);
+        processAction(() -> { formService.savePlannerAnswer(plannerAnswersTo); return null; }, action);
         return null;
     }
 
     public List<String> getExistedCompanies() {
         return formService.getExistedCompanies();
+    }
+
+    private void processAction(Supplier<Void> supplier, FlowService.EAction action) {
+        if (action.equals(FlowService.EAction.NEXT) || action.equals(FlowService.EAction.SAVE)) {
+            supplier.get();
+        }
+        if (!action.equals(FlowService.EAction.SAVE)) {
+            flowService.moveCounterTo(action);
+        } else {
+            savingStatusService.waitForSave();
+            reset();
+        }
+    }
+
+    public Integer savingProgress() {
+        return savingStatusService.savingProgress();
     }
 }

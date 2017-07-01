@@ -8,6 +8,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import cz.karpi.iaea.questionnaire.model.Flow;
 import cz.karpi.iaea.questionnaire.service.QuestionnaireFacadeService;
@@ -60,7 +64,7 @@ public class QuestionnaireController {
     @RequestMapping(value = "/start", method = RequestMethod.POST)
     public String start(@ModelAttribute(MODEL_ATTRIBUTE_FORM) InitVo initVo, BindingResult errors, Model model) {
         controllerUtils.catchValidationException(errors, () -> questionnaireFacadeService.init(viewConverter.toInitTo(initVo)));
-        return controllerUtils.returnPost(model, viewConverter.toInitMetaVo(questionnaireFacadeService.getExistedCompanies()), errors);
+        return controllerUtils.returnPost(model, () -> viewConverter.toInitMetaVo(questionnaireFacadeService.getExistedCompanies()), errors);
     }
 
     @FlowInterceptor.FlowCheck(Flow.EFlowType.INSTRUCTION)
@@ -88,7 +92,7 @@ public class QuestionnaireController {
     @RequestMapping(value = "/question", method = RequestMethod.POST)
     public String question(@ModelAttribute(MODEL_ATTRIBUTE_FORM) MatrixModel answerVo, @RequestParam String action, BindingResult errors, Model model) {
         controllerUtils.catchValidationException(errors, () -> questionnaireFacadeService.question(viewConverter.toAnswersTo(answerVo, questionnaireFacadeService.getAnswersTo()), viewConverter.convertToEAction(action)));
-        return controllerUtils.returnPost(model, viewConverter.toQuestionsMetaVo(questionnaireFacadeService.getQuestionsTo()), errors);
+        return controllerUtils.returnPost(model, () -> viewConverter.toQuestionsMetaVo(questionnaireFacadeService.getQuestionsTo()), errors);
     }
 
     @FlowInterceptor.FlowCheck(Flow.EFlowType.ASSESSMENT)
@@ -103,7 +107,7 @@ public class QuestionnaireController {
     @RequestMapping(value = "/assessment", method = RequestMethod.POST)
     public String assessmentPost(@ModelAttribute(MODEL_ATTRIBUTE_FORM) MatrixModel assessmentVo, @RequestParam String action, BindingResult errors, Model model) {
         controllerUtils.catchValidationException(errors, () -> questionnaireFacadeService.assessment(viewConverter.toAssessmentAnswerTo(assessmentVo, questionnaireFacadeService.getAssessmentAnswersTo()), viewConverter.convertToEAction(action)));
-        return controllerUtils.returnPost(model, viewConverter.toAssessmentMetaVo(questionnaireFacadeService.getAssessmentTo()), errors);
+        return controllerUtils.returnPost(model, () -> viewConverter.toAssessmentMetaVo(questionnaireFacadeService.getAssessmentTo()), errors);
     }
 
     @FlowInterceptor.FlowCheck(Flow.EFlowType.PLANNER)
@@ -118,7 +122,7 @@ public class QuestionnaireController {
     @RequestMapping(value = "/planner", method = RequestMethod.POST)
     public String plannerPost(@ModelAttribute(MODEL_ATTRIBUTE_FORM) MatrixModel plannerVo, @RequestParam String action, BindingResult errors, Model model) {
         controllerUtils.catchValidationException(errors, () -> questionnaireFacadeService.planner(viewConverter.toPlannerAnswerTo(plannerVo, questionnaireFacadeService.getPlannerAnswersTo()), viewConverter.convertToEAction(action)));
-        return controllerUtils.returnPost(model, viewConverter.toPlannerMetaVo(questionnaireFacadeService.getPlannerTo()), errors);
+        return controllerUtils.returnPost(model, () -> viewConverter.toPlannerMetaVo(questionnaireFacadeService.getPlannerTo()), errors);
     }
 
     @FlowInterceptor.FlowCheck(Flow.EFlowType.CDP)
@@ -133,5 +137,12 @@ public class QuestionnaireController {
     public String reset(Model model) {
         questionnaireFacadeService.reset();
         return controllerUtils.returnGet(model);
+    }
+
+    @FlowInterceptor.FlowCheck({Flow.EFlowType.START, Flow.EFlowType.INSTRUCTION, Flow.EFlowType.QUESTION, Flow.EFlowType.ASSESSMENT, Flow.EFlowType.PLANNER, Flow.EFlowType.CDP})
+    @RequestMapping("/savingProgress")
+    @ResponseBody
+    public Map<String, Integer> savingProgress() {
+        return new HashMap<String, Integer>() {{ put("progress", questionnaireFacadeService.savingProgress()); }};
     }
 }

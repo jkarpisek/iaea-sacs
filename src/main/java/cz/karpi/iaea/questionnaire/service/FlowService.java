@@ -16,7 +16,7 @@ import cz.karpi.iaea.questionnaire.model.SubCategory;
 @Service
 public class FlowService {
 
-    public enum EAction { PREVIOUS, NEXT, FINISH, RESET }
+    public enum EAction { PREVIOUS, NEXT, FINISH, RESET, SAVE }
 
     private Flow flow = new Flow();
 
@@ -107,17 +107,19 @@ public class FlowService {
                 actions = Collections.singletonList(EAction.NEXT);
                 break;
             case INSTRUCTION:
+                actions = Arrays.asList(EAction.PREVIOUS, EAction.NEXT, EAction.RESET);
+                break;
             case QUESTION:
             case ASSESSMENT:
-                actions = Arrays.asList(EAction.PREVIOUS, EAction.NEXT, EAction.RESET);
+                actions = Arrays.asList(EAction.PREVIOUS, EAction.NEXT, EAction.RESET, EAction.SAVE);
                 break;
             case PLANNER:
                 actions = !getCurrentPage().equals(getMaxPage())
-                          ? Arrays.asList(EAction.PREVIOUS, EAction.NEXT, EAction.RESET)
-                          : Arrays.asList(EAction.PREVIOUS, EAction.FINISH, EAction.RESET);
+                          ? Arrays.asList(EAction.PREVIOUS, EAction.NEXT, EAction.RESET, EAction.SAVE)
+                          : Arrays.asList(EAction.PREVIOUS, EAction.FINISH, EAction.RESET, EAction.SAVE);
                 break;
             case CDP:
-                actions = Arrays.asList(EAction.PREVIOUS, EAction.RESET);
+                actions = Arrays.asList(EAction.PREVIOUS, EAction.RESET, EAction.SAVE);
                 break;
             default:
                 actions = Collections.emptyList();
