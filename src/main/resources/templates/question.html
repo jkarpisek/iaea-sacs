@@ -38,7 +38,7 @@
                                 </select>
                             </td>
                             <td class="col-xs-6">
-                                <textarea th:field="*{value[__${#questionnaireUtils.getPropertyName(question.number, 'comments')}__]}" class="form-control auto-grow" th:placeholder="${question.type == 'STANDARD_QUESTION' ? 'enter comments' : 'enter additional comments'}" rows="1" onkeyup="auto_grow(this)"></textarea>
+                                <textarea th:field="*{value[__${#questionnaireUtils.getPropertyName(question.number, 'comments')}__]}" class="form-control auto-grow" placeholder="enter comments" rows="1" onkeyup="auto_grow(this)"></textarea>
                             </td>
                         </div>
                     </tr>
