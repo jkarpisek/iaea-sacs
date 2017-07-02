@@ -243,7 +243,6 @@ public class QuestionnaireFacadeService {
             flowService.moveCounterTo(action);
         } else {
             savingStatusService.waitForSave();
-            reset();
         }
     }
 

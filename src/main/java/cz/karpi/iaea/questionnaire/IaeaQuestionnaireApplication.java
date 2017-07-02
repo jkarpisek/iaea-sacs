@@ -1,5 +1,6 @@
 package cz.karpi.iaea.questionnaire;
 
+import javafx.scene.image.Image;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -32,9 +33,9 @@ public class IaeaQuestionnaireApplication extends Application {
         webView.setContextMenuEnabled(false);
 
         primaryStage.setScene(new Scene(webView));
-        primaryStage.setTitle("IAEA");
+        primaryStage.setTitle("IAEA Assistance programme on Nuclear Security Response Capabilities");
         primaryStage.setOnCloseRequest(this::closeHandler);
-        //primaryStage.getIcons().add(new Image("/images/iaea_logo.png"));
+        primaryStage.getIcons().add(new Image("/static/images/iaea_logo.png"));
         primaryStage.setMaximized(true);
         primaryStage.show();
     }

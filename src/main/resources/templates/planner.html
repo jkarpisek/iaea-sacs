@@ -13,7 +13,11 @@
             <div class="row common-errors" th:if="${#fields.hasAnyErrors()}">
                 <div class="col-xs-12">Form contains errors, please correct it.</div>
             </div>
-            <h3 th:if="${#lists.isEmpty(meta.sacsAnswers)}"><em>Nothing to show.</em></h3>
+            <h3 th:if="${#lists.isEmpty(meta.sacsAnswers)}">
+                <em>
+                    This field is not applicable, as you have not identified any areas for improvement in the SACS assessment
+                </em>
+            </h3>
             <table class="table" th:if="${!#lists.isEmpty(meta.sacsAnswers)}">
                 <thead>
                 <tr>

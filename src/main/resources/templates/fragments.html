@@ -16,10 +16,10 @@
 <nav class="navbar navbar-inverse" th:fragment="navigation">
     <div class="container">
         <div class="navbar-header">
-            <span class="navbar-brand">IAEA - SACS</span>
+            <span class="navbar-brand">IAEA Assistance programme on Nuclear Security Response Capabilities</span>
         </div>
         <div class="navbar-header" style="float: right">
-            <span class="navbar-brand" th:if="${#lists.contains(common.actions, 'RESET')}"><a th:href="@{reset}">Reset</a></span>
+            <!--<span class="navbar-brand" th:if="${#lists.contains(common.actions, 'RESET')}"><a th:href="@{reset}">Reset</a></span>-->
             <span class="navbar-brand" th:text="${common.companyName}">Company</span>
         </div>
     </div>
@@ -28,18 +28,23 @@
 <script type="text/javascript" src="webjars/bootstrap/3.3.7/js/bootstrap.min.js" th:fragment="bootrapScript"></script>
 
 <div class="row" th:fragment="buttons">
-    <div class="col-xs-6">
+    <div class="col-xs-4">
         <span th:replace="fragments :: buttonPrevious"></span>
     </div>
-    <div class="col-xs-6">
-        <span th:replace="fragments :: buttonNext"></span>
-        <span th:replace="fragments :: buttonFinish"></span>
+    <div class="col-xs-4">
         <span th:replace="fragments :: buttonSave"></span>
+    </div>
+    <div class="col-xs-4">
+        <span th:replace="fragments :: buttonSaveNext"></span>
+        <span th:replace="fragments :: buttonFinish"></span>
+
     </div>
 </div>
 
+<button th:fragment="buttonStart" th:if="${#lists.contains(common.actions, 'NEXT')}" type="submit" class="btn btn-primary btn-block" name="action" value="next">Start <span class="glyphicon glyphicon-arrow-right"/></button>
 <button th:fragment="buttonPrevious" th:if="${#lists.contains(common.actions, 'PREVIOUS')}" type="submit" class="btn btn-primary btn-block" name="action" value="previous"><span class="glyphicon glyphicon-arrow-left"/> Previous</button>
 <button th:fragment="buttonNext" th:if="${#lists.contains(common.actions, 'NEXT')}" type="submit" class="btn btn-primary btn-block" name="action" value="next">Next <span class="glyphicon glyphicon-arrow-right"/></button>
+<button th:fragment="buttonSaveNext" th:if="${#lists.contains(common.actions, 'NEXT')}" type="submit" class="btn btn-primary btn-block" name="action" value="next">Save &amp; Next <span class="glyphicon glyphicon-arrow-right"/></button>
 <button th:fragment="buttonFinish" th:if="${#lists.contains(common.actions, 'FINISH')}" type="submit" class="btn btn-primary btn-block" name="action" value="next">Finish <span class="glyphicon glyphicon-flag"/></button>
 <button th:fragment="buttonSave" th:if="${#lists.contains(common.actions, 'SAVE')}" type="submit" class="btn btn-primary btn-block" name="action" value="save">Save <span class="glyphicon glyphicon-floppy-disk"/></button>
 

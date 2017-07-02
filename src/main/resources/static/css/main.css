@@ -110,6 +110,8 @@ th.rotate > div {
 
         /* 45 is really 360 - 45 */
             rotate(315deg);
+
+    -webkit-transform: rotate(315deg);
     width: 30px;
 }
 th.rotate > div > span {

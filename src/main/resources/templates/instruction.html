@@ -165,12 +165,20 @@
                     and will set out a structured, prioritised plan for the development of the State’s nuclear security response capability,
                     in accordance with the priorities highlighted during the SACS process.
                 </p>
-                <form method="post">
-                    <span th:replace="fragments :: buttons"></span>
-                </form>
             </div>
         </div>
     </div>
+    <div class="row">
+        <form method="post">
+            <div class="col-xs-4">
+                <span th:replace="fragments :: buttonPrevious"></span>
+            </div>
+            <div class="col-xs-4 col-xs-offset-4 ">
+                <span th:replace="fragments :: buttonNext"></span>
+            </div>
+        </form>
+    </div>
+    <br/>
 </div>
 
 <span th:replace="fragments :: bootrapScript"></span>
