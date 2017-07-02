@@ -28,11 +28,10 @@ public class SavingStatusService {
     }
 
     public Integer savingProgress() {
+        if (taskExecutor.getThreadPoolExecutor().getTaskCount() == 0) {
+            return 100;
+        }
         return Long.valueOf(100 * taskExecutor.getThreadPoolExecutor().getCompletedTaskCount() / taskExecutor.getThreadPoolExecutor().getTaskCount()).intValue();
-    }
-
-    public boolean isSaving() {
-        return taskExecutor.getActiveCount() != 0;
     }
 
     public void shutdown() {

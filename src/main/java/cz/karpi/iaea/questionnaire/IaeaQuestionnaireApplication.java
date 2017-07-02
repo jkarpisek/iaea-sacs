@@ -1,15 +1,17 @@
 package cz.karpi.iaea.questionnaire;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
 import cz.karpi.iaea.questionnaire.service.SavingStatusService;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.Event;
-import javafx.event.EventType;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.web.WebView;
@@ -19,8 +21,11 @@ import javafx.stage.WindowEvent;
 @SpringBootApplication
 public class IaeaQuestionnaireApplication extends Application {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(IaeaQuestionnaireApplication.class);
+
     private ApplicationContext appContext;
     private WebView webView;
+    private Service<Void> closeService;
 
     public static void main(String[] args) {
         launch();
@@ -37,7 +42,11 @@ public class IaeaQuestionnaireApplication extends Application {
         primaryStage.getIcons().add(new Image("/static/images/iaea_logo.png"));
         primaryStage.setMaximized(true);
         primaryStage.show();
-        final Service<Void> service = new Service<Void>() {
+        getStartService().start();
+    }
+
+    private Service<Void> getStartService() {
+        final Service<Void> startService = new Service<Void>() {
             @Override
             protected Task<Void> createTask() {
                 return new Task<Void>() {
@@ -48,27 +57,48 @@ public class IaeaQuestionnaireApplication extends Application {
                 };
             }
         };
-        service.addEventHandler(EventType.ROOT, this::eventHandler);
-        service.start();
-    }
-
-    private void eventHandler(Event event) {
-        if (event.getEventType().getName().equals("WORKER_STATE_SUCCEEDED")) {
-            webView.getEngine().load("http://127.0.0.1:" + appContext.getEnvironment().getProperty("server.port"));
-        } else if (event.getEventType().getName().equals("WORKER_STATE_FAILED")) {
-            webView.getEngine().loadContent("Start application failed.");
-        }
+        startService.setOnSucceeded(event -> webView.getEngine().load("http://127.0.0.1:" + appContext.getEnvironment().getProperty("server.port")));
+        startService.setOnFailed(event -> webView.getEngine().loadContent("Start application failed."));
+        return startService;
     }
 
     private void closeHandler(WindowEvent event) {
-        final SavingStatusService savingStatusService = appContext.getBean(SavingStatusService.class);
-        if (savingStatusService.isSaving()) {
-            event.consume();
-            webView.getEngine().executeScript("savingInProgress('" + savingStatusService.savingProgress() + "%')");
-        } else {
-            savingStatusService.shutdown();
-            SpringApplication.exit(appContext, () -> 0);
+        event.consume();
+        if (!getCloseService().isRunning()) {
+            try {
+                webView.getEngine().executeScript("showSavingProgressAlert()");
+            } catch (Exception e) {
+                LOGGER.error("Execute script failed", e);
+            }
+            getCloseService().start();
         }
+    }
 
+    private Service<Void> getCloseService() {
+        if (closeService == null) {
+            closeService = new Service<Void>() {
+                @Override
+                protected Task<Void> createTask() {
+                    return new Task<Void>() {
+                        @Override
+                        protected Void call() throws InterruptedException {
+                            final SavingStatusService savingStatusService = appContext.getBean(SavingStatusService.class);
+                            savingStatusService.waitForSave();
+                            return null;
+                        }
+                    };
+                }
+            };
+            closeService.setOnSucceeded(this::exitApplication);
+            closeService.setOnFailed(event1 -> webView.getEngine().loadContent("Close application failed."));
+        }
+        return closeService;
+    }
+
+    private void exitApplication(Event event) {
+        final SavingStatusService savingStatusService = appContext.getBean(SavingStatusService.class);
+        savingStatusService.shutdown();
+        SpringApplication.exit(appContext, () -> 0);
+        Platform.exit();
     }
 }
