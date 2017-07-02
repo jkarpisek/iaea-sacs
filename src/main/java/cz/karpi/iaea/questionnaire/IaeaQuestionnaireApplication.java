@@ -1,15 +1,17 @@
 package cz.karpi.iaea.questionnaire;
 
-import javafx.scene.image.Image;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
-import java.net.InetAddress;
-
 import cz.karpi.iaea.questionnaire.service.SavingStatusService;
 import javafx.application.Application;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
+import javafx.event.Event;
+import javafx.event.EventType;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -26,18 +28,36 @@ public class IaeaQuestionnaireApplication extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        appContext = SpringApplication.run(IaeaQuestionnaireApplication.class);
-
         webView = new WebView();
-        webView.getEngine().load("http://" + InetAddress.getByName(null).getHostAddress() + ":" + appContext.getEnvironment().getProperty("server.port"));
         webView.setContextMenuEnabled(false);
-
+        webView.getEngine().load(getClass().getClassLoader().getResource("static/images/sacs_logo_small.jpg").toString());
         primaryStage.setScene(new Scene(webView));
         primaryStage.setTitle("IAEA Assistance programme on Nuclear Security Response Capabilities");
         primaryStage.setOnCloseRequest(this::closeHandler);
         primaryStage.getIcons().add(new Image("/static/images/iaea_logo.png"));
         primaryStage.setMaximized(true);
         primaryStage.show();
+        final Service<Void> service = new Service<Void>() {
+            @Override
+            protected Task<Void> createTask() {
+                return new Task<Void>() {
+                    @Override protected Void call() throws InterruptedException {
+                        appContext = SpringApplication.run(IaeaQuestionnaireApplication.class);
+                        return null;
+                    }
+                };
+            }
+        };
+        service.addEventHandler(EventType.ROOT, this::eventHandler);
+        service.start();
+    }
+
+    private void eventHandler(Event event) {
+        if (event.getEventType().getName().equals("WORKER_STATE_SUCCEEDED")) {
+            webView.getEngine().load("http://127.0.0.1:" + appContext.getEnvironment().getProperty("server.port"));
+        } else if (event.getEventType().getName().equals("WORKER_STATE_FAILED")) {
+            webView.getEngine().loadContent("Start application failed.");
+        }
     }
 
     private void closeHandler(WindowEvent event) {
@@ -50,22 +70,5 @@ public class IaeaQuestionnaireApplication extends Application {
             SpringApplication.exit(appContext, () -> 0);
         }
 
-        /*Service<Void> service = new Service<Void>() {
-            @Override protected Task<Void> createTask() {
-                return new Task<Void>() {
-                    @Override protected Void call() throws InterruptedException {
-                        updateMessage("Message . . .");
-                        updateProgress(0, 10);
-                        for (int i = 0; i < 10; i++) {
-                            Thread.sleep(300);
-                            updateProgress(i + 1, 10);
-                            updateMessage("Progress " + (i + 1) + " of 10");
-                        }
-                        updateMessage("End task");
-                        return null;
-                    }
-                };
-            }
-        };*/
     }
 }
