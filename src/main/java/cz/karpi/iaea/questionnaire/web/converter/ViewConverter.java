@@ -18,6 +18,7 @@ import cz.karpi.iaea.questionnaire.service.to.CommonTo;
 import cz.karpi.iaea.questionnaire.service.to.InitTo;
 import cz.karpi.iaea.questionnaire.service.to.PlannerAnswerTo;
 import cz.karpi.iaea.questionnaire.service.to.PlannerAnswersTo;
+import cz.karpi.iaea.questionnaire.service.to.PlannerOverviewTo;
 import cz.karpi.iaea.questionnaire.service.to.PlannerQuestionTo;
 import cz.karpi.iaea.questionnaire.service.to.PlannerTo;
 import cz.karpi.iaea.questionnaire.service.to.QuestionTo;
@@ -200,8 +201,25 @@ public class ViewConverter {
         return plannerAnswersTo;
     }
 
-    public Object toCdpVo(Object o) {
-        return null;
+    public Map<String, Object> toCdpMetaVo(PlannerOverviewTo plannerOverviewTo) {
+        final Map<String, Object> map = new HashMap<>();
+        map.put("years", plannerOverviewTo.getYears());
+        map.put("sacsAnswers", plannerOverviewTo.getPlannerQuestions().stream().map(this::mapPlannerVo).collect(Collectors.toList()));
+        map.put("value", toCdpValueVo(plannerOverviewTo.getValue()).getValue());
+        return map;
+    }
+
+    private MatrixModel toCdpValueVo(PlannerAnswersTo plannerAnswersTo) {
+        final MatrixModel plannerVo = new MatrixModel();
+        plannerAnswersTo.getAnswerList().forEach(plannerAnswerTo -> {
+            final String prefix = getPlannerKey(plannerAnswerTo);
+            plannerVo.getValue().put(questionnaireDialectUtils.getPropertyName(prefix, FIELD_PLANNER_ANSWER_TASK), plannerAnswerTo.getTask());
+            plannerVo.getValue().put(questionnaireDialectUtils.getPropertyName(prefix, FIELD_PLANNER_ANSWER_OWNERSHIP), plannerAnswerTo.getOwnership());
+            plannerAnswerTo.getPlanned().forEach(
+                (quarter, value) -> plannerVo.getValue().put(questionnaireDialectUtils.getPropertyName(prefix, getQuarterKey(quarter)), value)
+            );
+        });
+        return plannerVo;
     }
 
     public InitVo toInitFormVo() {

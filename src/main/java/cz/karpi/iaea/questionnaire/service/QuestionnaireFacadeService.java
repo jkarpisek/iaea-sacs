@@ -28,6 +28,7 @@ import cz.karpi.iaea.questionnaire.service.to.ElementTo;
 import cz.karpi.iaea.questionnaire.service.to.InitTo;
 import cz.karpi.iaea.questionnaire.service.to.PlannerAnswerTo;
 import cz.karpi.iaea.questionnaire.service.to.PlannerAnswersTo;
+import cz.karpi.iaea.questionnaire.service.to.PlannerOverviewTo;
 import cz.karpi.iaea.questionnaire.service.to.PlannerQuestionTo;
 import cz.karpi.iaea.questionnaire.service.to.PlannerTo;
 import cz.karpi.iaea.questionnaire.service.to.QuestionTo;
@@ -43,6 +44,8 @@ public class QuestionnaireFacadeService {
     private ValidateService validateService;
 
     private final SavingStatusService savingStatusService;
+
+    private Boolean useAllAnswerTo = Boolean.FALSE;
 
     @Autowired
     public QuestionnaireFacadeService(FormService formService, FlowService flowService, ValidateService validateService,
@@ -95,9 +98,19 @@ public class QuestionnaireFacadeService {
 
     public AnswersTo getAnswersTo() {
         final AnswersTo answersTo = new AnswersTo();
-        answersTo.setAnswerList(flowService.getCurrentSubCategory().getQuestions().stream()
-                                    .map(this::mapToAnswer).collect(Collectors.toList()));
+        answersTo.setAnswerList(getAnswerList());
         return answersTo;
+    }
+
+    private List<AnswerTo> getAnswerList() {
+        final Stream<Question> questionStream;
+        if (!useAllAnswerTo) {
+            questionStream = flowService.getCurrentSubCategory().getQuestions().stream();
+        } else {
+            questionStream = formService.getCategories().stream().flatMap(category -> category.getSubCategories().stream())
+                .flatMap(subCategory -> subCategory.getQuestions().stream());
+        }
+        return questionStream.map(this::mapToAnswer).collect(Collectors.toList());
     }
 
     private AnswerTo mapToAnswer(Question question) {
@@ -183,7 +196,6 @@ public class QuestionnaireFacadeService {
         plannerTo.setPlannerQuestions(filter(getAssessmentAnswersTo()).map(this::mapToPlanner).collect(Collectors.toList()));
         plannerTo.setCurrentPage(flowService.getCurrentPage());
         plannerTo.setMaxPage(flowService.getMaxPage());
-        plannerTo.setElements(formService.getElements().stream().map(this::mapToElement).collect(Collectors.toList()));
         plannerTo.setYears(formService.getYears());
         return plannerTo;
     }
@@ -231,6 +243,11 @@ public class QuestionnaireFacadeService {
         return null;
     }
 
+    public Void cdp(FlowService.EAction action) {
+        processAction(() -> null, action);
+        return null;
+    }
+
     public List<String> getExistedCompanies() {
         return formService.getExistedCompanies();
     }
@@ -248,5 +265,15 @@ public class QuestionnaireFacadeService {
 
     public Integer savingProgress() {
         return savingStatusService.savingProgress();
+    }
+
+    public PlannerOverviewTo getPlannerOverviewTo() {
+        final PlannerOverviewTo plannerOverviewTo = new PlannerOverviewTo();
+        useAllAnswerTo = Boolean.TRUE;
+        plannerOverviewTo.setPlannerQuestions(filter(getAssessmentAnswersTo()).map(this::mapToPlanner).collect(Collectors.toList()));
+        plannerOverviewTo.setYears(formService.getYears());
+        plannerOverviewTo.setValue(getPlannerAnswersTo());
+        useAllAnswerTo = Boolean.FALSE;
+        return plannerOverviewTo;
     }
 }

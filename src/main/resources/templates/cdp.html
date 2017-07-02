@@ -5,37 +5,53 @@
 
 <nav th:replace="fragments :: navigation"></nav>
 
-<div class="container">
+<div class="container-fluid">
     <div class="starter-template">
-        <h1>1) Overarching Capabilities</h1>
-        <h2>Multi-Agency Command, Control and Coordination</h2>
+        <h2 class="sheet-title"><strong>Capability Development Plan Overview</strong></h2>
         <form method="post" class="form-horizontal">
-            <!--<div class="row common-errors" th:if="${#fields.hasAnyErrors()}">
-                <div class="col-xs-12">Form contains errors, please correct it.</div>
-            </div>
-            <div th:each="question,questionStat : ${questions.questionList}" class="question-box">
-                <div class="row">
-                    <div class="col-xs-3"><strong>No.:</strong> <span th:text="${question.number}"></span></div>
-                    <div th:if="${question.type == 'WITH_PIGRADE'}" class="col-xs-9"><strong>Response action:</strong> <span th:text="${question.text}"></span></div>
-                </div>
-                <div class="row">
-                    <div th:if="${question.type == 'WITH_PIGRADE'}" th:class="${#fields.hasErrors('answerList[__${questionStat.index}__].piGrade')} ? 'col-xs-3 has-error' : 'col-xs-3'">
-                        <select title="PI Grade" th:field="*{answerList[__${questionStat.index}__].piGrade}" class="form-control pi-grade" required="required">
-                            <option value="">select PI Grade..</option>
-                            <option value="3">3 - MS has full confidence in its capability</option>
-                            <option value="2">2 - good confidence in the MS capability</option>
-                            <option value="1">1 - low confidence in the MS capability</option>
-                            <option value="0">0 - no capability in place</option>
-                        </select>
-                    </div>
-                    <div th:if="${question.type == 'STANDARD_QUESTION'}" th:class="${#fields.hasErrors('answerList[__${questionStat.index}__].comments')} ? 'col-xs-9 has-error' : 'col-xs-9'">
-                        <textarea th:field="*{answerList[__${questionStat.index}__].comments}" class="form-control" placeholder="enter comments" required="required"></textarea>
-                    </div>
-                    <div th:if="${question.type == 'ADDITIONAL_COMMENT'}" th:class="${#fields.hasErrors('answerList[__${questionStat.index}__].comments')} ? 'col-xs-12 has-error' : 'col-xs-12'">
-                        <textarea th:field="*{answerList[__${questionStat.index}__].comments}" class="form-control" placeholder="enter additional comments"></textarea>
-                    </div>
-                </div>
-            </div>-->
+            <h3 th:if="${#lists.isEmpty(meta.sacsAnswers)}">
+                <em>
+                    This field is not applicable, as you have not identified any areas for improvement in the SACS assessment
+                </em>
+            </h3>
+            <table class="table" th:if="${!#lists.isEmpty(meta.sacsAnswers)}">
+                <thead>
+                <tr>
+                    <th rowspan="2">No.</th>
+                    <th rowspan="2">Response action</th>
+                    <th rowspan="2">Element</th>
+                    <th rowspan="2" style="min-width: 250px;">Development plan</th>
+                    <th rowspan="2" style="min-width: 250px;">Ownership</th>
+                    <th th:each="year : ${meta.years}" th:text="${year.name}" colspan="4">2017</th>
+                </tr>
+                <tr>
+                    <th:block th:each="year : ${meta.years}">
+                        <th th:each="quarter : ${year.quarters}" th:text="${#strings.concat(quarter.name, 'Q')}">1Q</th>
+                    </th:block>
+                </tr>
+                </thead>
+                <tbody>
+                <th:block th:each="answer : ${meta.sacsAnswers}">
+                    <tr>
+                        <td th:rowspan="${1 + #maps.size(answer.piGrades)}" th:text="${answer.number}">O-1</td>
+                        <td th:rowspan="${1 + #maps.size(answer.piGrades)}" th:text="${answer.question}">All agencies to be involved in response to NSE identified</td>
+                    </tr>
+                    <tr th:each="elementEntry : ${answer.piGrades}">
+                        <td th:text="${elementEntry.key}">Policy</td>
+                        <td th:text="${meta.value[#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', elementEntry.key), 'task')]}">Task</td>
+                        <td th:text="${meta.value[#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', elementEntry.key), 'ownership')]}">Ownership</td>
+                        <th:block th:each="year : ${meta.years}">
+                            <td class="planning-column" th:each="quarter: ${year.quarters}">
+                                <label th:for="${#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', elementEntry.key), #strings.concat(year.name, '-', quarter.name))}"
+                                       th:class="'planning-label' + ${#bools.isTrue(meta.value[#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', elementEntry.key), #strings.concat(year.name, '-', quarter.name))]) ? ' planning-label-checked' : ''}">
+                                    <span class="planning-line"></span>
+                                </label>
+                            </td>
+                        </th:block>
+                    </tr>
+                </th:block>
+                </tbody>
+            </table>
             <span th:replace="fragments :: buttons"></span>
         </form>
     </div>

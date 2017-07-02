@@ -21,7 +21,6 @@ import cz.karpi.iaea.questionnaire.web.interceptor.FlowInterceptor;
 import cz.karpi.iaea.questionnaire.web.model.InitVo;
 import cz.karpi.iaea.questionnaire.web.model.MatrixModel;
 
-import static cz.karpi.iaea.questionnaire.web.controller.ControllerUtils.MODEL_ATTRIBUTE_CDP;
 import static cz.karpi.iaea.questionnaire.web.controller.ControllerUtils.MODEL_ATTRIBUTE_FORM;
 import static cz.karpi.iaea.questionnaire.web.controller.ControllerUtils.MODEL_ATTRIBUTE_META;
 
@@ -128,8 +127,15 @@ public class QuestionnaireController {
     @FlowInterceptor.FlowCheck(Flow.EFlowType.CDP)
     @RequestMapping("/cdp")
     public String cdp(Model model) {
-        model.addAttribute(MODEL_ATTRIBUTE_CDP, viewConverter.toCdpVo(null));
+        model.addAttribute(MODEL_ATTRIBUTE_META, viewConverter.toCdpMetaVo(questionnaireFacadeService.getPlannerOverviewTo()));
         return controllerUtils.returnGet(model);
+    }
+
+    @FlowInterceptor.FlowCheck(Flow.EFlowType.CDP)
+    @RequestMapping(value = "/cdp", method = RequestMethod.POST)
+    public String cdpPost(@ModelAttribute(MODEL_ATTRIBUTE_FORM) MatrixModel cdpVo, @RequestParam String action, BindingResult errors, Model model) {
+        controllerUtils.catchValidationException(errors, () -> questionnaireFacadeService.cdp(viewConverter.convertToEAction(action)));
+        return controllerUtils.returnPost(model, () -> null, errors);
     }
 
     @FlowInterceptor.FlowCheck({Flow.EFlowType.START, Flow.EFlowType.INSTRUCTION, Flow.EFlowType.QUESTION, Flow.EFlowType.ASSESSMENT, Flow.EFlowType.PLANNER, Flow.EFlowType.CDP})

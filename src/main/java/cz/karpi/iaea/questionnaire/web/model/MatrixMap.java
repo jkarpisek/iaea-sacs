@@ -9,6 +9,8 @@ public class MatrixMap implements Map<String, Object> {
 
     private Map<String, Map<String, Object>> values = new HashMap<>();
 
+    private static final String PROPERTY_DELIMITER = ";";
+
     @Override
     public int size() {
         return values.size();
@@ -19,8 +21,12 @@ public class MatrixMap implements Map<String, Object> {
         return values.isEmpty();
     }
 
-    private String[] parseKey(Object key) {
-        return key.toString().split(";");
+    public static String[] parseKey(Object key) {
+        return key.toString().split(PROPERTY_DELIMITER);
+    }
+
+    public static String getPropertyName(String key1, String key2) {
+        return String.join(PROPERTY_DELIMITER, key1, key2);
     }
 
     @Override
