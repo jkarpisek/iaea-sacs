@@ -1,1 +1,1 @@
-start javaw -jar iaea-questionnaire-1.0.jar
+start java/bin/javaw.exe -jar iaea-questionnaire-1.0.jar
