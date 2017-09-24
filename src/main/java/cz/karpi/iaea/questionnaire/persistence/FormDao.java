@@ -47,6 +47,7 @@ public class FormDao {
     private static final String EXCEL_SHEET_SACS_NAME = "1-SACS";
     private static final String EXCEL_SHEET_ASSESSMENT_NAME = "2-Assessment Grid";
     private static final String EXCEL_SHEET_PLANNER_NAME = "-%s";
+    private static final String EXCEL_SHEET_CDP_NAME = "CDP";
 
     private static final Integer FIRST_CELL_INDEX = 0;
 
@@ -63,6 +64,10 @@ public class FormDao {
     private static final Integer PLANNER_TASK_CELL_INDEX = 5;
     private static final Integer PLANNER_OWNERSHIP_CELL_INDEX = 6;
     private static final String PLANNED_VALUE = "x";
+
+    private static final Integer CDP_TASK_CELL_INDEX = 3;
+    private static final Integer CDP_OWNERSHIP_CELL_INDEX = 4;
+    private static final Integer PLANNER_CDP_DELTA = 2;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FormDao.class);
 
@@ -227,6 +232,23 @@ public class FormDao {
                     row.getCell(PLANNER_OWNERSHIP_CELL_INDEX).setCellValue(answerRow.getOwnership());
                     answerRow.getPlanned().forEach((quarter, value) -> row.getCell(getQuarterIndex(quarter)).setCellValue(value ? PLANNED_VALUE : ""));
                 })
+            );
+        }
+    }
+
+    @Async
+    public void saveCdp(Map<Question, Map<Element, PlannerRow>> plannerRows) {
+        if (!plannerRows.isEmpty()) {
+            save(EXCEL_SHEET_CDP_NAME, (mySheet) ->
+                plannerRows.forEach((question, elementRows) ->
+                    elementRows.forEach(((element, plannerRow) -> {
+                        final Row row = mySheet.getRow(getRowNum(mySheet, FIRST_CELL_INDEX, question.getNumber()) + getPlannerElementIndex(element));
+                        row.getCell(CDP_TASK_CELL_INDEX).setCellValue(plannerRow.getTask());
+                        row.getCell(CDP_OWNERSHIP_CELL_INDEX).setCellValue(plannerRow.getOwnership());
+                        plannerRow.getPlanned().forEach(
+                            (quarter, value) -> row.getCell(getQuarterIndex(quarter) - PLANNER_CDP_DELTA).setCellValue(value ? PLANNED_VALUE : ""));
+                    }))
+                )
             );
         }
     }

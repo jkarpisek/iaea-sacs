@@ -240,6 +240,9 @@ public class QuestionnaireFacadeService {
 
     public Void planner(PlannerAnswersTo plannerAnswersTo, FlowService.EAction action) {
         processAction(() -> { formService.savePlannerAnswer(plannerAnswersTo); return null; }, action);
+        if (flowService.getPossibilityActions().contains(FlowService.EAction.FINISH)) {
+            formService.saveCdp();
+        }
         return null;
     }
 

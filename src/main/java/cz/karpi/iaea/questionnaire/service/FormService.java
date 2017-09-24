@@ -151,6 +151,10 @@ public class FormService {
         formDao.savePlannerAnswers(answers, sacsRows, assessmentRows);
     }
 
+    public void saveCdp() {
+        formDao.saveCdp(plannerRows);
+    }
+
     public AnswerRow getAnswerRow(Question question) {
         return sacsRows.getOrDefault(question, new AnswerRow());
     }
