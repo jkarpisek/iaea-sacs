@@ -1,5 +1,8 @@
 package cz.karpi.iaea.questionnaire.web.model;
 
+import cz.karpi.iaea.questionnaire.model.Category;
+import cz.karpi.iaea.questionnaire.model.MenuEntry;
+
 import java.util.List;
 
 /**
@@ -8,6 +11,10 @@ import java.util.List;
 public class CommonVo {
     private String companyName;
     private List<String> actions;
+    private List<Category> categories;
+    private List<MenuEntry> questionnaireMenu;
+    private List<MenuEntry> assessmentMenu;
+    private List<MenuEntry> plannerMenu;
 
     public String getCompanyName() {
         return companyName;
@@ -23,5 +30,37 @@ public class CommonVo {
 
     public void setActions(List<String> actions) {
         this.actions = actions;
+    }
+
+    public List<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(List<Category> categories) {
+        this.categories = categories;
+    }
+
+    public List<MenuEntry> getQuestionnaireMenu() {
+        return questionnaireMenu;
+    }
+
+    public void setQuestionnaireMenu(List<MenuEntry> questionnaireMenu) {
+        this.questionnaireMenu = questionnaireMenu;
+    }
+
+    public List<MenuEntry> getAssessmentMenu() {
+        return assessmentMenu;
+    }
+
+    public void setAssessmentMenu(List<MenuEntry> assessmentMenu) {
+        this.assessmentMenu = assessmentMenu;
+    }
+
+    public List<MenuEntry> getPlannerMenu() {
+        return plannerMenu;
+    }
+
+    public void setPlannerMenu(List<MenuEntry> plannerMenu) {
+        this.plannerMenu = plannerMenu;
     }
 }

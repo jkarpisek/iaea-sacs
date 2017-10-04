@@ -1,15 +1,11 @@
 package cz.karpi.iaea.questionnaire.service;
 
-import cz.karpi.iaea.questionnaire.model.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.OptionalInt;
-import java.util.function.Supplier;
-import java.util.stream.IntStream;
 
 import cz.karpi.iaea.questionnaire.model.Flow;
 import cz.karpi.iaea.questionnaire.model.SubCategory;
@@ -20,7 +16,11 @@ import cz.karpi.iaea.questionnaire.model.SubCategory;
 @Service
 public class FlowService {
 
-    public enum EAction { PREVIOUS, NEXT, FINISH, RESET, SAVE, GOTO }
+<<<<<<< Updated upstream
+    public enum EAction { PREVIOUS, NEXT, FINISH, RESET, SAVE }
+=======
+    public enum EAction { PREVIOUS, NEXT, FINISH, RESET, GOTO }
+>>>>>>> Stashed changes
 
     private Flow flow = new Flow();
 
@@ -36,12 +36,8 @@ public class FlowService {
     }
 
     public void moveCounterTo(EAction action) {
-        moveCounterTo(action, null, null, null);
-    }
-
-    public void moveCounterTo(EAction action, Flow.EFlowType nextStep, String category, String subCategory) {
         if (action.equals(EAction.GOTO)) {
-            moveCounterToPosition(nextStep, category, subCategory);
+            moveCounterToPosition();
         } else if (action.equals(EAction.PREVIOUS)) {
             moveCounterToPrevious();
         } else {
@@ -49,31 +45,9 @@ public class FlowService {
         }
     }
 
-    public void moveCounterToPosition(Flow.EFlowType nextStep, String category, String subCategory) {
-        int categoryIdx;
-        int subCategoryIdx;
-
-        if (category.equals("") || subCategory.equals("")) {
-            categoryIdx = 0;
-            subCategoryIdx = 0;
-        } else {
-            categoryIdx = IntStream.range(0, formService.getCategories().size())
-                    .filter(i -> category.equals(formService.getCategories().get(i).getName()))
-                    .findFirst().orElse(-1);
-
-            subCategoryIdx = IntStream.range(0, formService.getCategories().get(categoryIdx).getSubCategories().size())
-                    .filter(i -> subCategory.equals(formService.getCategories().get(categoryIdx).getSubCategories().get(i).getName()))
-                    .findFirst().orElse(-1);
-        }
-
-        getFlow().resetFlow(nextStep);
-        getFlow().setCategoryAndSubCategory(categoryIdx, () -> subCategoryIdx);
-    }
-
-    private boolean isNotEmpty() {
-        return formService.getCategories().get(getFlow().getCurrentCategoryIndex())
-                .getSubCategories().get(getFlow().getCurrentSubCategoryIndex())
-                .getQuestions().stream().anyMatch(question -> formService.getSacsRows().get(question).getPiGrade() != null);
+    public void moveCounterToPosition() {
+        System.out.println(formService.getCategories().size());
+        formService.getCategories().forEach(c -> System.out.println(c.getSubCategories().size()));
     }
 
     public void moveCounterToNext() {
@@ -88,30 +62,8 @@ public class FlowService {
                 resolveCategoryNext(Flow.EFlowType.ASSESSMENT);
                 break;
             case ASSESSMENT:
-                //I would try to skip pages which are "empty"
-                //check whether next subcategory is not "empty"
-                //check wether next category has subcategory which is not "empty"
-                //else getFlow().resetFlow(Flow.EFlowType.PLANNER);
-                while (formService.getCategories().size() >= getFlow().getCurrentCategoryIndex() + 1) {
-                    while (getCurrentSubCategory().getCategory().getSubCategories().size() > getFlow().getCurrentSubCategoryIndex() + 1) {
-                        getFlow().upSubCategory();
-                        if (isNotEmpty())
-                            return;
-                    }
-
-                    if (formService.getCategories().size() <= getFlow().getCurrentCategoryIndex() + 1) {
-                        getFlow().resetFlow(Flow.EFlowType.PLANNER);
-                        return;
-                    }
-
-                    getFlow().upCategory();
-                    getFlow().resetSubCategory();
-
-                    if (isNotEmpty())
-                        return;
-                }
-                //MS resolveCategoryNext(Flow.EFlowType.PLANNER);
-                //break;
+                resolveCategoryNext(Flow.EFlowType.PLANNER);
+                break;
             case PLANNER:
                 resolveCategoryNext(Flow.EFlowType.CDP);
                 break;

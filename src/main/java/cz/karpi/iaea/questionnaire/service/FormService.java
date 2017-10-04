@@ -1,14 +1,14 @@
 package cz.karpi.iaea.questionnaire.service;
 
+import cz.karpi.iaea.questionnaire.model.*;
+import javafx.scene.control.Tab;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import cz.karpi.iaea.questionnaire.model.AnswerRow;
 import cz.karpi.iaea.questionnaire.model.AssessmentRow;
@@ -75,6 +75,86 @@ public class FormService {
 
     public List<Category> getCategories() {
         return categories;
+    }
+
+    public List<MenuEntry> getQuestionnaireMenu() {
+        if (this.categories == null) return null;
+
+        List<MenuEntry> result = new ArrayList<>();
+
+        for (Category category: categories) {
+            for (SubCategory subCategory : category.getSubCategories()) {
+                MenuEntry entry = new MenuEntry();
+                entry.setCategory(category.getName());
+                entry.setSubCategory(subCategory.getName());
+                entry.setActive(true);
+
+                result.add(entry);
+            }
+        }
+        return result;
+    }
+
+    public Map<Question, AnswerRow> getSacsRows() {
+        return sacsRows;
+    }
+
+    public List<MenuEntry> getAssessmentMenu () {
+        if (this.categories == null) return null;
+        //go throu all categories and find out whether some data is filled in.
+        //if so, add it into menu as active link otherwise as inactive
+        List<MenuEntry> result = new ArrayList<>();
+
+        for (Category category: categories) {
+            for (SubCategory subCategory: category.getSubCategories()) {
+                MenuEntry entry = new MenuEntry();
+                entry.setCategory(category.getName());
+                entry.setSubCategory(subCategory.getName());
+                //how to find out whether something is filled in??
+                //subCategory by měla být vidět, když jakákoliv otázek pod ní je vyplněná, tzn.
+                //for all subCategory.questions najdi odpověď a čekni, jestli je tam piGrade?
+                //a udělat to přes lambda
+                //this.sacsRows.get(subCategory.getName())
+                boolean active = subCategory.getQuestions().stream().anyMatch(question -> this.sacsRows.get(question).getPiGrade() != null);
+                entry.setActive(active);
+                result.add(entry);
+            }
+        }
+        return result;
+    }
+
+    private boolean getPlannerMenuStatus(SubCategory subCategory) {
+        for (Question question: subCategory.getQuestions()) {
+            for (Map.Entry<Element, Integer> piGrade : this.assessmentRows.get(question).getElementsPiGrade().entrySet()) {
+                if (piGrade.getValue() != null) return true;
+            }
+        }
+        return false;
+    }
+
+    public List<MenuEntry> getPlannerMenu () {
+        if (this.categories == null) return null;
+        //go throu all categories and find out whether some data is filled in.
+        //if so, add it into menu as active link otherwise as inactive
+        List<MenuEntry> result = new ArrayList<>();
+
+        for (Category category: categories) {
+            for (SubCategory subCategory: category.getSubCategories()) {
+                MenuEntry entry = new MenuEntry();
+                entry.setCategory(category.getName());
+                entry.setSubCategory(subCategory.getName());
+                //how to find out whether something is filled in??
+                //subCategory by měla být vidět, když jakákoliv otázek pod ní je vyplněná, tzn.
+                //for all subCategory.questions najdi odpověď a čekni, jestli je tam piGrade?
+                //a udělat to přes lambda
+                //this.sacsRows.get(subCategory.getName())
+
+                entry.setActive(getPlannerMenuStatus(subCategory));
+
+                result.add(entry);
+            }
+        }
+        return result;
     }
 
     public List<Element> getElements() {

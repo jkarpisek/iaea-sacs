@@ -1,5 +1,6 @@
 package cz.karpi.iaea.questionnaire.service;
 
+import cz.karpi.iaea.questionnaire.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,12 +12,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import cz.karpi.iaea.questionnaire.model.AnswerRow;
-import cz.karpi.iaea.questionnaire.model.AssessmentRow;
-import cz.karpi.iaea.questionnaire.model.Element;
-import cz.karpi.iaea.questionnaire.model.PlannerRow;
-import cz.karpi.iaea.questionnaire.model.Question;
-import cz.karpi.iaea.questionnaire.model.SubCategory;
 import cz.karpi.iaea.questionnaire.service.to.AnswerTo;
 import cz.karpi.iaea.questionnaire.service.to.AnswersTo;
 import cz.karpi.iaea.questionnaire.service.to.AssessmentAnswerTo;
@@ -66,6 +61,10 @@ public class QuestionnaireFacadeService {
         commonTo.setCompanyName(formService.getCompanyName());
         commonTo.setState(flowService.getFlow().getFlowType().name());
         commonTo.setActions(flowService.getPossibilityActions());
+        commonTo.setCategories(formService.getCategories());
+        commonTo.setQuestionnaireMenu(formService.getQuestionnaireMenu());
+        commonTo.setAssessmentMenu(formService.getAssessmentMenu());
+        commonTo.setPlannerMenu(formService.getPlannerMenu());
         return commonTo;
     }
 
@@ -122,17 +121,26 @@ public class QuestionnaireFacadeService {
         return answerTo;
     }
 
-    public Void question(AnswersTo answersTo, FlowService.EAction action) {
-        processAction(() -> {
-            validateService.validate(answersTo);
-            formService.saveAnswer(answersTo);
-            return null;
-        }, action);
+    public Void question(AnswersTo answersTo, FlowService.EAction action, Flow.EFlowType nextStep, String category, String subCategory) {
+        processAction(
+                () -> {
+                    validateService.validate(answersTo);
+                    formService.saveAnswer(answersTo);
+                    return null;
+                    },
+                action,
+                nextStep,
+                category,
+                subCategory);
         return null;
     }
 
     public void instruction(FlowService.EAction action) {
-        flowService.moveCounterTo(action);
+        this.instruction(action, null,  null, null);
+    }
+
+    public void instruction(FlowService.EAction action, Flow.EFlowType nextStep, String category, String subCategory) {
+        flowService.moveCounterTo(action, nextStep, category, subCategory);
     }
 
     public AssessmentTo getAssessmentTo() {
@@ -183,8 +191,14 @@ public class QuestionnaireFacadeService {
             .filter(answerTo -> answerTo.getPiGrade() != null);
     }
 
-    public Void assessment(AssessmentAnswersTo assessmentAnswersTo, FlowService.EAction action) {
-        processAction(() -> { formService.saveAssessmentAnswer(assessmentAnswersTo); return null; }, action);
+    public Void assessment(AssessmentAnswersTo assessmentAnswersTo, FlowService.EAction action, Flow.EFlowType nextStep, String category, String subCategory) {
+        processAction(
+                () -> { formService.saveAssessmentAnswer(assessmentAnswersTo); return null; },
+                action,
+                nextStep,
+                category,
+                subCategory
+        );
         return null;
     }
 
@@ -238,8 +252,14 @@ public class QuestionnaireFacadeService {
             });
     }
 
-    public Void planner(PlannerAnswersTo plannerAnswersTo, FlowService.EAction action) {
-        processAction(() -> { formService.savePlannerAnswer(plannerAnswersTo); return null; }, action);
+    public Void planner(PlannerAnswersTo plannerAnswersTo, FlowService.EAction action, Flow.EFlowType nextStep, String category, String subCategory) {
+        processAction(
+                () -> { formService.savePlannerAnswer(plannerAnswersTo); return null; },
+                action,
+                nextStep,
+                category, 
+		subCategory);
+
         if (flowService.getPossibilityActions().contains(FlowService.EAction.FINISH)) {
             formService.saveCdp();
         }
@@ -256,6 +276,15 @@ public class QuestionnaireFacadeService {
     }
 
     private void processAction(Supplier<Void> supplier, FlowService.EAction action) {
+        this.processAction(supplier, action, null, null, null);
+    }
+
+    private void processAction(Supplier<Void> supplier, FlowService.EAction action, Flow.EFlowType nextStep, String category, String subCategory) {
+        // TODO: 2. 7. 2017 reorganize if else if else....
+        if (action.equals(FlowService.EAction.GOTO)) {
+            supplier.get();
+            flowService.moveCounterToPosition(nextStep, category, subCategory);
+        }
         if (action.equals(FlowService.EAction.NEXT) || action.equals(FlowService.EAction.SAVE)) {
             supplier.get();
         }

@@ -14,12 +14,15 @@ $(function() {
             placeholder += ' ...';
         }
         $companyName.attr('placeholder', placeholder).autocomplete({ source: companies });
-        $companyName.focus();
     }
     $('.planning-checkbox').each(function() {
         timelineBorder($(this));
     }).on('change', function() {
         timelineBorder($(this));
+    });
+    $('#savingInProgressAlert').on('show.bs.modal', function(e) {
+        var formsToSave = $(e.currentTarget).data('formsToSave');
+        $(e.currentTarget).find('span[id="formsToSave"]').text(formsToSave);
     });
     $('button:submit').click(function() {
         $(this).parents('form:first').data('submitButton', $(this).prop('value'));
@@ -28,7 +31,7 @@ $(function() {
         if ($(this).data('submitButton') != 'save') {
             $('#loadingAlert').modal('show');
         } else {
-            showSavingProgressAlert();
+            $('#savingProgressAlert').modal('show');
         }
     });
     $('#savingProgressAlert').on('show.bs.modal', function(e) {
@@ -85,23 +88,22 @@ function auto_grow(element) {
     element.style.height = (element.scrollHeight)+"px";
 }
 
-function showSavingProgressAlert() {
-    $('#savingProgressAlert').modal('show');
+<<<<<<< Updated upstream
+function savingInProgress(formsToSave) {
+    $('#savingInProgressAlert').data('formsToSave', formsToSave).modal('show');
 }
-function goto (nextStep, category, subCategory) {
+=======
+
+function toggleMenu() {
+    console.log ("cllick");
+    $(".nav-side-menu").toggle();
+};
+
+function goto (element) {
+    console.log (element);
     var input = $("<input>")
         .attr("type", "hidden")
-        .attr("name", "nextStep").val(nextStep);
-    $('form').append($(input));
-
-    input = $("<input>")
-        .attr("type", "hidden")
-        .attr("name", "category").val(category);
-    $('form').append($(input));
-
-    input = $("<input>")
-        .attr("type", "hidden")
-        .attr("name", "subCategory").val(subCategory);
+        .attr("name", "target").val("TEST");
     $('form').append($(input));
 
     input = $("<input>")
@@ -112,3 +114,4 @@ function goto (nextStep, category, subCategory) {
     //$('form').attr('action','goto');
     $('form').submit();
 };
+>>>>>>> Stashed changes

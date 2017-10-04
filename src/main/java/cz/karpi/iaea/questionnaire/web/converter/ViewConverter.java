@@ -1,5 +1,6 @@
 package cz.karpi.iaea.questionnaire.web.converter;
 
+import cz.karpi.iaea.questionnaire.model.Flow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -78,6 +79,10 @@ public class ViewConverter {
         final CommonVo commonVo = new CommonVo();
         commonVo.setCompanyName(commonTo.getCompanyName());
         commonVo.setActions(commonTo.getActions().stream().map(FlowService.EAction::name).collect(Collectors.toList()));
+        commonVo.setCategories(commonTo.getCategories());
+        commonVo.setQuestionnaireMenu(commonTo.getQuestionnaireMenu());
+        commonVo.setAssessmentMenu(commonTo.getAssessmentMenu());
+        commonVo.setPlannerMenu(commonTo.getPlannerMenu());
         return commonVo;
     }
 
@@ -101,6 +106,11 @@ public class ViewConverter {
 
     public FlowService.EAction convertToEAction(String action) {
         return FlowService.EAction.valueOf(action.toUpperCase());
+    }
+
+    public Flow.EFlowType convertToEFlowType(String nextStep) {
+        if (nextStep == null) return null;
+        return Flow.EFlowType.valueOf(nextStep.toUpperCase());
     }
 
     public Map<String, Object> toAssessmentMetaVo(AssessmentTo assessmentTo) {

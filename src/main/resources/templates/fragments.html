@@ -3,25 +3,83 @@
 <head th:fragment="head">
     <title>IAEA - SACS</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+    <script type="text/javascript" src="webjars/jquery-ui/1.9.2/js/jquery-ui-1.9.2.custom.min.js"></script>
+    <script type="text/javascript" src="webjars/jquery/1.11.1/jquery.min.js"></script>
+    <script type="text/javascript" src="webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" th:src="@{/js/main.js}" src="../../js/main.js"></script>
     <link rel="stylesheet" type="text/css" href="webjars/bootstrap/3.3.7/css/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="webjars/open-sans/1.1.0/css/open-sans.min.css"/>
     <link rel="stylesheet" type="text/css" href="webjars/jquery-ui/1.9.2/css/smoothness/jquery-ui-1.9.2.custom.min.css"/>
     <link rel="stylesheet" th:href="@{/css/main.css}" href="../../css/main.css" />
-    <script type="text/javascript" src="webjars/jquery/1.11.1/jquery.min.js"></script>
-    <script type="text/javascript" src="webjars/jquery-ui/1.9.2/js/jquery-ui-1.9.2.custom.min.js"></script>
-    <script type="text/javascript" src="webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script type="text/javascript" th:src="@{/js/main.js}" src="../../js/main.js"></script>
 </head>
 <body>
-<nav class="navbar navbar-inverse" th:fragment="navigation">
-    <div class="container">
+
+<nav class="navbar navbar-inverse navbar-fixed-top" th:fragment="navigation">
+    <div class="container-fluid">
         <div class="navbar-header">
-            <span class="navbar-brand">IAEA Assistance programme on Nuclear Security Response Capabilities</span>
+            <a class="navbar-brand" href="#">IAEA Assistance programme on Nuclear Security Response Capabilities</a>
         </div>
         <div class="navbar-header" style="float: right">
-            <!--<span class="navbar-brand" th:if="${#lists.contains(common.actions, 'RESET')}"><a th:href="@{reset}">Reset</a></span>-->
             <span class="navbar-brand" th:text="${common.companyName}">Company</span>
         </div>
+        <ul class="nav navbar-nav" th:if="${common.companyName}">
+            <li class="active"><a href="#" th:text="Instructions" th:onclick="'javascript:goto(\'INSTRUCTION\',null,null)'"></a></li>
+
+
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">SACS
+                    <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <th:block th:each="entry,iter : ${common.questionnaireMenu}">
+                        <li th:class="${entry.active} ? '' : 'disabled'">
+                            <a
+                                href="#"
+                                th:text="${entry.subCategory}"
+                                th:onclick="'javascript:goto(\'QUESTION\',\'' + ${entry.category} + '\',\'' + ${entry.subCategory} + '\')'"
+                                th:class="${entry.active} ? 'active' : 'not-active'">
+                            </a>
+                        </li>
+                    </th:block>
+                </ul>
+            </li>
+
+
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Assessment
+                    <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <th:block th:each="entry,iter : ${common.assessmentMenu}">
+                        <li th:class="${entry.active} ? '' : 'disabled'">
+                            <a
+                                href="#"
+                                th:text="${entry.subCategory}"
+                                th:onclick="'javascript:goto(\'ASSESSMENT\',\'' + ${entry.category} + '\',\'' + ${entry.subCategory} + '\')'"
+                                th:class="${entry.active} ? 'active' : 'not-active'">
+                            </a>
+                        </li>
+                    </th:block>
+                </ul>
+            </li>
+
+
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Planner
+                    <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <th:block th:each="entry,iter : ${common.plannerMenu}">
+                        <li th:class="${entry.active} ? '' : 'disabled'">
+                            <a
+                                href="#"
+                                th:text="${entry.subCategory}"
+                                th:onclick="'javascript:goto(\'PLANNER\',\'' + ${entry.category} + '\',\'' + ${entry.subCategory} + '\')'"
+                                th:class="${entry.active} ? 'active' : 'not-active'">
+                            </a>
+                        </li>
+                    </th:block>
+                </ul>
+            </li>
+        </ul>
     </div>
 </nav>
 

@@ -74,8 +74,9 @@ public class QuestionnaireController {
 
     @FlowInterceptor.FlowCheck(Flow.EFlowType.INSTRUCTION)
     @RequestMapping(value = "/instruction", method = RequestMethod.POST)
-    public String instruction(Model model, @RequestParam String action) {
-        questionnaireFacadeService.instruction(viewConverter.convertToEAction(action));
+    public String instruction(Model model, @RequestParam String action, String nextStep, String category, String subCategory) {
+        questionnaireFacadeService.instruction(
+                viewConverter.convertToEAction(action), viewConverter.convertToEFlowType(nextStep), category, subCategory);
         return controllerUtils.returnPost(model, null,null);
     }
 
@@ -89,8 +90,19 @@ public class QuestionnaireController {
 
     @FlowInterceptor.FlowCheck(Flow.EFlowType.QUESTION)
     @RequestMapping(value = "/question", method = RequestMethod.POST)
-    public String question(@ModelAttribute(MODEL_ATTRIBUTE_FORM) MatrixModel answerVo, @RequestParam String action, BindingResult errors, Model model) {
-        controllerUtils.catchValidationException(errors, () -> questionnaireFacadeService.question(viewConverter.toAnswersTo(answerVo, questionnaireFacadeService.getAnswersTo()), viewConverter.convertToEAction(action)));
+    public String question(
+            @ModelAttribute(MODEL_ATTRIBUTE_FORM) MatrixModel answerVo,
+            @RequestParam String action,
+            String nextStep,
+            String category,
+            String subCategory,
+            BindingResult errors,
+            Model model) {
+        controllerUtils.catchValidationException(
+                errors,
+                () -> questionnaireFacadeService.question(
+                        viewConverter.toAnswersTo(answerVo, questionnaireFacadeService.getAnswersTo()),
+                        viewConverter.convertToEAction(action), viewConverter.convertToEFlowType(nextStep), category, subCategory));
         return controllerUtils.returnPost(model, () -> viewConverter.toQuestionsMetaVo(questionnaireFacadeService.getQuestionsTo()), errors);
     }
 
@@ -104,8 +116,27 @@ public class QuestionnaireController {
 
     @FlowInterceptor.FlowCheck(Flow.EFlowType.ASSESSMENT)
     @RequestMapping(value = "/assessment", method = RequestMethod.POST)
-    public String assessmentPost(@ModelAttribute(MODEL_ATTRIBUTE_FORM) MatrixModel assessmentVo, @RequestParam String action, BindingResult errors, Model model) {
-        controllerUtils.catchValidationException(errors, () -> questionnaireFacadeService.assessment(viewConverter.toAssessmentAnswerTo(assessmentVo, questionnaireFacadeService.getAssessmentAnswersTo()), viewConverter.convertToEAction(action)));
+    public String assessmentPost(
+            @ModelAttribute(MODEL_ATTRIBUTE_FORM) MatrixModel assessmentVo,
+            @RequestParam String action,
+            String nextStep,
+            String category,
+            String subCategory,
+            BindingResult errors,
+            Model model) {
+        controllerUtils.catchValidationException(
+                errors,
+                () -> questionnaireFacadeService.assessment(
+                        viewConverter.toAssessmentAnswerTo(
+                                assessmentVo,
+                                questionnaireFacadeService.getAssessmentAnswersTo()
+                        ),
+                        viewConverter.convertToEAction(action),
+                        viewConverter.convertToEFlowType(nextStep),
+                        category,
+                        subCategory
+                )
+        );
         return controllerUtils.returnPost(model, () -> viewConverter.toAssessmentMetaVo(questionnaireFacadeService.getAssessmentTo()), errors);
     }
 
@@ -119,8 +150,24 @@ public class QuestionnaireController {
 
     @FlowInterceptor.FlowCheck(Flow.EFlowType.PLANNER)
     @RequestMapping(value = "/planner", method = RequestMethod.POST)
-    public String plannerPost(@ModelAttribute(MODEL_ATTRIBUTE_FORM) MatrixModel plannerVo, @RequestParam String action, BindingResult errors, Model model) {
-        controllerUtils.catchValidationException(errors, () -> questionnaireFacadeService.planner(viewConverter.toPlannerAnswerTo(plannerVo, questionnaireFacadeService.getPlannerAnswersTo()), viewConverter.convertToEAction(action)));
+    public String plannerPost(
+            @ModelAttribute(MODEL_ATTRIBUTE_FORM) MatrixModel plannerVo,
+            @RequestParam String action,
+            String nextStep,
+            String category,
+            String subCategory,
+            BindingResult errors,
+            Model model) {
+        controllerUtils.catchValidationException(
+                errors,
+                () -> questionnaireFacadeService.planner(
+                        viewConverter.toPlannerAnswerTo(plannerVo, questionnaireFacadeService.getPlannerAnswersTo()),
+                        viewConverter.convertToEAction(action),
+                        viewConverter.convertToEFlowType(nextStep),
+                        category,
+                        subCategory
+                )
+        );
         return controllerUtils.returnPost(model, () -> viewConverter.toPlannerMetaVo(questionnaireFacadeService.getPlannerTo()), errors);
     }
 
