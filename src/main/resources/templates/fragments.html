@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:fragment="head">
-    <title>IAEA - SACS</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title th:replace="fragments :: titleAndContentType">IAEA - SACS</title>
 
     <script type="text/javascript" src="webjars/jquery-ui/1.9.2/js/jquery-ui-1.9.2.custom.min.js"></script>
     <script type="text/javascript" src="webjars/jquery/1.11.1/jquery.min.js"></script>
@@ -13,6 +12,16 @@
     <link rel="stylesheet" type="text/css" href="webjars/jquery-ui/1.9.2/css/smoothness/jquery-ui-1.9.2.custom.min.css"/>
     <link rel="stylesheet" th:href="@{/css/main.css}" href="../../css/main.css" />
 </head>
+
+<head th:fragment="headTitleAndContentType">
+    <title th:replace="fragments :: titleAndContentType">IAEA - SACS</title>
+</head>
+
+<hean th:fragment="titleAndContentType" th:remove="tag">
+    <title>IAEA - SACS</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</hean>
+
 <body>
 
 <nav class="navbar navbar-inverse navbar-fixed-top" th:fragment="navigation">
@@ -95,6 +104,7 @@
     <div class="col-xs-4">
         <span th:replace="fragments :: buttonSaveNext"></span>
         <span th:replace="fragments :: buttonFinish"></span>
+        <span th:replace="fragments :: buttonPrint"></span>
 
     </div>
 </div>
@@ -105,6 +115,7 @@
 <button th:fragment="buttonSaveNext" th:if="${#lists.contains(common.actions, 'NEXT')}" type="submit" class="btn btn-primary btn-block" name="action" value="next">Save &amp; Next <span class="glyphicon glyphicon-arrow-right"/></button>
 <button th:fragment="buttonFinish" th:if="${#lists.contains(common.actions, 'FINISH')}" type="submit" class="btn btn-primary btn-block" name="action" value="next">Finish <span class="glyphicon glyphicon-flag"/></button>
 <button th:fragment="buttonSave" th:if="${#lists.contains(common.actions, 'SAVE')}" type="submit" class="btn btn-primary btn-block" name="action" value="save">Save <span class="glyphicon glyphicon-floppy-disk"/></button>
+<button th:fragment="buttonPrint" th:if="${#lists.contains(common.actions, 'PRINT')}" type="submit" class="btn btn-primary btn-block" name="action" value="print">Print <span class="glyphicon glyphicon-print"/></button>
 
 <th:block th:fragment="alerts">
     <span th:replace="fragments :: savingProgressAlert"></span>

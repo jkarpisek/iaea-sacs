@@ -1,14 +1,11 @@
 package cz.karpi.iaea.questionnaire.service;
 
-import cz.karpi.iaea.questionnaire.model.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.OptionalInt;
-import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 import cz.karpi.iaea.questionnaire.model.Flow;
@@ -20,7 +17,7 @@ import cz.karpi.iaea.questionnaire.model.SubCategory;
 @Service
 public class FlowService {
 
-    public enum EAction { PREVIOUS, NEXT, FINISH, RESET, SAVE, GOTO }
+    public enum EAction { PREVIOUS, NEXT, FINISH, RESET, SAVE, GOTO, PRINT }
 
     private Flow flow = new Flow();
 
@@ -178,7 +175,7 @@ public class FlowService {
                           : Arrays.asList(EAction.PREVIOUS, EAction.FINISH, EAction.RESET, EAction.SAVE);
                 break;
             case CDP:
-                actions = Arrays.asList(EAction.PREVIOUS, EAction.RESET, EAction.SAVE);
+                actions = Arrays.asList(EAction.PREVIOUS, EAction.RESET, EAction.SAVE, EAction.PRINT);
                 break;
             default:
                 actions = Collections.emptyList();

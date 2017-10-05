@@ -1,0 +1,69 @@
+<html xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="fragments :: headTitleAndContentType"></head>
+    <style type="text/css">
+        * {
+            font-family: 'Open Sans', Arial, sans-serif;
+        }
+    </style>
+<body>
+
+<h1 th:text="${common.companyName}">Company</h1>
+
+<div class="container-fluid">
+    <div class="starter-template">
+        <h2 class="sheet-title"><strong>Capability Development Plan Overview</strong></h2>
+        <form method="post" class="form-horizontal">
+            <h3 th:if="${#lists.isEmpty(meta.sacsAnswers)}">
+                <em>
+                    This field is not applicable, as you have not identified any areas for improvement in the SACS assessment
+                </em>
+            </h3>
+            <table class="table" th:if="${!#lists.isEmpty(meta.sacsAnswers)}">
+                <thead>
+                <tr>
+                    <th rowspan="2">No.</th>
+                    <th rowspan="2">Response action</th>
+                    <th rowspan="2">Element</th>
+                    <th rowspan="2" style="min-width: 250px;">Development plan</th>
+                    <th rowspan="2" style="min-width: 250px;">Ownership</th>
+                    <th th:each="year : ${meta.years}" th:text="${year.name}" colspan="4">2017</th>
+                </tr>
+                <tr>
+                    <th:block th:each="year : ${meta.years}">
+                        <th th:each="quarter : ${year.quarters}" th:text="${#strings.concat(quarter.name, 'Q')}">1Q</th>
+                    </th:block>
+                </tr>
+                </thead>
+                <tbody>
+                <th:block th:each="answer : ${meta.sacsAnswers}">
+                    <tr>
+                        <td th:rowspan="${1 + #maps.size(answer.piGrades)}" th:text="${answer.number}">O-1</td>
+                        <td th:rowspan="${1 + #maps.size(answer.piGrades)}" th:text="${answer.question}">All agencies to be involved in response to NSE identified</td>
+                    </tr>
+                    <tr th:each="elementEntry : ${answer.piGrades}">
+                        <td th:text="${elementEntry.key}">Policy</td>
+                        <td th:text="${meta.value[#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', elementEntry.key), 'task')]}">Task</td>
+                        <td th:text="${meta.value[#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', elementEntry.key), 'ownership')]}">Ownership</td>
+                        <th:block th:each="year : ${meta.years}">
+                            <td class="planning-column" th:each="quarter: ${year.quarters}">
+                                <label th:for="${#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', elementEntry.key), #strings.concat(year.name, '-', quarter.name))}"
+                                       th:class="'planning-label' + ${#bools.isTrue(meta.value[#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', elementEntry.key), #strings.concat(year.name, '-', quarter.name))]) ? ' planning-label-checked' : ''}">
+                                    <span class="planning-line"></span>
+                                </label>
+                            </td>
+                        </th:block>
+                    </tr>
+                </th:block>
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+    if (/print/.test(window.location.search.substring(1))) {
+        window.print();
+    }
+</script>
+</body>
+</html>

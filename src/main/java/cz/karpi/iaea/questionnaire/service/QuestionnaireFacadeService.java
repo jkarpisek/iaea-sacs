@@ -1,6 +1,5 @@
 package cz.karpi.iaea.questionnaire.service;
 
-import cz.karpi.iaea.questionnaire.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +11,13 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import cz.karpi.iaea.questionnaire.model.AnswerRow;
+import cz.karpi.iaea.questionnaire.model.AssessmentRow;
+import cz.karpi.iaea.questionnaire.model.Element;
+import cz.karpi.iaea.questionnaire.model.Flow;
+import cz.karpi.iaea.questionnaire.model.PlannerRow;
+import cz.karpi.iaea.questionnaire.model.Question;
+import cz.karpi.iaea.questionnaire.model.SubCategory;
 import cz.karpi.iaea.questionnaire.service.to.AnswerTo;
 import cz.karpi.iaea.questionnaire.service.to.AnswersTo;
 import cz.karpi.iaea.questionnaire.service.to.AssessmentAnswerTo;
@@ -38,17 +44,20 @@ public class QuestionnaireFacadeService {
 
     private ValidateService validateService;
 
+    private PrintService printService;
+
     private final SavingStatusService savingStatusService;
 
     private Boolean useAllAnswerTo = Boolean.FALSE;
 
     @Autowired
     public QuestionnaireFacadeService(FormService formService, FlowService flowService, ValidateService validateService,
-                                      SavingStatusService savingStatusService) {
+                                      SavingStatusService savingStatusService, PrintService printService) {
         this.formService = formService;
         this.flowService = flowService;
         this.validateService = validateService;
         this.savingStatusService = savingStatusService;
+        this.printService = printService;
     }
 
     public void reset() {
@@ -268,6 +277,9 @@ public class QuestionnaireFacadeService {
 
     public Void cdp(FlowService.EAction action) {
         processAction(() -> null, action);
+        if (action.equals(FlowService.EAction.PRINT)) {
+            printService.print(getCommonTo(), getPlannerOverviewTo());
+        }
         return null;
     }
 
@@ -288,7 +300,7 @@ public class QuestionnaireFacadeService {
         if (action.equals(FlowService.EAction.NEXT) || action.equals(FlowService.EAction.SAVE)) {
             supplier.get();
         }
-        if (!action.equals(FlowService.EAction.SAVE)) {
+        if (!action.equals(FlowService.EAction.SAVE) && !action.equals(FlowService.EAction.PRINT)) {
             flowService.moveCounterTo(action);
         } else {
             savingStatusService.waitForSave();
