@@ -1,4 +1,7 @@
-if not defined JAVA_HOME (
-    set JAVA_HOME=java/bin
+@echo off
+javaw.exe
+if %errorlevel% == 1 (
+  start javaw.exe -jar iaea-questionnaire-1.0.jar
+) else (
+  start java/bin/javaw.exe -jar iaea-questionnaire-1.0.jar
 )
-start %JAVA_HOME%/javaw.exe -jar iaea-questionnaire-1.0.jar

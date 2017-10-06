@@ -2,16 +2,16 @@ package cz.karpi.iaea.questionnaire.service;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URI;
 
 import cz.karpi.iaea.questionnaire.service.to.CommonTo;
 import cz.karpi.iaea.questionnaire.service.to.PlannerOverviewTo;
@@ -19,6 +19,7 @@ import cz.karpi.iaea.questionnaire.web.converter.ViewConverter;
 
 @Service
 public class PrintService {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final TemplateEngine templateEngine;
 
@@ -54,19 +55,15 @@ public class PrintService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        logger.info("Generated print file " + file.getAbsolutePath());
     }
 
     private void openBrowserToPrint(File file) {
         try {
-            String url = file.toURI() + "?print";
-            if (Desktop.isDesktopSupported()) {
-                // Windows
-                Desktop.getDesktop().browse(URI.create(url));
-            } else {
-                // Ubuntu
-                Runtime runtime = Runtime.getRuntime();
-                runtime.exec("chromium-browser " + url);
-            }
+            final String url = file.toURI().toString();
+            final String osInfo = System.getProperty("os.name").toLowerCase();
+            final String cmd =  (osInfo.contains("nix") || osInfo.contains("nux")) ? "xdg-open" : "rundll32.exe url.dll,FileProtocolHandler";
+            Runtime.getRuntime().exec(cmd + " " + url);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
