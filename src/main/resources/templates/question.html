@@ -7,9 +7,11 @@
 
 <div class="container-fluid">
     <div class="starter-template">
-        <h2 class="sheet-title"><strong>SACS</strong> <span th:text="${#strings.concat('(', meta.currentPage, '/', meta.maxPage, ')')}">(2/10)</span></h2>
-        <h3><span th:text="${meta.category}">1) Overarching Capabilities</span> - <strong th:text="${meta.subCategory}">Multi-Agency Command, Control and Coordination</strong></h3>
+        <br/>
         <form th:object="${form}" method="post" class="form-horizontal">
+            <span th:replace="fragments :: buttons"></span>
+            <h2 class="sheet-title"><strong>SACS</strong> <span th:text="${#strings.concat('(', meta.currentPage, '/', meta.maxPage, ')')}">(2/10)</span></h2>
+            <h3><span th:text="${meta.category}">1) Overarching Capabilities</span> - <strong th:text="${meta.subCategory}">Multi-Agency Command, Control and Coordination</strong></h3>
             <div class="row common-errors" th:if="${#fields.hasAnyErrors()}">
                 <div class="col-xs-12">Form contains errors, please correct it.</div>
             </div>
@@ -29,7 +31,11 @@
                             <td th:if="${question.type == 'STANDARD_QUESTION'}" class="col-xs-4"><span th:text="${question.question}"></span></td>
                             <td th:if="${question.type == 'ADDITIONAL_COMMENT'}" th:class="'col-xs-4'">Additional comments (any other area for improvement)</td>
                             <td class="col-xs-1">
-                                <select title="PI Grade" th:field="*{value[__${#questionnaireUtils.getPropertyName(question.number, 'piGrade')}__]}" class="form-control pi-grade">
+                                <select
+                                        data-toggle="tooltip"
+                                        title="Select PI Grade"
+                                        th:field="*{value[__${#questionnaireUtils.getPropertyName(question.number, 'piGrade')}__]}"
+                                        class="form-control pi-grade">
                                     <option value="">PI Grade..</option>
                                     <option value="3">3</option>
                                     <option value="2">2</option>
@@ -38,7 +44,16 @@
                                 </select>
                             </td>
                             <td class="col-xs-6">
-                                <textarea th:field="*{value[__${#questionnaireUtils.getPropertyName(question.number, 'comments')}__]}" class="form-control auto-grow" placeholder="enter comments" rows="1" onkeyup="auto_grow(this)"></textarea>
+                                <textarea
+                                        th:field="*{value[__${#questionnaireUtils.getPropertyName(question.number, 'comments')}__]}"
+                                        class="form-control auto-grow"
+                                        data-toggle="tooltip"
+                                        title="Describe what needs to be improved, or the strength"
+                                        placeholder="Describe what needs to be improved, or the strength"
+                                        rows="1"
+                                        onkeyup="auto_grow(this)">
+
+                                </textarea>
                             </td>
                         </div>
                     </tr>

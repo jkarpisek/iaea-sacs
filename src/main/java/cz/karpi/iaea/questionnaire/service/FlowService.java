@@ -50,7 +50,7 @@ public class FlowService {
         int categoryIdx;
         int subCategoryIdx;
 
-        if (category.equals("") || subCategory.equals("")) {
+        if (category == null || subCategory == null || category.equals("") || subCategory.equals("")) {
             categoryIdx = 0;
             subCategoryIdx = 0;
         } else {

@@ -11,6 +11,12 @@
     <link rel="stylesheet" type="text/css" href="webjars/open-sans/1.1.0/css/open-sans.min.css"/>
     <link rel="stylesheet" type="text/css" href="webjars/jquery-ui/1.9.2/css/smoothness/jquery-ui-1.9.2.custom.min.css"/>
     <link rel="stylesheet" th:href="@{/css/main.css}" href="../../css/main.css" />
+
+    <script>
+        $(document).ready(function(){
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
 </head>
 
 <head th:fragment="headTitleAndContentType">
@@ -35,7 +41,6 @@
         <ul class="nav navbar-nav" th:if="${common.companyName}">
             <li class="active"><a href="#" th:text="Instructions" th:onclick="'javascript:goto(\'INSTRUCTION\',null,null)'"></a></li>
 
-
             <li class="dropdown">
                 <a class="dropdown-toggle" data-toggle="dropdown" href="#">SACS
                     <span class="caret"></span></a>
@@ -59,7 +64,8 @@
                     <span class="caret"></span></a>
                 <ul class="dropdown-menu">
                     <th:block th:each="entry,iter : ${common.assessmentMenu}">
-                        <li th:class="${entry.active} ? '' : 'disabled'">
+                        <li th:class="${entry.active} ? '' : 'disabled'"
+                            th:title="${entry.active} ? '' : 'This field is not applicable, as you have not identified any areas for improvement in the SACS assessment'">
                             <a
                                 href="#"
                                 th:text="${entry.subCategory}"
@@ -88,6 +94,8 @@
                     </th:block>
                 </ul>
             </li>
+
+            <li><a href="#" th:text="CDP" th:onclick="'javascript:goto(\'CDP\',null,null)'"></a></li>
         </ul>
     </div>
 </nav>

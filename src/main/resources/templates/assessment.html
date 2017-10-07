@@ -7,9 +7,11 @@
 
 <div class="container-fluid">
     <div class="starter-template">
-        <h2 class="sheet-title"><strong>Assessment grid</strong> <span th:text="${#strings.concat('(', meta.currentPage, '/', meta.maxPage, ')')}">(2/10)</span></h2>
-        <h3><span th:text="${meta.category}">1) Overarching Capabilities</span> - <strong th:text="${meta.subCategory}">Multi-Agency Command, Control and Coordination</strong></h3>
+        <br/>
         <form method="post" class="form-horizontal" th:object="${form}">
+            <span th:replace="fragments :: buttons"></span>
+            <h2 class="sheet-title"><strong>Assessment grid</strong> <span th:text="${#strings.concat('(', meta.currentPage, '/', meta.maxPage, ')')}">(2/10)</span></h2>
+            <h3><span th:text="${meta.category}">1) Overarching Capabilities</span> - <strong th:text="${meta.subCategory}">Multi-Agency Command, Control and Coordination</strong></h3>
             <div class="row common-errors" th:if="${#fields.hasAnyErrors()}">
                 <div class="col-xs-12">Form contains errors, please correct it.</div>
             </div>
@@ -36,8 +38,12 @@
                             <td><span th:text="${answer.answer}">Most of the agencies involved in the response have been identified, but the formal policies, protocols and agreements are not yet all completed. This includes the national response plan.</span></td>
                             <td th:text="${answer.piGrade}" style="width: 40px;">1</td>
                             <td th:each="element : ${meta.elements}" style="width: 40px;">
-                                <select th:title="${#strings.concat(element.name, ' grade')}" th:field="*{value[__${#questionnaireUtils.getPropertyName(answer.number, element.name)}__]}"
-                                        class="form-control pi-grade" style="padding-left: 5px; padding-right: 5px; width: 42px;">
+                                <select
+                                        data-toggle="tooltip"
+                                        th:title="${#strings.concat('Select ', element.name, ' PI grade')}"
+                                        th:field="*{value[__${#questionnaireUtils.getPropertyName(answer.number, element.name)}__]}"
+                                        class="form-control pi-grade"
+                                        style="padding-left: 5px; padding-right: 5px; width: 42px;">
                                     <option value="" th:text="${#strings.concat(element.name, ' grade')}">Policy grade...</option>
                                     <option value="3">3</option>
                                     <option value="2">2</option>

@@ -7,9 +7,11 @@
 
 <div class="container-fluid">
     <div class="starter-template">
-        <h2 class="sheet-title"><strong>Capability Development Plan</strong> <span th:text="${#strings.concat('(', meta.currentPage, '/', meta.maxPage, ')')}">(2/10)</span></h2>
-        <h3><span th:text="${meta.category}">1) Overarching Capabilities</span> - <strong th:text="${meta.subCategory}">Multi-Agency Command, Control and Coordination</strong></h3>
+        <br/>
         <form method="post" class="form-horizontal" th:object="${form}">
+            <span th:replace="fragments :: buttons"></span>
+            <h2 class="sheet-title"><strong>Capability Development Plan</strong> <span th:text="${#strings.concat('(', meta.currentPage, '/', meta.maxPage, ')')}">(2/10)</span></h2>
+            <h3><span th:text="${meta.category}">1) Overarching Capabilities</span> - <strong th:text="${meta.subCategory}">Multi-Agency Command, Control and Coordination</strong></h3>
             <div class="row common-errors" th:if="${#fields.hasAnyErrors()}">
                 <div class="col-xs-12">Form contains errors, please correct it.</div>
             </div>

@@ -1,5 +1,8 @@
 package cz.karpi.iaea.questionnaire.service;
 
+import cz.karpi.iaea.questionnaire.service.to.CommonTo;
+import cz.karpi.iaea.questionnaire.service.to.PlannerOverviewTo;
+import cz.karpi.iaea.questionnaire.web.converter.ViewConverter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -12,10 +15,6 @@ import org.thymeleaf.context.Context;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-
-import cz.karpi.iaea.questionnaire.service.to.CommonTo;
-import cz.karpi.iaea.questionnaire.service.to.PlannerOverviewTo;
-import cz.karpi.iaea.questionnaire.web.converter.ViewConverter;
 
 @Service
 public class PrintService {

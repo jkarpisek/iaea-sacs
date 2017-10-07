@@ -267,7 +267,8 @@ public class QuestionnaireFacadeService {
                 action,
                 nextStep,
                 category, 
-		subCategory);
+		        subCategory
+        );
 
         if (flowService.getPossibilityActions().contains(FlowService.EAction.FINISH)) {
             formService.saveCdp();
@@ -275,8 +276,14 @@ public class QuestionnaireFacadeService {
         return null;
     }
 
-    public Void cdp(FlowService.EAction action) {
-        processAction(() -> null, action);
+    public Void cdp(FlowService.EAction action, Flow.EFlowType nextStep, String category, String subCategory) {
+        processAction(
+                () -> null,
+                action,
+                nextStep,
+                category,
+                subCategory
+        );
         if (action.equals(FlowService.EAction.PRINT)) {
             printService.print(getCommonTo(), getPlannerOverviewTo());
         }
@@ -292,16 +299,13 @@ public class QuestionnaireFacadeService {
     }
 
     private void processAction(Supplier<Void> supplier, FlowService.EAction action, Flow.EFlowType nextStep, String category, String subCategory) {
-        // TODO: 2. 7. 2017 reorganize if else if else....
-        if (action.equals(FlowService.EAction.GOTO)) {
-            supplier.get();
-            flowService.moveCounterToPosition(nextStep, category, subCategory);
-        }
-        if (action.equals(FlowService.EAction.NEXT) || action.equals(FlowService.EAction.SAVE)) {
+        if (action.equals(FlowService.EAction.NEXT)
+                || action.equals(FlowService.EAction.SAVE)
+                || action.equals(FlowService.EAction.GOTO)) {
             supplier.get();
         }
         if (!action.equals(FlowService.EAction.SAVE) && !action.equals(FlowService.EAction.PRINT)) {
-            flowService.moveCounterTo(action);
+            flowService.moveCounterTo(action, nextStep, category, subCategory);
         } else {
             savingStatusService.waitForSave();
         }

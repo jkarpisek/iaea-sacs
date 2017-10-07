@@ -180,8 +180,23 @@ public class QuestionnaireController {
 
     @FlowInterceptor.FlowCheck(Flow.EFlowType.CDP)
     @RequestMapping(value = "/cdp", method = RequestMethod.POST)
-    public String cdpPost(@ModelAttribute(MODEL_ATTRIBUTE_FORM) MatrixModel cdpVo, @RequestParam String action, BindingResult errors, Model model) {
-        controllerUtils.catchValidationException(errors, () -> questionnaireFacadeService.cdp(viewConverter.convertToEAction(action)));
+    public String cdpPost(
+            @ModelAttribute(MODEL_ATTRIBUTE_FORM) MatrixModel cdpVo,
+            @RequestParam String action,
+            String nextStep,
+            String category,
+            String subCategory,
+            BindingResult errors,
+            Model model) {
+        controllerUtils.catchValidationException(
+                errors,
+                () -> questionnaireFacadeService.cdp(
+                        viewConverter.convertToEAction(action),
+                        viewConverter.convertToEFlowType(nextStep),
+                        category,
+                        subCategory
+                )
+        );
         return controllerUtils.returnPost(model, () -> null, errors);
     }
 
