@@ -43,6 +43,7 @@ $(function() {
     $("textarea.auto-grow").each(function(){
         auto_grow(this);
     });
+    $('[data-toggle="tooltip"]').tooltip();
     console.log(new Date());
 });
 
