@@ -4,10 +4,25 @@
         * {
             font-family: 'Open Sans', Arial, sans-serif;
         }
+        table {
+            border-collapse: collapse;
+        }
+        .no {
+            white-space: nowrap;
+        }
+        td, th {
+            border: 1px solid black;
+            padding: 3px;
+        }
+        .planning-label-checked span {
+            border: 10px solid black;
+            border-bottom: 0;
+            border-top: 0;
+        }
     </style>
 <body>
 
-<h1 th:text="${common.companyName}">Company</h1>
+<h2>Company <span th:text="${common.companyName}">abc</span>, generated at <span th:text="${#dates.format(#dates.createNow(), 'dd-MM-yyyy')}">1.1.2017</span></h2>
 
 <div class="container-fluid">
     <div class="starter-template">
@@ -34,10 +49,25 @@
                     </th:block>
                 </tr>
                 </thead>
+                <tfoot>
+                <tr>
+                    <th rowspan="2">No.</th>
+                    <th rowspan="2">Response action</th>
+                    <th rowspan="2">Element</th>
+                    <th rowspan="2" style="min-width: 250px;">Development plan</th>
+                    <th rowspan="2" style="min-width: 250px;">Ownership</th>
+                    <th:block th:each="year : ${meta.years}">
+                        <th th:each="quarter : ${year.quarters}" th:text="${#strings.concat(quarter.name, 'Q')}">1Q</th>
+                    </th:block>
+                </tr>
+                <tr>
+                    <th th:each="year : ${meta.years}" th:text="${year.name}" colspan="4">2017</th>
+                </tr>
+                </tfoot>
                 <tbody>
                 <th:block th:each="answer : ${meta.sacsAnswers}">
                     <tr>
-                        <td th:rowspan="${1 + #maps.size(answer.piGrades)}" th:text="${answer.number}">O-1</td>
+                        <td class="no" th:rowspan="${1 + #maps.size(answer.piGrades)}" th:text="${answer.number}">O-1</td>
                         <td th:rowspan="${1 + #maps.size(answer.piGrades)}" th:text="${answer.question}">All agencies to be involved in response to NSE identified</td>
                     </tr>
                     <tr th:each="elementEntry : ${answer.piGrades}">

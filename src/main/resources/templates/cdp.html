@@ -7,8 +7,10 @@
 
 <div class="container-fluid">
     <div class="starter-template">
-        <h2 class="sheet-title"><strong>Capability Development Plan Overview</strong></h2>
+        <br/>
         <form method="post" class="form-horizontal">
+            <span th:replace="fragments :: buttons"></span>
+            <h2 class="sheet-title"><strong>Capability Development Plan Overview</strong></h2>
             <h3 th:if="${#lists.isEmpty(meta.sacsAnswers)}">
                 <em>
                     This field is not applicable, as you have not identified any areas for improvement in the SACS assessment
