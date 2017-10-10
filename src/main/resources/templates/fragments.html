@@ -58,11 +58,12 @@
                 <ul class="dropdown-menu">
                     <th:block th:each="entry,iter : ${common.assessmentMenu}">
                         <li th:class="${entry.active} ? '' : 'disabled'"
+                            data-toggle="tooltip"
                             th:title="${entry.active} ? '' : 'This field is not applicable, as you have not identified any areas for improvement in the SACS assessment'">
                             <a
                                 href="#"
                                 th:text="${#strings.concat(entry.subCategory, ' (', iter.index + 1, '/', #lists.size(common.questionnaireMenu), ')')}"
-                                th:onclick="'javascript:goto(\'ASSESSMENT\',\'' + ${entry.category} + '\',\'' + ${entry.subCategory} + '\')'"
+                                th:onclick="${entry.active} ? 'javascript:goto(\'ASSESSMENT\',\'' + ${entry.category} + '\',\'' + ${entry.subCategory} + '\')' : ''"
                                 th:class="${entry.active} ? 'active' : 'not-active'">
                             </a>
                         </li>
@@ -76,11 +77,13 @@
                     <span class="caret"></span></a>
                 <ul class="dropdown-menu">
                     <th:block th:each="entry,iter : ${common.plannerMenu}">
-                        <li th:class="${entry.active} ? '' : 'disabled'">
+                        <li th:class="${entry.active} ? '' : 'disabled'"
+                            data-toggle="tooltip"
+                            th:title="${entry.active} ? '' : 'This field is not applicable, as you have not identified any areas for improvement in the SACS assessment'">
                             <a
                                 href="#"
                                 th:text="${#strings.concat(entry.subCategory, ' (', iter.index + 1, '/', #lists.size(common.questionnaireMenu), ')')}"
-                                th:onclick="'javascript:goto(\'PLANNER\',\'' + ${entry.category} + '\',\'' + ${entry.subCategory} + '\')'"
+                                th:onclick="${entry.active} ? 'javascript:goto(\'PLANNER\',\'' + ${entry.category} + '\',\'' + ${entry.subCategory} + '\')' : ''"
                                 th:class="${entry.active} ? 'active' : 'not-active'">
                             </a>
                         </li>
