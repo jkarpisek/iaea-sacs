@@ -42,7 +42,7 @@
                         <li th:class="${entry.active} ? '' : 'disabled'">
                             <a
                                 href="#"
-                                th:text="${entry.subCategory}"
+                                th:text="${#strings.concat(entry.subCategory, ' (', iter.index + 1, '/', #lists.size(common.questionnaireMenu), ')')}"
                                 th:onclick="'javascript:goto(\'QUESTION\',\'' + ${entry.category} + '\',\'' + ${entry.subCategory} + '\')'"
                                 th:class="${entry.active} ? 'active' : 'not-active'">
                             </a>
@@ -61,7 +61,7 @@
                             th:title="${entry.active} ? '' : 'This field is not applicable, as you have not identified any areas for improvement in the SACS assessment'">
                             <a
                                 href="#"
-                                th:text="${entry.subCategory}"
+                                th:text="${#strings.concat(entry.subCategory, ' (', iter.index + 1, '/', #lists.size(common.questionnaireMenu), ')')}"
                                 th:onclick="'javascript:goto(\'ASSESSMENT\',\'' + ${entry.category} + '\',\'' + ${entry.subCategory} + '\')'"
                                 th:class="${entry.active} ? 'active' : 'not-active'">
                             </a>
@@ -79,7 +79,7 @@
                         <li th:class="${entry.active} ? '' : 'disabled'">
                             <a
                                 href="#"
-                                th:text="${entry.subCategory}"
+                                th:text="${#strings.concat(entry.subCategory, ' (', iter.index + 1, '/', #lists.size(common.questionnaireMenu), ')')}"
                                 th:onclick="'javascript:goto(\'PLANNER\',\'' + ${entry.category} + '\',\'' + ${entry.subCategory} + '\')'"
                                 th:class="${entry.active} ? 'active' : 'not-active'">
                             </a>
