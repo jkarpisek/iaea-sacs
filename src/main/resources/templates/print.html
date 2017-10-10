@@ -1,91 +1,65 @@
 <html xmlns:th="http://www.thymeleaf.org">
     <head th:replace="fragments :: headTitleAndContentType"></head>
     <style type="text/css">
-        * {
-            font-family: 'Open Sans', Arial, sans-serif;
-        }
-        table {
-            border-collapse: collapse;
-        }
-        .no {
-            white-space: nowrap;
-        }
-        td, th {
-            border: 1px solid black;
-            padding: 3px;
-        }
-        .planning-label-checked span {
-            border: 10px solid black;
-            border-bottom: 0;
-            border-top: 0;
+        @media all {
+            * {
+                font-family: 'Open Sans', Arial, sans-serif;
+            }
+
+            .sheet-title {
+                text-align: center;
+            }
+
+            .company-and-generated {
+                text-align: right;
+            }
+
+            table {
+                border-collapse: collapse;
+            }
+
+            thead, tfoot {
+                background-color: #b0b0b0;
+            }
+
+            tr.second-row {
+                background-color: #e0e0e0;
+            }
+
+            .no {
+                white-space: nowrap;
+            }
+
+            td, th {
+                border: 1px solid black;
+                padding: 3px;
+            }
+
+            .planning-column {
+                padding: 0;
+            }
+
+            .planning-label-checked span {
+                border: 14px solid black;
+                border-bottom: 0;
+                border-top: 0;
+            }
         }
     </style>
 <body>
 
-<h2>Company <span th:text="${common.companyName}">abc</span>, generated at <span th:text="${#dates.format(#dates.createNow(), 'dd-MM-yyyy')}">1.1.2017</span></h2>
 
 <div class="container-fluid">
     <div class="starter-template">
         <h2 class="sheet-title"><strong>Capability Development Plan Overview</strong></h2>
+        <h3 class="company-and-generated">Company <span th:text="${common.companyName}">abc</span>, generated on <span th:text="${#dates.format(#dates.createNow(), 'dd.MM.yyyy HH:mm')}">1.1.2017 10:00</span></h3>
         <form method="post" class="form-horizontal">
             <h3 th:if="${#lists.isEmpty(meta.sacsAnswers)}">
                 <em>
                     This field is not applicable, as you have not identified any areas for improvement in the SACS assessment
                 </em>
             </h3>
-            <table class="table" th:if="${!#lists.isEmpty(meta.sacsAnswers)}">
-                <thead>
-                <tr>
-                    <th rowspan="2">No.</th>
-                    <th rowspan="2">Response action</th>
-                    <th rowspan="2">Element</th>
-                    <th rowspan="2" style="min-width: 250px;">Development plan</th>
-                    <th rowspan="2" style="min-width: 250px;">Ownership</th>
-                    <th th:each="year : ${meta.years}" th:text="${year.name}" colspan="4">2017</th>
-                </tr>
-                <tr>
-                    <th:block th:each="year : ${meta.years}">
-                        <th th:each="quarter : ${year.quarters}" th:text="${#strings.concat(quarter.name, 'Q')}">1Q</th>
-                    </th:block>
-                </tr>
-                </thead>
-                <tfoot>
-                <tr>
-                    <th rowspan="2">No.</th>
-                    <th rowspan="2">Response action</th>
-                    <th rowspan="2">Element</th>
-                    <th rowspan="2" style="min-width: 250px;">Development plan</th>
-                    <th rowspan="2" style="min-width: 250px;">Ownership</th>
-                    <th:block th:each="year : ${meta.years}">
-                        <th th:each="quarter : ${year.quarters}" th:text="${#strings.concat(quarter.name, 'Q')}">1Q</th>
-                    </th:block>
-                </tr>
-                <tr>
-                    <th th:each="year : ${meta.years}" th:text="${year.name}" colspan="4">2017</th>
-                </tr>
-                </tfoot>
-                <tbody>
-                <th:block th:each="answer : ${meta.sacsAnswers}">
-                    <tr>
-                        <td class="no" th:rowspan="${1 + #maps.size(answer.piGrades)}" th:text="${answer.number}">O-1</td>
-                        <td th:rowspan="${1 + #maps.size(answer.piGrades)}" th:text="${answer.question}">All agencies to be involved in response to NSE identified</td>
-                    </tr>
-                    <tr th:each="elementEntry : ${answer.piGrades}">
-                        <td th:text="${elementEntry.key}">Policy</td>
-                        <td th:text="${meta.value[#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', elementEntry.key), 'task')]}">Task</td>
-                        <td th:text="${meta.value[#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', elementEntry.key), 'ownership')]}">Ownership</td>
-                        <th:block th:each="year : ${meta.years}">
-                            <td class="planning-column" th:each="quarter: ${year.quarters}">
-                                <label th:for="${#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', elementEntry.key), #strings.concat(year.name, '-', quarter.name))}"
-                                       th:class="'planning-label' + ${#bools.isTrue(meta.value[#questionnaireUtils.getPropertyName(#strings.concat(answer.number, '-', elementEntry.key), #strings.concat(year.name, '-', quarter.name))]) ? ' planning-label-checked' : ''}">
-                                    <span class="planning-line"></span>
-                                </label>
-                            </td>
-                        </th:block>
-                    </tr>
-                </th:block>
-                </tbody>
-            </table>
+            <table th:replace="cdp :: cdp-table"/>
         </form>
     </div>
 </div>
