@@ -26,73 +26,85 @@
 <nav class="navbar navbar-inverse navbar-fixed-top" th:fragment="navigation">
     <div class="container-fluid">
         <div class="navbar-header">
-            <a class="navbar-brand" href="#">IAEA Assistance programme on Nuclear Security Response Capabilities</a>
+            <button  th:if="${common.companyName != null}" type="button" class="navbar-toggle collapsed pull-left" data-toggle="collapse" data-target="#navigation-menu" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand hidden-xs" th:classappend="${common.companyName != null} ? 'hidden-sm hidden-md' : ''" href="#">IAEA Assistance programme on Nuclear Security Response Capabilities</a>
+            <div class="navbar-header pull-right  hidden-sm  hidden-md  hidden-lg  hidden-xl">
+                <span class="navbar-brand" th:text="${common.companyName}">Company</span>
+            </div>
         </div>
-        <div class="navbar-header" style="float: right">
+        <div class="navbar-header pull-right hidden-xs">
             <span class="navbar-brand" th:text="${common.companyName}">Company</span>
         </div>
-        <ul class="nav navbar-nav" th:if="${common.companyName}">
-            <li class="active"><a href="#" th:text="Instructions" th:onclick="'javascript:goto(\'INSTRUCTION\',null,null)'"></a></li>
 
-            <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#">SACS
-                    <span class="caret"></span></a>
-                <ul class="dropdown-menu">
-                    <th:block th:each="entry,iter : ${common.questionnaireMenu}">
-                        <li th:class="${entry.active} ? '' : 'disabled'">
-                            <a
-                                href="#"
-                                th:text="${#strings.concat(entry.subCategory, ' (', iter.index + 1, '/', #lists.size(common.questionnaireMenu), ')')}"
-                                th:onclick="'javascript:goto(\'QUESTION\',\'' + ${entry.category} + '\',\'' + ${entry.subCategory} + '\')'"
-                                th:class="${entry.active} ? 'active' : 'not-active'">
-                            </a>
-                        </li>
-                    </th:block>
-                </ul>
-            </li>
+        <div class="collapse navbar-collapse" id="navigation-menu">
+            <ul class="nav navbar-nav" th:if="${common.companyName}">
+                <li class="active"><a href="#" th:text="Instructions" th:onclick="'javascript:goto(\'INSTRUCTION\',null,null)'"></a></li>
 
-
-            <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Assessment
-                    <span class="caret"></span></a>
-                <ul class="dropdown-menu">
-                    <th:block th:each="entry,iter : ${common.assessmentMenu}">
-                        <li th:class="${entry.active} ? '' : 'disabled'"
-                            data-toggle="tooltip"
-                            th:title="${entry.active} ? '' : 'This field is not applicable, as you have not identified any areas for improvement in the SACS assessment'">
-                            <a
-                                href="#"
-                                th:text="${#strings.concat(entry.subCategory, ' (', iter.index + 1, '/', #lists.size(common.questionnaireMenu), ')')}"
-                                th:onclick="${entry.active} ? 'javascript:goto(\'ASSESSMENT\',\'' + ${entry.category} + '\',\'' + ${entry.subCategory} + '\')' : ''"
-                                th:class="${entry.active} ? 'active' : 'not-active'">
-                            </a>
-                        </li>
-                    </th:block>
-                </ul>
-            </li>
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">SACS
+                        <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <th:block th:each="entry,iter : ${common.questionnaireMenu}">
+                            <li th:class="${entry.active} ? '' : 'disabled'">
+                                <a
+                                    href="#"
+                                    th:text="${#strings.concat(entry.subCategory, ' (', iter.index + 1, '/', #lists.size(common.questionnaireMenu), ')')}"
+                                    th:onclick="'javascript:goto(\'QUESTION\',\'' + ${entry.category} + '\',\'' + ${entry.subCategory} + '\')'"
+                                    th:class="${entry.active} ? 'active' : 'not-active'">
+                                </a>
+                            </li>
+                        </th:block>
+                    </ul>
+                </li>
 
 
-            <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Planner
-                    <span class="caret"></span></a>
-                <ul class="dropdown-menu">
-                    <th:block th:each="entry,iter : ${common.plannerMenu}">
-                        <li th:class="${entry.active} ? '' : 'disabled'"
-                            data-toggle="tooltip"
-                            th:title="${entry.active} ? '' : 'This field is not applicable, as you have not identified any areas for improvement in the SACS assessment'">
-                            <a
-                                href="#"
-                                th:text="${#strings.concat(entry.subCategory, ' (', iter.index + 1, '/', #lists.size(common.questionnaireMenu), ')')}"
-                                th:onclick="${entry.active} ? 'javascript:goto(\'PLANNER\',\'' + ${entry.category} + '\',\'' + ${entry.subCategory} + '\')' : ''"
-                                th:class="${entry.active} ? 'active' : 'not-active'">
-                            </a>
-                        </li>
-                    </th:block>
-                </ul>
-            </li>
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Assessment
+                        <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <th:block th:each="entry,iter : ${common.assessmentMenu}">
+                            <li th:class="${entry.active} ? '' : 'disabled'"
+                                data-toggle="tooltip"
+                                th:title="${entry.active} ? '' : 'This field is not applicable, as you have not identified any areas for improvement in the SACS assessment'">
+                                <a
+                                    href="#"
+                                    th:text="${#strings.concat(entry.subCategory, ' (', iter.index + 1, '/', #lists.size(common.questionnaireMenu), ')')}"
+                                    th:onclick="${entry.active} ? 'javascript:goto(\'ASSESSMENT\',\'' + ${entry.category} + '\',\'' + ${entry.subCategory} + '\')' : ''"
+                                    th:class="${entry.active} ? 'active' : 'not-active'">
+                                </a>
+                            </li>
+                        </th:block>
+                    </ul>
+                </li>
 
-            <li><a href="#" th:text="CDP" th:onclick="'javascript:goto(\'CDP\',null,null)'"></a></li>
-        </ul>
+
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Planner
+                        <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <th:block th:each="entry,iter : ${common.plannerMenu}">
+                            <li th:class="${entry.active} ? '' : 'disabled'"
+                                data-toggle="tooltip"
+                                th:title="${entry.active} ? '' : 'This field is not applicable, as you have not identified any areas for improvement in the SACS assessment'">
+                                <a
+                                    href="#"
+                                    th:text="${#strings.concat(entry.subCategory, ' (', iter.index + 1, '/', #lists.size(common.questionnaireMenu), ')')}"
+                                    th:onclick="${entry.active} ? 'javascript:goto(\'PLANNER\',\'' + ${entry.category} + '\',\'' + ${entry.subCategory} + '\')' : ''"
+                                    th:class="${entry.active} ? 'active' : 'not-active'">
+                                </a>
+                            </li>
+                        </th:block>
+                    </ul>
+                </li>
+
+                <li><a href="#" th:text="CDP" th:onclick="'javascript:goto(\'CDP\',null,null)'"></a></li>
+            </ul>
+        </div>
     </div>
 </nav>
 
