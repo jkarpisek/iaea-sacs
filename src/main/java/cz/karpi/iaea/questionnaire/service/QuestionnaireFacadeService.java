@@ -299,9 +299,8 @@ public class QuestionnaireFacadeService {
     }
 
     private void processAction(Supplier<Void> supplier, FlowService.EAction action, Flow.EFlowType nextStep, String category, String subCategory) {
-        if (action.equals(FlowService.EAction.NEXT)
-                || action.equals(FlowService.EAction.SAVE)
-                || action.equals(FlowService.EAction.GOTO)) {
+        if (action.equals(FlowService.EAction.PREVIOUS) || action.equals(FlowService.EAction.NEXT)
+                || action.equals(FlowService.EAction.SAVE) || action.equals(FlowService.EAction.GOTO)) {
             supplier.get();
         }
         if (!action.equals(FlowService.EAction.SAVE) && !action.equals(FlowService.EAction.PRINT)) {
