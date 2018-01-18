@@ -1,19 +1,21 @@
 package cz.karpi.iaea.questionnaire.service;
 
-import cz.karpi.iaea.questionnaire.model.*;
-import javafx.scene.control.Tab;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import cz.karpi.iaea.questionnaire.model.AnswerRow;
 import cz.karpi.iaea.questionnaire.model.AssessmentRow;
 import cz.karpi.iaea.questionnaire.model.Category;
 import cz.karpi.iaea.questionnaire.model.Element;
+import cz.karpi.iaea.questionnaire.model.MenuEntry;
 import cz.karpi.iaea.questionnaire.model.PlannerRow;
 import cz.karpi.iaea.questionnaire.model.Quarter;
 import cz.karpi.iaea.questionnaire.model.Question;
@@ -233,6 +235,7 @@ public class FormService {
     }
 
     public void savePlannerAnswer(PlannerAnswersTo plannerAnswersTo) {
+        final Map<Question, Map<Element, PlannerRow>> currentPlannerRows = new HashMap<>();
         final List<PlannerRow> answers = plannerAnswersTo.getAnswerList().stream().map(plannerAnswerTo -> {
             final PlannerRow plannerRow = new PlannerRow();
             plannerRow.setQuestion(getQuestion(plannerAnswerTo.getNumber()));
@@ -241,13 +244,11 @@ public class FormService {
             plannerRow.setTask(plannerAnswerTo.getTask());
             plannerRow.setPlanned(plannerAnswerTo.getPlanned());
             plannerRows.putIfAbsent(plannerRow.getQuestion(), new HashMap<>()).put(plannerRow.getElement(), plannerRow);
+            currentPlannerRows.put(plannerRow.getQuestion(), plannerRows.get(plannerRow.getQuestion()));
             return plannerRow;
         }).collect(Collectors.toList());
         formDao.savePlannerAnswers(answers, sacsRows, assessmentRows);
-    }
-
-    public void saveCdp() {
-        formDao.saveCdp(plannerRows);
+        formDao.saveCdp(currentPlannerRows);
     }
 
     public AnswerRow getAnswerRow(Question question) {

@@ -2,16 +2,19 @@ $(function() {
     console.log(new Date());
     var $companyName = $('#companyName');
     if ($companyName.length) {
-        var companies = $companyName.data('source').replace(/^'/, '').replace(/'$/, '').split("','");
         var placeholder = 'type name of new company';
-        if (companies.length > 0) {
-            placeholder += ' or e.g. ' + companies[0];
-        }
-        if (companies.length > 1) {
-            placeholder += ', ' + companies[1];
-        }
-        if (companies.length > 2) {
-            placeholder += ' ...';
+        var dataSource = $companyName.data('source');
+        if (dataSource) {
+            var companies = dataSource.replace(/^'/, '').replace(/'$/, '').split("','");
+            if (companies.length > 0) {
+                placeholder += ' or e.g. ' + companies[0];
+            }
+            if (companies.length > 1) {
+                placeholder += ', ' + companies[1];
+            }
+            if (companies.length > 2) {
+                placeholder += ' ...';
+            }
         }
         $companyName.attr('placeholder', placeholder).autocomplete({ source: companies });
         $companyName.focus();

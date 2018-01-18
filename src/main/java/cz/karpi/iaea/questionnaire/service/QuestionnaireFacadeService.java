@@ -272,9 +272,6 @@ public class QuestionnaireFacadeService {
 		        subCategory
         );
 
-        if (flowService.getPossibilityActions().contains(FlowService.EAction.FINISH)) {
-            formService.saveCdp();
-        }
         return null;
     }
 
