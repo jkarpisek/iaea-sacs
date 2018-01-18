@@ -61,6 +61,7 @@ public class QuestionnaireFacadeService {
     }
 
     public void reset() {
+        //if (formService.getIntro()==null) formService.loadIntro();
         formService.reset();
         flowService.reset();
     }
@@ -68,6 +69,7 @@ public class QuestionnaireFacadeService {
     public CommonTo getCommonTo() {
         final CommonTo commonTo = new CommonTo();
         commonTo.setCompanyName(formService.getCompanyName());
+        commonTo.setIntro(formService.getIntro());
         commonTo.setState(flowService.getFlow().getFlowType().name());
         commonTo.setActions(flowService.getPossibilityActions());
         commonTo.setCategories(formService.getCategories());

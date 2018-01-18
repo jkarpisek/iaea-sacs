@@ -78,6 +78,7 @@ public class ViewConverter {
     public CommonVo toCommonVo(CommonTo commonTo) {
         final CommonVo commonVo = new CommonVo();
         commonVo.setCompanyName(commonTo.getCompanyName());
+        commonVo.setIntro(commonTo.getIntro());
         commonVo.setActions(commonTo.getActions().stream().map(FlowService.EAction::name).collect(Collectors.toList()));
         commonVo.setCategories(commonTo.getCategories());
         commonVo.setQuestionnaireMenu(commonTo.getQuestionnaireMenu());
@@ -97,7 +98,7 @@ public class ViewConverter {
     }
 
     private Map<String, Object> mapQuestionVo(QuestionTo questionTo) {
-        final Map<String, Object> question = new HashMap<>();
+        final Map<String, Object>  question = new HashMap<>();
         question.put("number", questionTo.getNumber());
         question.put("question", questionTo.getText());
         question.put("type", questionTo.getType());

@@ -12,6 +12,7 @@ import cz.karpi.iaea.questionnaire.service.FlowService;
  */
 public class CommonTo {
     private String companyName;
+    private String intro;
     private String state;
     private List<FlowService.EAction> actions;
     private List<Category> categories;//MS TODO DELETE??? Of course not only here!
@@ -26,6 +27,10 @@ public class CommonTo {
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
     }
+
+    public String getIntro() { return intro; }
+
+    public void setIntro(String intro) { this.intro = intro; }
 
     public String getState() {
         return state;

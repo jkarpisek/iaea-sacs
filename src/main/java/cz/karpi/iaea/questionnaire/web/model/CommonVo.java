@@ -10,6 +10,7 @@ import java.util.List;
  */
 public class CommonVo {
     private String companyName;
+    private String intro;
     private List<String> actions;
     private List<Category> categories;
     private List<MenuEntry> questionnaireMenu;
@@ -23,6 +24,10 @@ public class CommonVo {
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
     }
+
+    public String getIntro() { return intro; }
+
+    public void setIntro(String intro) { this.intro = intro; }
 
     public List<String> getActions() {
         return actions;

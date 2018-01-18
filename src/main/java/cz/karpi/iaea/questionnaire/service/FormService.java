@@ -33,6 +33,8 @@ public class FormService {
 
     private String companyName;
 
+    private String intro;
+
     private List<Category> categories;
 
     private List<Element> elements;
@@ -59,8 +61,13 @@ public class FormService {
         formDao.reset();
     }
 
+    public void loadIntro() {
+        this.intro = formDao.getIntro();
+    }
+
     public void loadDefinitions() {
         formDao.copyForm(companyName);
+        intro = formDao.getIntro();
         categories = formDao.getSACSDefinition();
         sacsRows = formDao.getSACSAnswers(categories);
         elements = formDao.getAssessmentDefinition();
@@ -173,6 +180,14 @@ public class FormService {
                                  .collect(Collectors.toList()));
             return year;
         }).collect(Collectors.toList());
+    }
+
+    public String getIntro() {
+        return intro;
+    }
+
+    public void setIntro(String intro) {
+        this.intro = intro;
     }
 
     public Question getQuestion(String number) {

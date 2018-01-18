@@ -5,22 +5,20 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.docx4j.Docx4J;
+import org.docx4j.Docx4jProperties;
+import org.docx4j.convert.out.HTMLSettings;
+import org.docx4j.openpackaging.exceptions.Docx4JException;
+import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.FileCopyUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,6 +40,7 @@ import cz.karpi.iaea.questionnaire.model.Year;
 @Repository
 public class FormDao {
 
+    private static final String DOCX_INTRO_NAME = "SACS Intro.docx";
     private static final String EXCEL_TEMPLATE_NAME = "SACS Grid CDP.xlsx";
     private static final String EXCEL_NAME = "SACS Grid CDP-{0}.xlsx";
     private static final String EXCEL_SHEET_SACS_NAME = "1-SACS";
@@ -146,6 +145,54 @@ public class FormDao {
         return IntStream.range(0, mySheet.getLastRowNum())
             .filter(row -> mySheet.getRow(row).getCell(column) != null && content.equals(mySheet.getRow(row).getCell(column).getStringCellValue()))
             .findFirst().orElseThrow(() -> new DaoExpcetion("Row #" + content + " not found", null));
+    }
+
+    public String getIntro() {
+        System.out.println("load-intro-start");
+        System.out.println(new Date());
+        File intro = new File (DOCX_INTRO_NAME);
+        if(!intro.exists() || intro.isDirectory()) {
+            return null;
+        }
+        // Document loading (required)
+        WordprocessingMLPackage wordMLPackage;
+        System.out.println("Loading file from " + DOCX_INTRO_NAME);
+        try {
+            wordMLPackage = Docx4J.load(intro);
+            // HTML exporter setup (required)
+            // .. the HTMLSettings object
+            HTMLSettings htmlSettings = Docx4J.createHTMLSettings();
+        /*
+        htmlSettings.setImageDirPath(inputfilepath + "_files");
+        htmlSettings.setImageTargetUri(inputfilepath.substring(inputfilepath.lastIndexOf("/")+1)
+                + "_files");
+                */
+            htmlSettings.setWmlPackage(wordMLPackage);
+
+            // output to an OutputStream.
+            OutputStream os;
+            os = new ByteArrayOutputStream();
+
+            // If you want XHTML output
+            Docx4jProperties.setProperty("docx4j.Convert.Out.HTML.OutputMethodXML", true);
+            Docx4J.toHTML(htmlSettings, os, Docx4J.FLAG_EXPORT_PREFER_XSL);
+            //System.out.println( ((ByteArrayOutputStream)os).toString() );
+
+            // Clean up, so any ObfuscatedFontPart temp files can be deleted
+            if (wordMLPackage.getMainDocumentPart().getFontTablePart()!=null) {
+                wordMLPackage.getMainDocumentPart().getFontTablePart().deleteEmbeddedFontTempFiles();
+            }
+            // This would also do it, via finalize() methods
+            htmlSettings = null;
+            wordMLPackage = null;
+
+            System.out.println("load-intro-end");
+            System.out.println(new Date());
+            return ((ByteArrayOutputStream)os).toString();
+        } catch (Docx4JException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public List<Category> getSACSDefinition() {
