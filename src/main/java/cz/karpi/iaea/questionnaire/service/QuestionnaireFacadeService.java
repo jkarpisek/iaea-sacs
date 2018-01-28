@@ -11,6 +11,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.annotation.PostConstruct;
+
 import cz.karpi.iaea.questionnaire.model.AnswerRow;
 import cz.karpi.iaea.questionnaire.model.AssessmentRow;
 import cz.karpi.iaea.questionnaire.model.Element;
@@ -58,6 +60,11 @@ public class QuestionnaireFacadeService {
         this.validateService = validateService;
         this.savingStatusService = savingStatusService;
         this.printService = printService;
+    }
+
+    @PostConstruct
+    public void postConstruct() {
+        formService.loadIntro();
     }
 
     public void reset() {

@@ -1,6 +1,10 @@
 package cz.karpi.iaea.questionnaire.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -31,7 +35,10 @@ import cz.karpi.iaea.questionnaire.service.to.PlannerAnswersTo;
  * Created by karpi on 12.4.17.
  */
 @Service
+@DependsOn("asyncExecutor")
 public class FormService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(FormService.class);
 
     private String companyName;
 
@@ -63,13 +70,13 @@ public class FormService {
         formDao.reset();
     }
 
+    @Async
     public void loadIntro() {
         this.intro = formDao.getIntro();
     }
 
     public void loadDefinitions() {
         formDao.copyForm(companyName);
-        intro = formDao.getIntro();
         categories = formDao.getSACSDefinition();
         sacsRows = formDao.getSACSAnswers(categories);
         elements = formDao.getAssessmentDefinition();
@@ -185,6 +192,13 @@ public class FormService {
     }
 
     public String getIntro() {
+        while (intro == null) {
+            try {
+                Thread.sleep(250L);
+            } catch (InterruptedException e) {
+                throw new RuntimeException("Wait for load intro failed", e);
+            }
+        }
         return intro;
     }
 
