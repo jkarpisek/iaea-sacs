@@ -13,6 +13,7 @@
                 <include>java/**</include>
                 <include>iaea.cmd</include>
                 <include>SACS Grid CDP.xlsx</include>
+                <include>SACS Intro.docx</include>
             </includes>
         </fileSet>
         <fileSet>
